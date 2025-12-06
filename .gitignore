@@ -44,9 +44,26 @@ Thumbs.db
 .env
 .env.local
 
-# Model checkpoints and large files (uncomment if needed)
-# *.pth
-# *.pt
-# *.ckpt
-# *.h5
+# Model checkpoints and large files
+*.pth
+*.pt
+*.ckpt
+*.h5
+*.pkl
 
+# Type checking
+.mypy_cache/
+.pytype/
+
+# Pretrained models
+pretrained/
+
+# Datasets (large files, should not be tracked)
+koniq-10k/
+koniq-test/
+spaq-test/
+kadid-test/
+agiqa-test/
+*.zip
+
+# datasets

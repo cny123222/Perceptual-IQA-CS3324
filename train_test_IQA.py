@@ -10,12 +10,15 @@ from HyerIQASolver import HyperIQASolver
 
 def main(config):
 
+    # 获取当前脚本所在目录的绝对路径
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    
     folder_path = {
         'live': '/home/ssl/Database/databaserelease2/',
         'csiq': '/home/ssl/Database/CSIQ/',
         'tid2013': '/home/ssl/Database/TID2013/',
         'livec': '/home/ssl/Database/ChallengeDB_release/ChallengeDB_release/',
-        'koniq-10k': '/home/ssl/Database/koniq-10k/',
+        'koniq-10k': os.path.join(base_dir, 'koniq-10k') + '/',
         'bid': '/home/ssl/Database/BID/',
     }
 

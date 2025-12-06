@@ -185,10 +185,43 @@ class Koniq_10kFolder(data.Dataset):
                 mos = np.array(float(row['MOS_zscore'])).astype(np.float32)
                 mos_all.append(mos)
 
+        # Load train/test split from JSON files to determine which folder to use
+        import json
+        train_json = os.path.join(root, 'koniq_train.json')
+        test_json = os.path.join(root, 'koniq_test.json')
+        
+        train_images = set()
+        test_images = set()
+        
+        if os.path.exists(train_json):
+            with open(train_json) as f:
+                train_data = json.load(f)
+                for item in train_data:
+                    # Extract filename from path like "koniq_train/xxx.jpg"
+                    filename = os.path.basename(item['image'])
+                    train_images.add(filename)
+        
+        if os.path.exists(test_json):
+            with open(test_json) as f:
+                test_data = json.load(f)
+                for item in test_data:
+                    filename = os.path.basename(item['image'])
+                    test_images.add(filename)
+
         sample = []
         for i, item in enumerate(index):
+            img_filename = imgname[item]
+            # Determine if image is in train or test folder
+            if img_filename in train_images:
+                img_path = os.path.join(root, 'train', img_filename)
+            elif img_filename in test_images:
+                img_path = os.path.join(root, 'test', img_filename)
+            else:
+                # Fallback to 1024x768 if JSON files not available
+                img_path = os.path.join(root, '1024x768', img_filename)
+            
             for aug in range(patch_num):
-                sample.append((os.path.join(root, '1024x768', imgname[item]), mos_all[item]))
+                sample.append((img_path, mos_all[item]))
 
         self.samples = sample
         self.transform = transform
