@@ -65,5 +65,9 @@ spaq-test/
 kadid-test/
 agiqa-test/
 *.zip
+csiq_label.txt
+
+# Dataset label files
+csiq_label.txt
 
 # datasets
