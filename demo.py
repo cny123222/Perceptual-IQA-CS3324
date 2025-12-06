@@ -11,11 +11,22 @@ def pil_loader(path):
         return img.convert('RGB')
 
 
+# 自动检测可用设备：优先使用 MPS (macOS GPU)，否则使用 CPU
+def get_device():
+    if torch.backends.mps.is_available():
+        return torch.device("mps")
+    else:
+        return torch.device("cpu")
+
+
+device = get_device()
+print(f'Using device: {device}')
+
 im_path = './data/D_01.jpg'
-model_hyper = models.HyperNet(16, 112, 224, 112, 56, 28, 14, 7).cuda()
+model_hyper = models.HyperNet(16, 112, 224, 112, 56, 28, 14, 7).to(device)
 model_hyper.train(False)
 # load our pre-trained model on the koniq-10k dataset
-model_hyper.load_state_dict((torch.load('./pretrained/koniq_pretrained.pkl')))
+model_hyper.load_state_dict((torch.load('./pretrained/koniq_pretrained.pkl', map_location=device)))
 
 transforms = torchvision.transforms.Compose([
                     torchvision.transforms.Resize((512, 384)),
@@ -29,11 +40,11 @@ pred_scores = []
 for i in range(10):
     img = pil_loader(im_path)
     img = transforms(img)
-    img = torch.tensor(img.cuda()).unsqueeze(0)
+    img = torch.tensor(img).unsqueeze(0).to(device)
     paras = model_hyper(img)  # 'paras' contains the network weights conveyed to target network
 
     # Building target network
-    model_target = models.TargetNet(paras).cuda()
+    model_target = models.TargetNet(paras).to(device)
     for param in model_target.parameters():
         param.requires_grad = False
 

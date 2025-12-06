@@ -4,8 +4,8 @@ import random
 import numpy as np
 from HyerIQASolver import HyperIQASolver
 
-
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+# macOS 不支持 CUDA，移除 CUDA_VISIBLE_DEVICES 设置
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 
 def main(config):

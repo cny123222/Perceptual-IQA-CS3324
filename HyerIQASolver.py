@@ -4,17 +4,27 @@ import numpy as np
 import models
 import data_loader
 
+# 自动检测可用设备：优先使用 MPS (macOS GPU)，否则使用 CPU
+def get_device():
+    if torch.backends.mps.is_available():
+        return torch.device("mps")
+    else:
+        return torch.device("cpu")
+
 class HyperIQASolver(object):
     """Solver for training and testing hyperIQA"""
     def __init__(self, config, path, train_idx, test_idx):
 
+        self.device = get_device()
+        print(f'Using device: {self.device}')
+
         self.epochs = config.epochs
         self.test_patch_num = config.test_patch_num
 
-        self.model_hyper = models.HyperNet(16, 112, 224, 112, 56, 28, 14, 7).cuda()
+        self.model_hyper = models.HyperNet(16, 112, 224, 112, 56, 28, 14, 7).to(self.device)
         self.model_hyper.train(True)
 
-        self.l1_loss = torch.nn.L1Loss().cuda()
+        self.l1_loss = torch.nn.L1Loss().to(self.device)
 
         backbone_params = list(map(id, self.model_hyper.res.parameters()))
         self.hypernet_params = filter(lambda p: id(p) not in backbone_params, self.model_hyper.parameters())
@@ -42,8 +52,8 @@ class HyperIQASolver(object):
             gt_scores = []
 
             for img, label in self.train_data:
-                img = torch.tensor(img.cuda())
-                label = torch.tensor(label.cuda())
+                img = torch.tensor(img).to(self.device)
+                label = torch.tensor(label).to(self.device)
 
                 self.solver.zero_grad()
 
@@ -51,7 +61,7 @@ class HyperIQASolver(object):
                 paras = self.model_hyper(img)  # 'paras' contains the network weights conveyed to target network
 
                 # Building target network
-                model_target = models.TargetNet(paras).cuda()
+                model_target = models.TargetNet(paras).to(self.device)
                 for param in model_target.parameters():
                     param.requires_grad = False
 
@@ -95,11 +105,11 @@ class HyperIQASolver(object):
 
         for img, label in data:
             # Data.
-            img = torch.tensor(img.cuda())
-            label = torch.tensor(label.cuda())
+            img = torch.tensor(img).to(self.device)
+            label = torch.tensor(label).to(self.device)
 
             paras = self.model_hyper(img)
-            model_target = models.TargetNet(paras).cuda()
+            model_target = models.TargetNet(paras).to(self.device)
             model_target.train(False)
             pred = model_target(paras['target_in_vec'])
 
