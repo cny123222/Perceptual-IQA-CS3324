@@ -27,13 +27,15 @@ def main(config):
         'csiq': list(range(0, 30)),
         'tid2013': list(range(0, 25)),
         'livec': list(range(0, 1162)),
-        'koniq-10k': list(range(0, 10073)),
+        # koniq-10k: CSV has 10073 records, but only 9056 images are available
+        # (7046 train + 2010 test). The code will skip missing images automatically.
+        'koniq-10k': list(range(0, 10073)),  # Use CSV count, missing images will be skipped
         'bid': list(range(0, 586)),
     }
     sel_num = img_num[config.dataset]
 
-    srcc_all = np.zeros(config.train_test_num, dtype=np.float)
-    plcc_all = np.zeros(config.train_test_num, dtype=np.float)
+    srcc_all = np.zeros(config.train_test_num, dtype=np.float64)
+    plcc_all = np.zeros(config.train_test_num, dtype=np.float64)
 
     print('Training and testing on %s dataset for %d rounds...' % (config.dataset, config.train_test_num))
     for i in range(config.train_test_num):

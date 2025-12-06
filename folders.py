@@ -209,16 +209,31 @@ class Koniq_10kFolder(data.Dataset):
                     test_images.add(filename)
 
         sample = []
+        # Pre-check which images actually exist
+        train_dir = os.path.join(root, 'train')
+        test_dir = os.path.join(root, 'test')
+        existing_train = set(os.listdir(train_dir)) if os.path.exists(train_dir) else set()
+        existing_test = set(os.listdir(test_dir)) if os.path.exists(test_dir) else set()
+        
         for i, item in enumerate(index):
             img_filename = imgname[item]
             # Determine if image is in train or test folder
-            if img_filename in train_images:
+            img_path = None
+            if img_filename in train_images and img_filename in existing_train:
                 img_path = os.path.join(root, 'train', img_filename)
-            elif img_filename in test_images:
+            elif img_filename in test_images and img_filename in existing_test:
                 img_path = os.path.join(root, 'test', img_filename)
-            else:
-                # Fallback to 1024x768 if JSON files not available
-                img_path = os.path.join(root, '1024x768', img_filename)
+            elif img_filename in existing_train:
+                # Image exists in train folder but not in JSON (use it anyway)
+                img_path = os.path.join(root, 'train', img_filename)
+            elif img_filename in existing_test:
+                # Image exists in test folder but not in JSON (use it anyway)
+                img_path = os.path.join(root, 'test', img_filename)
+            
+            # Skip if image doesn't exist
+            if img_path is None or not os.path.exists(img_path):
+                # Skip this image silently (some images in CSV might not be in train/test folders)
+                continue
             
             for aug in range(patch_num):
                 sample.append((img_path, mos_all[item]))

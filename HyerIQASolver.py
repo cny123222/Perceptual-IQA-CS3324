@@ -3,6 +3,7 @@ from scipy import stats
 import numpy as np
 import models
 import data_loader
+from tqdm import tqdm
 
 # 自动检测可用设备：优先使用 MPS (macOS GPU)，否则使用 CPU
 def get_device():
@@ -51,9 +52,26 @@ class HyperIQASolver(object):
             pred_scores = []
             gt_scores = []
 
-            for img, label in self.train_data:
-                img = torch.tensor(img).to(self.device)
-                label = torch.tensor(label).to(self.device)
+            # Use tqdm for progress bar with total length
+            total_batches = len(self.train_data)
+            print(f'  Total batches: {total_batches}')
+            print(f'  Loading first batch (this may take a moment)...')
+            train_loader_with_progress = tqdm(
+                self.train_data, 
+                desc=f'Epoch {t+1}/{self.epochs}',
+                total=total_batches,
+                unit='batch',
+                mininterval=0.5,  # Update more frequently
+                maxinterval=2.0,
+                smoothing=0.1,
+                initial=0  # Start from 0
+            )
+            for batch_idx, (img, label) in enumerate(train_loader_with_progress):
+                # DataLoader returns tensors, so use .to() directly to avoid warning
+                if batch_idx == 0:
+                    print(f'  First batch loaded, starting training...')
+                img = img.to(self.device)
+                label = label.float().to(self.device)  # MPS 需要 float32
 
                 self.solver.zero_grad()
 
@@ -74,6 +92,11 @@ class HyperIQASolver(object):
                 epoch_loss.append(loss.item())
                 loss.backward()
                 self.solver.step()
+                
+                # Update progress bar with current loss
+                if batch_idx % 10 == 0:  # Update every 10 batches
+                    avg_loss = sum(epoch_loss) / len(epoch_loss) if epoch_loss else 0.0
+                    train_loader_with_progress.set_postfix({'loss': f'{avg_loss:.4f}'})
 
             train_srcc, _ = stats.spearmanr(pred_scores, gt_scores)
 
@@ -103,10 +126,19 @@ class HyperIQASolver(object):
         pred_scores = []
         gt_scores = []
 
-        for img, label in data:
-            # Data.
-            img = torch.tensor(img).to(self.device)
-            label = torch.tensor(label).to(self.device)
+        # Use tqdm for progress bar during testing
+        total_test_batches = len(data)
+        test_loader_with_progress = tqdm(
+            data, 
+            desc='Testing',
+            total=total_test_batches,
+            unit='batch',
+            mininterval=1.0
+        )
+        for img, label in test_loader_with_progress:
+            # DataLoader returns tensors, so use .to() directly to avoid warning
+            img = img.to(self.device)
+            label = label.float().to(self.device)  # MPS 需要 float32
 
             paras = self.model_hyper(img)
             model_target = models.TargetNet(paras).to(self.device)

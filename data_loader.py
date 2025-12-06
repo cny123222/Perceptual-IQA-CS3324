@@ -83,8 +83,10 @@ class DataLoader(object):
     def get_data(self):
         if self.istrain:
             dataloader = torch.utils.data.DataLoader(
-                self.data, batch_size=self.batch_size, shuffle=True)
+                self.data, batch_size=self.batch_size, shuffle=True,
+                num_workers=0, pin_memory=False)  # num_workers=0 for macOS compatibility
         else:
             dataloader = torch.utils.data.DataLoader(
-                self.data, batch_size=1, shuffle=False)
+                self.data, batch_size=1, shuffle=False,
+                num_workers=0, pin_memory=False)  # num_workers=0 for macOS compatibility
         return dataloader
