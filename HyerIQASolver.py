@@ -4,6 +4,7 @@ import numpy as np
 import models
 import data_loader
 from tqdm import tqdm
+import os
 
 # 自动检测可用设备：优先使用 CUDA，然后是 MPS (macOS GPU)，最后使用 CPU
 def get_device():
@@ -23,6 +24,12 @@ class HyperIQASolver(object):
 
         self.epochs = config.epochs
         self.test_patch_num = config.test_patch_num
+        self.dataset = config.dataset
+        
+        # 创建模型保存目录
+        self.save_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'checkpoints', self.dataset)
+        os.makedirs(self.save_dir, exist_ok=True)
+        print(f'Model checkpoints will be saved to: {self.save_dir}')
 
         self.model_hyper = models.HyperNet(16, 112, 224, 112, 56, 28, 14, 7).to(self.device)
         self.model_hyper.train(True)
@@ -108,6 +115,12 @@ class HyperIQASolver(object):
                 best_plcc = test_plcc
             print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
                   (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc))
+
+            # 每两个epoch保存一次模型
+            if (t + 1) % 2 == 0:
+                model_path = os.path.join(self.save_dir, f'checkpoint_epoch_{t+1}_srcc_{test_srcc:.4f}_plcc_{test_plcc:.4f}.pkl')
+                torch.save(self.model_hyper.state_dict(), model_path)
+                print(f'  Model saved to: {model_path}')
 
             # Update optimizer
             lr = self.lr / pow(10, (t // 6))
