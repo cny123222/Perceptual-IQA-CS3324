@@ -4,8 +4,8 @@ import random
 import numpy as np
 from HyerIQASolver import HyperIQASolver
 
-# macOS 不支持 CUDA，移除 CUDA_VISIBLE_DEVICES 设置
-# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+# 设置 CUDA 设备（如果使用 CUDA，取消注释下面一行并指定 GPU ID）
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0'  # 使用第一个 GPU，可以改为 '0,1' 使用多个 GPU
 
 
 def main(config):

@@ -5,9 +5,11 @@ import models
 import data_loader
 from tqdm import tqdm
 
-# 自动检测可用设备：优先使用 MPS (macOS GPU)，否则使用 CPU
+# 自动检测可用设备：优先使用 CUDA，然后是 MPS (macOS GPU)，最后使用 CPU
 def get_device():
-    if torch.backends.mps.is_available():
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    elif torch.backends.mps.is_available():
         return torch.device("mps")
     else:
         return torch.device("cpu")
@@ -68,10 +70,10 @@ class HyperIQASolver(object):
             )
             for batch_idx, (img, label) in enumerate(train_loader_with_progress):
                 # DataLoader returns tensors, so use .to() directly to avoid warning
-                if batch_idx == 0:
-                    print(f'  First batch loaded, starting training...')
+                # if batch_idx == 0:
+                #     print(f'  First batch loaded, starting training...')
                 img = img.to(self.device)
-                label = label.float().to(self.device)  # MPS 需要 float32
+                label = label.float().to(self.device)  # MPS/CUDA 需要 float32
 
                 self.solver.zero_grad()
 
@@ -138,7 +140,7 @@ class HyperIQASolver(object):
         for img, label in test_loader_with_progress:
             # DataLoader returns tensors, so use .to() directly to avoid warning
             img = img.to(self.device)
-            label = label.float().to(self.device)  # MPS 需要 float32
+            label = label.float().to(self.device)  # MPS/CUDA 需要 float32
 
             paras = self.model_hyper(img)
             model_target = models.TargetNet(paras).to(self.device)

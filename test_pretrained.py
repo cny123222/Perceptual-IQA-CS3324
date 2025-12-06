@@ -10,9 +10,11 @@ import json
 from PIL import Image
 from tqdm import tqdm
 
-# 自动检测可用设备：优先使用 MPS (macOS GPU)，否则使用 CPU
+# 自动检测可用设备：优先使用 CUDA，然后是 MPS (macOS GPU)，最后使用 CPU
 def get_device():
-    if torch.backends.mps.is_available():
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    elif torch.backends.mps.is_available():
         return torch.device("mps")
     else:
         return torch.device("cpu")
