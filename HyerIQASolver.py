@@ -17,7 +17,7 @@ def get_device():
 
 class HyperIQASolver(object):
     """Solver for training and testing hyperIQA"""
-    def __init__(self, config, path, train_idx, val_idx, test_idx=None):
+    def __init__(self, config, path, train_idx, test_idx):
 
         self.device = get_device()
         print(f'Using device: {self.device}')
@@ -47,29 +47,15 @@ class HyperIQASolver(object):
         self.solver = torch.optim.Adam(paras, weight_decay=self.weight_decay)
 
         train_loader = data_loader.DataLoader(config.dataset, path, train_idx, config.patch_size, config.train_patch_num, batch_size=config.batch_size, istrain=True)
-        val_loader = data_loader.DataLoader(config.dataset, path, val_idx, config.patch_size, config.test_patch_num, istrain=False)
+        test_loader = data_loader.DataLoader(config.dataset, path, test_idx, config.patch_size, config.test_patch_num, istrain=False)
         self.train_data = train_loader.get_data()
-        self.val_data = val_loader.get_data()
-        
-        # Load test data if test_idx is provided (for koniq-10k)
-        if test_idx is not None:
-            test_loader = data_loader.DataLoader(config.dataset, path, test_idx, config.patch_size, config.test_patch_num, istrain=False)
-            self.test_data = test_loader.get_data()
-        else:
-            self.test_data = None
+        self.test_data = test_loader.get_data()
 
     def train(self):
         """Training"""
-        best_val_srcc = 0.0
-        best_val_plcc = 0.0
-        best_epoch = 0
-        
-        # Print header
-        if self.test_data is not None:
-            print('Epoch\tTrain_Loss\tTrain_SRCC\tVal_SRCC\tVal_PLCC\tTest_SRCC\tTest_PLCC')
-        else:
-            print('Epoch\tTrain_Loss\tTrain_SRCC\tVal_SRCC\tVal_PLCC')
-            
+        best_srcc = 0.0
+        best_plcc = 0.0
+        print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC')
         for t in range(self.epochs):
             epoch_loss = []
             pred_scores = []
@@ -120,27 +106,16 @@ class HyperIQASolver(object):
 
             train_srcc, _ = stats.spearmanr(pred_scores, gt_scores)
 
-            # Evaluate on validation set
-            val_srcc, val_plcc = self.test(self.val_data)
-            if val_srcc > best_val_srcc:
-                best_val_srcc = val_srcc
-                best_val_plcc = val_plcc
-                best_epoch = t + 1
-            
-            # Print results
-            result_str = '%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f' % (
-                t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, val_srcc, val_plcc)
-            
-            # Evaluate on test set if available
-            if self.test_data is not None:
-                test_srcc, test_plcc = self.test(self.test_data)
-                result_str += '\t\t%4.4f\t\t%4.4f' % (test_srcc, test_plcc)
-            
-            print(result_str)
+            test_srcc, test_plcc = self.test(self.test_data)
+            if test_srcc > best_srcc:
+                best_srcc = test_srcc
+                best_plcc = test_plcc
+            print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
+                  (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc))
 
             # 每两个epoch保存一次模型
             if (t + 1) % 2 == 0:
-                model_path = os.path.join(self.save_dir, f'checkpoint_epoch_{t+1}_val_srcc_{val_srcc:.4f}.pkl')
+                model_path = os.path.join(self.save_dir, f'checkpoint_epoch_{t+1}_srcc_{test_srcc:.4f}_plcc_{test_plcc:.4f}.pkl')
                 torch.save(self.model_hyper.state_dict(), model_path)
                 print(f'  Model saved to: {model_path}')
 
@@ -153,10 +128,9 @@ class HyperIQASolver(object):
                           ]
             self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay)
 
-        print('Best validation SRCC %f at epoch %d, PLCC %f' % (best_val_srcc, best_epoch, best_val_plcc))
-        
-        # Return validation performance (used for cross-validation in original datasets)
-        return best_val_srcc, best_val_plcc
+        print('Best test SRCC %f, PLCC %f' % (best_srcc, best_plcc))
+
+        return best_srcc, best_plcc
 
     def test(self, data):
         """Testing"""

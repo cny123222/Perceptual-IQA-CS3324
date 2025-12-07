@@ -88,16 +88,13 @@ def main(config):
         
         for i in range(config.train_test_num):
             print('Round %d' % (i+1))
-            # Split train set into train/val (80/20) for this round
-            train_indices_copy = train_indices_all.copy()
-            random.shuffle(train_indices_copy)
-            split_point = int(round(0.8 * len(train_indices_copy)))
-            train_index = train_indices_copy[0:split_point]
-            val_index = train_indices_copy[split_point:]
+            # Use all training images (no validation split, following original paper)
+            train_index = train_indices_all
+            test_index = test_indices_all
             
-            print(f'  Train: {len(train_index)} images, Val: {len(val_index)} images, Test: {len(test_indices_all)} images')
+            print(f'  Train: {len(train_index)} images, Test: {len(test_index)} images')
             
-            solver = HyperIQASolver(config, folder_path[config.dataset], train_index, val_index, test_indices_all)
+            solver = HyperIQASolver(config, folder_path[config.dataset], train_index, test_index)
             srcc_all[i], plcc_all[i] = solver.train()
     else:
         # Original logic for other datasets
