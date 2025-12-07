@@ -2,10 +2,54 @@ import os
 import argparse
 import random
 import numpy as np
+import csv
+import json
 from HyerIQASolver import HyperIQASolver
 
 # 设置 CUDA 设备（如果使用 CUDA，取消注释下面一行并指定 GPU ID）
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'  # 使用第一个 GPU，可以改为 '0,1' 使用多个 GPU
+
+
+def get_koniq_train_test_indices(root_path):
+    """Get train and test indices for KonIQ-10k based on official split"""
+    csv_file = os.path.join(root_path, 'koniq10k_scores_and_distributions.csv')
+    train_json = os.path.join(root_path, 'koniq_train.json')
+    test_json = os.path.join(root_path, 'koniq_test.json')
+    
+    # Read CSV to get all image names
+    csv_images = []
+    with open(csv_file) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            csv_images.append(row['image_name'])
+    
+    # Read official train/test split from JSON
+    train_images = set()
+    test_images = set()
+    
+    if os.path.exists(train_json):
+        with open(train_json) as f:
+            train_data = json.load(f)
+            for item in train_data:
+                train_images.add(os.path.basename(item['image']))
+    
+    if os.path.exists(test_json):
+        with open(test_json) as f:
+            test_data = json.load(f)
+            for item in test_data:
+                test_images.add(os.path.basename(item['image']))
+    
+    # Get indices for train and test images from CSV
+    train_indices = []
+    test_indices = []
+    
+    for idx, img_name in enumerate(csv_images):
+        if img_name in train_images:
+            train_indices.append(idx)
+        elif img_name in test_images:
+            test_indices.append(idx)
+    
+    return train_indices, test_indices
 
 
 def main(config):
@@ -27,26 +71,47 @@ def main(config):
         'csiq': list(range(0, 30)),
         'tid2013': list(range(0, 25)),
         'livec': list(range(0, 1162)),
-        # koniq-10k: CSV has 10073 records, but only 9056 images are available
-        # (7046 train + 2010 test). The code will skip missing images automatically.
-        'koniq-10k': list(range(0, 10073)),  # Use CSV count, missing images will be skipped
+        'koniq-10k': None,  # Will be handled separately
         'bid': list(range(0, 586)),
     }
-    sel_num = img_num[config.dataset]
-
+    
     srcc_all = np.zeros(config.train_test_num, dtype=np.float64)
     plcc_all = np.zeros(config.train_test_num, dtype=np.float64)
 
     print('Training and testing on %s dataset for %d rounds...' % (config.dataset, config.train_test_num))
-    for i in range(config.train_test_num):
-        print('Round %d' % (i+1))
-        # Randomly select 80% images for training and the rest for testing
-        random.shuffle(sel_num)
-        train_index = sel_num[0:int(round(0.8 * len(sel_num)))]
-        test_index = sel_num[int(round(0.8 * len(sel_num))):len(sel_num)]
+    
+    # Special handling for koniq-10k to use official train/test split
+    if config.dataset == 'koniq-10k':
+        # Get indices for train and test sets based on official split
+        train_indices_all, test_indices_all = get_koniq_train_test_indices(folder_path[config.dataset])
+        print(f'KonIQ-10k: {len(train_indices_all)} train images, {len(test_indices_all)} test images')
+        
+        for i in range(config.train_test_num):
+            print('Round %d' % (i+1))
+            # Split train set into train/val (80/20) for this round
+            train_indices_copy = train_indices_all.copy()
+            random.shuffle(train_indices_copy)
+            split_point = int(round(0.8 * len(train_indices_copy)))
+            train_index = train_indices_copy[0:split_point]
+            val_index = train_indices_copy[split_point:]
+            
+            print(f'  Train: {len(train_index)} images, Val: {len(val_index)} images, Test: {len(test_indices_all)} images')
+            
+            solver = HyperIQASolver(config, folder_path[config.dataset], train_index, val_index, test_indices_all)
+            srcc_all[i], plcc_all[i] = solver.train()
+    else:
+        # Original logic for other datasets
+        sel_num = img_num[config.dataset]
+        
+        for i in range(config.train_test_num):
+            print('Round %d' % (i+1))
+            # Randomly select 80% images for training and the rest for testing
+            random.shuffle(sel_num)
+            train_index = sel_num[0:int(round(0.8 * len(sel_num)))]
+            test_index = sel_num[int(round(0.8 * len(sel_num))):len(sel_num)]
 
-        solver = HyperIQASolver(config, folder_path[config.dataset], train_index, test_index)
-        srcc_all[i], plcc_all[i] = solver.train()
+            solver = HyperIQASolver(config, folder_path[config.dataset], train_index, test_index)
+            srcc_all[i], plcc_all[i] = solver.train()
 
     # print(srcc_all)
     # print(plcc_all)
