@@ -38,7 +38,7 @@ class HyperIQASolver(object):
         self.l1_loss = torch.nn.L1Loss().to(self.device)
 
         backbone_params = list(map(id, self.model_hyper.swin.parameters()))
-        self.hypernet_params = filter(lambda p: id(p) not in backbone_params, self.model_hyper.parameters())
+        self.hypernet_params = list(filter(lambda p: id(p) not in backbone_params, self.model_hyper.parameters()))
         self.lr = config.lr
         self.lrratio = config.lr_ratio
         self.weight_decay = config.weight_decay
