@@ -5,6 +5,7 @@ import models_swin as models
 import data_loader
 from tqdm import tqdm
 import os
+import torch.nn.functional as F
 
 # 自动检测可用设备：优先使用 CUDA，然后是 MPS (macOS GPU)，最后使用 CPU
 def get_device():
@@ -27,8 +28,15 @@ class HyperIQASolver(object):
         self.test_patch_num = config.test_patch_num
         self.dataset = config.dataset
         
+        # Ranking loss parameters (must be set before save_dir)
+        self.ranking_loss_alpha = getattr(config, 'ranking_loss_alpha', 0.5)
+        self.ranking_loss_margin = getattr(config, 'ranking_loss_margin', 0.1)
+        
         # 创建模型保存目录
-        self.save_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'checkpoints', self.dataset + '-swin')
+        save_dir_suffix = '-swin'
+        if self.ranking_loss_alpha > 0:
+            save_dir_suffix += '-ranking'
+        self.save_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'checkpoints', self.dataset + save_dir_suffix)
         os.makedirs(self.save_dir, exist_ok=True)
         print(f'Model checkpoints will be saved to: {self.save_dir}')
 
@@ -51,6 +59,9 @@ class HyperIQASolver(object):
         test_loader = data_loader.DataLoader(config.dataset, path, test_idx, config.patch_size, config.test_patch_num, istrain=False)
         self.train_data = train_loader.get_data()
         self.test_data = test_loader.get_data()
+        
+        if self.ranking_loss_alpha > 0:
+            print(f'Ranking loss enabled: alpha={self.ranking_loss_alpha}, margin={self.ranking_loss_margin}')
 
     def train(self):
         """Training"""
@@ -59,6 +70,8 @@ class HyperIQASolver(object):
         print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC')
         for t in range(self.epochs):
             epoch_loss = []
+            epoch_l1_loss = []
+            epoch_rank_loss = []
             pred_scores = []
             gt_scores = []
 
@@ -95,15 +108,36 @@ class HyperIQASolver(object):
                 pred_scores = pred_scores + pred.cpu().tolist()
                 gt_scores = gt_scores + label.cpu().tolist()
 
-                loss = self.l1_loss(pred.squeeze(), label.float().detach())
-                epoch_loss.append(loss.item())
-                loss.backward()
+                # Compute L1 loss
+                l1_loss = self.l1_loss(pred.squeeze(), label.float().detach())
+                epoch_l1_loss.append(l1_loss.item())
+                
+                # Compute ranking loss if enabled
+                if self.ranking_loss_alpha > 0:
+                    rank_loss = self.pairwise_ranking_loss(
+                        pred.squeeze(), 
+                        label.float(), 
+                        margin=self.ranking_loss_margin
+                    )
+                    epoch_rank_loss.append(rank_loss.item())
+                    # Combine losses
+                    total_loss = l1_loss + self.ranking_loss_alpha * rank_loss
+                else:
+                    total_loss = l1_loss
+                    rank_loss = None
+                
+                epoch_loss.append(total_loss.item())
+                total_loss.backward()
                 self.solver.step()
                 
                 # Update progress bar with current loss
                 if batch_idx % 10 == 0:
                     avg_loss = sum(epoch_loss) / len(epoch_loss) if epoch_loss else 0.0
-                    train_loader_with_progress.set_postfix({'loss': f'{avg_loss:.4f}'})
+                    postfix = {'loss': f'{avg_loss:.4f}'}
+                    if self.ranking_loss_alpha > 0 and epoch_rank_loss:
+                        avg_rank_loss = sum(epoch_rank_loss) / len(epoch_rank_loss)
+                        postfix['rank_loss'] = f'{avg_rank_loss:.4f}'
+                    train_loader_with_progress.set_postfix(postfix)
 
             train_srcc, _ = stats.spearmanr(pred_scores, gt_scores)
 
@@ -111,8 +145,17 @@ class HyperIQASolver(object):
             if test_srcc > best_srcc:
                 best_srcc = test_srcc
                 best_plcc = test_plcc
-            print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
-                  (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc))
+            
+            # Print epoch results
+            avg_total_loss = sum(epoch_loss) / len(epoch_loss)
+            if self.ranking_loss_alpha > 0 and epoch_rank_loss:
+                avg_l1 = sum(epoch_l1_loss) / len(epoch_l1_loss)
+                avg_rank = sum(epoch_rank_loss) / len(epoch_rank_loss)
+                print('%d\t%4.3f (L1:%4.3f,Rank:%4.3f)\t%4.4f\t%4.4f\t%4.4f' %
+                      (t + 1, avg_total_loss, avg_l1, avg_rank, train_srcc, test_srcc, test_plcc))
+            else:
+                print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
+                      (t + 1, avg_total_loss, train_srcc, test_srcc, test_plcc))
 
             # 每两个epoch保存一次模型
             if (t + 1) % 2 == 0:
@@ -132,6 +175,51 @@ class HyperIQASolver(object):
         print('Best test SRCC %f, PLCC %f' % (best_srcc, best_plcc))
 
         return best_srcc, best_plcc
+
+    def pairwise_ranking_loss(self, preds, labels, margin=0.1):
+        """
+        Compute pairwise ranking loss for a batch.
+        This loss directly optimizes for ranking consistency, which aligns with SRCC metric.
+        
+        Args:
+            preds: Tensor of shape [batch_size] - model predictions
+            labels: Tensor of shape [batch_size] - ground truth labels
+            margin: Margin for hinge loss (default 0.1)
+        Returns:
+            Scalar tensor representing the ranking loss
+        """
+        # Ensure preds and labels are 1D tensors
+        preds = preds.squeeze()
+        labels = labels.squeeze()
+        
+        # Create pairwise difference matrices
+        # pred_diffs[i, j] = preds[i] - preds[j]
+        pred_diffs = preds.unsqueeze(1) - preds.unsqueeze(0)
+        # label_diffs[i, j] = labels[i] - labels[j]
+        label_diffs = labels.unsqueeze(1) - labels.unsqueeze(0)
+        
+        # Get the sign of label differences: -1, 0, or 1
+        # We only care about pairs with different labels (non-zero signs)
+        label_signs = torch.sign(label_diffs)
+        
+        # When prediction order contradicts label order, produce loss
+        # Use Hinge Loss: max(0, -pred_diff * label_sign + margin)
+        # If predictions are correctly ordered, -pred_diff * label_sign will be negative
+        # If incorrectly ordered, it will be positive, triggering the loss
+        loss = F.relu(-pred_diffs * label_signs + margin)
+        
+        # Only compute loss for valid pairs (pairs with different labels)
+        mask = (label_signs != 0).float()
+        
+        # Average over valid pairs
+        valid_pairs = mask.sum()
+        if valid_pairs > 0:
+            loss = (loss * mask).sum() / valid_pairs
+        else:
+            # If all labels are the same in this batch, return zero loss
+            loss = torch.tensor(0.0, device=preds.device, requires_grad=True)
+        
+        return loss
 
     def test(self, data):
         """Testing"""

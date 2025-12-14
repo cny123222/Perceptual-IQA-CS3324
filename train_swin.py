@@ -133,6 +133,8 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', dest='epochs', type=int, default=16, help='Epochs for training')
     parser.add_argument('--patch_size', dest='patch_size', type=int, default=224, help='Crop size for training & testing image patches')
     parser.add_argument('--train_test_num', dest='train_test_num', type=int, default=10, help='Train-test times')
+    parser.add_argument('--ranking_loss_alpha', dest='ranking_loss_alpha', type=float, default=0.5, help='Weight for ranking loss (set to 0 to disable)')
+    parser.add_argument('--ranking_loss_margin', dest='ranking_loss_margin', type=float, default=0.1, help='Margin for hinge loss in ranking loss')
 
     config = parser.parse_args()
     main(config)
