@@ -1,7 +1,7 @@
 import torch
 from scipy import stats
 import numpy as np
-import models
+import models_swin as models
 import data_loader
 from tqdm import tqdm
 import os
@@ -16,18 +16,19 @@ def get_device():
         return torch.device("cpu")
 
 class HyperIQASolver(object):
-    """Solver for training and testing hyperIQA"""
+    """Solver for training and testing hyperIQA with Swin Transformer backbone"""
     def __init__(self, config, path, train_idx, test_idx):
 
         self.device = get_device()
         print(f'Using device: {self.device}')
+        print('Backbone: Swin Transformer Tiny')
 
         self.epochs = config.epochs
         self.test_patch_num = config.test_patch_num
         self.dataset = config.dataset
         
         # 创建模型保存目录
-        self.save_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'checkpoints', self.dataset)
+        self.save_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'checkpoints', self.dataset + '-swin')
         os.makedirs(self.save_dir, exist_ok=True)
         print(f'Model checkpoints will be saved to: {self.save_dir}')
 
@@ -36,13 +37,13 @@ class HyperIQASolver(object):
 
         self.l1_loss = torch.nn.L1Loss().to(self.device)
 
-        backbone_params = list(map(id, self.model_hyper.res.parameters()))
+        backbone_params = list(map(id, self.model_hyper.swin.parameters()))
         self.hypernet_params = list(filter(lambda p: id(p) not in backbone_params, self.model_hyper.parameters()))
         self.lr = config.lr
         self.lrratio = config.lr_ratio
         self.weight_decay = config.weight_decay
         paras = [{'params': self.hypernet_params, 'lr': self.lr * self.lrratio},
-                 {'params': self.model_hyper.res.parameters(), 'lr': self.lr}
+                 {'params': self.model_hyper.swin.parameters(), 'lr': self.lr}
                  ]
         self.solver = torch.optim.Adam(paras, weight_decay=self.weight_decay)
 
@@ -124,7 +125,7 @@ class HyperIQASolver(object):
             if t > 8:
                 self.lrratio = 1
             self.paras = [{'params': self.hypernet_params, 'lr': lr * self.lrratio},
-                          {'params': self.model_hyper.res.parameters(), 'lr': self.lr}
+                          {'params': self.model_hyper.swin.parameters(), 'lr': self.lr}
                           ]
             self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay)
 
@@ -148,9 +149,8 @@ class HyperIQASolver(object):
             mininterval=1.0
         )
         for img, label in test_loader_with_progress:
-            # DataLoader returns tensors, so use .to() directly to avoid warning
             img = img.to(self.device)
-            label = label.float().to(self.device)  # MPS/CUDA 需要 float32
+            label = label.float().to(self.device)
 
             paras = self.model_hyper(img)
             model_target = models.TargetNet(paras).to(self.device)
@@ -167,3 +167,4 @@ class HyperIQASolver(object):
 
         self.model_hyper.train(True)
         return test_srcc, test_plcc
+
