@@ -6,6 +6,7 @@ import scipy.io
 import numpy as np
 import csv
 from openpyxl import load_workbook
+from tqdm import tqdm
 
 
 class LIVEFolder(data.Dataset):
@@ -215,7 +216,8 @@ class Koniq_10kFolder(data.Dataset):
         existing_train = set(os.listdir(train_dir)) if os.path.exists(train_dir) else set()
         existing_test = set(os.listdir(test_dir)) if os.path.exists(test_dir) else set()
         
-        for i, item in enumerate(index):
+        print(f'Building sample list from {len(index)} images...')
+        for i, item in enumerate(tqdm(index, desc='  Preparing samples', unit='img')):
             img_filename = imgname[item]
             # Determine if image is in train or test folder
             img_path = None
@@ -237,6 +239,7 @@ class Koniq_10kFolder(data.Dataset):
             
             for aug in range(patch_num):
                 sample.append((img_path, mos_all[item]))
+        print(f'  Total samples created: {len(sample)}')
 
         self.samples = sample
         self.transform = transform
@@ -250,9 +253,14 @@ class Koniq_10kFolder(data.Dataset):
             tuple: (sample, target) where target is class_index of the target class.
         """
         path, target = self.samples[index]
-        sample = pil_loader(path)
-        sample = self.transform(sample)
-        return sample, target
+        try:
+            sample = pil_loader(path)
+            sample = self.transform(sample)
+            return sample, target
+        except Exception as e:
+            print(f'Error loading image at index {index}: {path}')
+            print(f'Error: {e}')
+            raise
 
     def __len__(self):
         length = len(self.samples)
@@ -377,6 +385,11 @@ def getTIDFileName(path, suffix):
 
 
 def pil_loader(path):
-    with open(path, 'rb') as f:
-        img = Image.open(f)
-        return img.convert('RGB')
+    try:
+        with open(path, 'rb') as f:
+            img = Image.open(f)
+            return img.convert('RGB')
+    except Exception as e:
+        print(f'Error in pil_loader for path: {path}')
+        print(f'Error: {e}')
+        raise
