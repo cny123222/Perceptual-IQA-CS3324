@@ -40,7 +40,8 @@ class HyperIQASolver(object):
         self.l1_loss = torch.nn.L1Loss().to(self.device)
 
         backbone_params = list(map(id, self.model_hyper.res.parameters()))
-        self.hypernet_params = filter(lambda p: id(p) not in backbone_params, self.model_hyper.parameters())
+        # FIX: Convert filter to list to avoid iterator exhaustion bug
+        self.hypernet_params = list(filter(lambda p: id(p) not in backbone_params, self.model_hyper.parameters()))
         self.lr = config.lr
         self.lrratio = config.lr_ratio
         self.weight_decay = config.weight_decay
@@ -73,7 +74,7 @@ class HyperIQASolver(object):
         if self.spaq_path is not None:
             print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC\tSPAQ_SRCC\tSPAQ_PLCC')
         else:
-            print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC')
+        print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC')
         for t in range(self.epochs):
             epoch_loss = []
             pred_scores = []
@@ -139,8 +140,8 @@ class HyperIQASolver(object):
                 print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
                       (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc, spaq_srcc, spaq_plcc))
             else:
-                print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
-                      (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc))
+            print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
+                  (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc))
 
             # Save checkpoint every epoch
             if self.spaq_path is not None and spaq_srcc is not None:
@@ -150,13 +151,22 @@ class HyperIQASolver(object):
             torch.save(self.model_hyper.state_dict(), model_path)
             print(f'  Model saved to: {model_path}')
 
-            # Original implementation: recreate optimizer each epoch, only hypernet LR decays
-            hypernet_lr = self.lr * self.lrratio / pow(10, (t // 6))
-            backbone_lr = self.lr  # Backbone LR stays constant
+            # FIX: Update optimizer learning rates (backbone LR now also decays, optimizer state preserved)
+            backbone_lr = self.lr / pow(10, (t // 6))  # Backbone LR also decays
+            hypernet_lr = backbone_lr * self.lrratio
+            if t > 8:
+                self.lrratio = 1
+                hypernet_lr = backbone_lr  # When lrratio becomes 1, hypernet LR = backbone LR
             
-            self.paras = [{'params': self.hypernet_params, 'lr': hypernet_lr},
-                          {'params': self.model_hyper.res.parameters(), 'lr': backbone_lr}]
-            self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay)
+            if t == 0:
+                # First epoch: create optimizer
+                self.paras = [{'params': self.hypernet_params, 'lr': hypernet_lr},
+                              {'params': self.model_hyper.res.parameters(), 'lr': backbone_lr}]
+                self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay)
+            else:
+                # Subsequent epochs: only update learning rates (preserves Adam momentum state)
+                self.solver.param_groups[0]['lr'] = hypernet_lr
+                self.solver.param_groups[1]['lr'] = backbone_lr
 
         print('Best test SRCC %f, PLCC %f' % (best_srcc, best_plcc))
 
@@ -178,18 +188,18 @@ class HyperIQASolver(object):
             mininterval=1.0
         )
         with torch.no_grad():  # Disable gradient computation for faster inference (same as SPAQ test)
-            for img, label in test_loader_with_progress:
-                # DataLoader returns tensors, so use .to() directly to avoid warning
-                img = img.to(self.device)
-                label = label.float().to(self.device)  # MPS/CUDA 需要 float32
+        for img, label in test_loader_with_progress:
+            # DataLoader returns tensors, so use .to() directly to avoid warning
+            img = img.to(self.device)
+            label = label.float().to(self.device)  # MPS/CUDA 需要 float32
 
-                paras = self.model_hyper(img)
-                model_target = models.TargetNet(paras).to(self.device)
-                model_target.train(False)
-                pred = model_target(paras['target_in_vec'])
+            paras = self.model_hyper(img)
+            model_target = models.TargetNet(paras).to(self.device)
+            model_target.train(False)
+            pred = model_target(paras['target_in_vec'])
 
-                pred_scores.append(float(pred.item()))
-                gt_scores = gt_scores + label.cpu().tolist()
+            pred_scores.append(float(pred.item()))
+            gt_scores = gt_scores + label.cpu().tolist()
 
         pred_scores = np.mean(np.reshape(np.array(pred_scores), (-1, self.test_patch_num)), axis=1)
         gt_scores = np.mean(np.reshape(np.array(gt_scores), (-1, self.test_patch_num)), axis=1)
