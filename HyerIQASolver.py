@@ -187,18 +187,19 @@ class HyperIQASolver(object):
             unit='batch',
             mininterval=1.0
         )
-        for img, label in test_loader_with_progress:
-            # DataLoader returns tensors, so use .to() directly to avoid warning
-            img = img.to(self.device)
-            label = label.float().to(self.device)  # MPS/CUDA 需要 float32
+        with torch.no_grad():  # Disable gradient computation for faster inference (same as SPAQ test)
+            for img, label in test_loader_with_progress:
+                # DataLoader returns tensors, so use .to() directly to avoid warning
+                img = img.to(self.device)
+                label = label.float().to(self.device)  # MPS/CUDA 需要 float32
 
-            paras = self.model_hyper(img)
-            model_target = models.TargetNet(paras).to(self.device)
-            model_target.train(False)
-            pred = model_target(paras['target_in_vec'])
+                paras = self.model_hyper(img)
+                model_target = models.TargetNet(paras).to(self.device)
+                model_target.train(False)
+                pred = model_target(paras['target_in_vec'])
 
-            pred_scores.append(float(pred.item()))
-            gt_scores = gt_scores + label.cpu().tolist()
+                pred_scores.append(float(pred.item()))
+                gt_scores = gt_scores + label.cpu().tolist()
 
         pred_scores = np.mean(np.reshape(np.array(pred_scores), (-1, self.test_patch_num)), axis=1)
         gt_scores = np.mean(np.reshape(np.array(gt_scores), (-1, self.test_patch_num)), axis=1)
@@ -215,6 +216,7 @@ class HyperIQASolver(object):
         
         import json
         from PIL import Image
+        import torchvision
         
         json_path = os.path.join(self.spaq_path, 'spaq_test.json')
         if not os.path.exists(json_path):
@@ -225,7 +227,6 @@ class HyperIQASolver(object):
             spaq_data = json.load(f)
         
         # Use same transforms as koniq-10k
-        import torchvision
         transforms = torchvision.transforms.Compose([
             torchvision.transforms.Resize((512, 384)),
             torchvision.transforms.RandomCrop(size=224),
@@ -238,39 +239,101 @@ class HyperIQASolver(object):
                 img = Image.open(f)
                 return img.convert('RGB')
         
+        # Create dataset similar to JSONTestFolder in test_pretrained.py
+        # Generate samples: each image has test_patch_num patches
+        samples = []
+        for item in spaq_data:
+            img_path = os.path.join(self.spaq_path, os.path.basename(item['image']))
+            if not os.path.exists(img_path):
+                continue
+            score = float(item['score'])
+            for _ in range(self.test_patch_num):
+                samples.append((img_path, score))
+        
+        if len(samples) == 0:
+            return None, None
+        
+        # Create a dataset class with optimized caching: pre-resize images
+        # SPAQ images are much larger (13MP vs 0.8MP), so pre-resizing saves significant time
+        class SPAQDataset(torch.utils.data.Dataset):
+            def __init__(self, samples, transform):
+                self.samples = samples
+                # Split transform: Resize is expensive for large images, cache it
+                self.resize_transform = torchvision.transforms.Resize((512, 384))
+                self.crop_transform = torchvision.transforms.Compose([
+                    torchvision.transforms.RandomCrop(size=224),
+                    torchvision.transforms.ToTensor(),
+                    torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
+                                                     std=(0.229, 0.224, 0.225))])
+                
+                # Cache resized images (key: path, value: resized PIL Image)
+                self._resized_cache = {}
+                # Pre-load and resize unique images
+                unique_paths = list(set([s[0] for s in samples]))
+                for path in unique_paths:
+                    if os.path.exists(path):
+                        img = pil_loader(path)
+                        self._resized_cache[path] = self.resize_transform(img)
+            
+            def __getitem__(self, index):
+                path, target = self.samples[index]
+                # Get pre-resized image from cache
+                resized_img = self._resized_cache.get(path)
+                if resized_img is None:
+                    # Fallback
+                    img = pil_loader(path)
+                    resized_img = self.resize_transform(img)
+                    self._resized_cache[path] = resized_img
+                
+                # Only do RandomCrop + ToTensor + Normalize (fast)
+                sample = self.crop_transform(resized_img)
+                return sample, target
+            
+            def __len__(self):
+                return len(self.samples)
+        
+        # Create DataLoader (same as KonIQ test)
+        spaq_dataset = SPAQDataset(samples, transforms)
+        spaq_loader = torch.utils.data.DataLoader(
+            spaq_dataset, batch_size=1, shuffle=False, num_workers=0, pin_memory=False)
+        
         self.model_hyper.train(False)
         pred_scores = []
         gt_scores = []
         
-        print(f'  Testing on SPAQ dataset ({len(spaq_data)} images)...')
-        for item in tqdm(spaq_data, desc='  SPAQ', unit='img'):
-            img_path = os.path.join(self.spaq_path, os.path.basename(item['image']))
-            if not os.path.exists(img_path):
-                continue
-            
-            score = float(item['score'])
-            
-            # Generate multiple patches per image
-            patch_preds = []
-            for _ in range(self.test_patch_num):
-                img = pil_loader(img_path)
-                img_tensor = transforms(img).unsqueeze(0).to(self.device)
+        num_images = len(spaq_data)
+        print(f'  Testing on SPAQ dataset ({num_images} images)...')
+        
+        # Use tqdm for progress bar (same as KonIQ test)
+        total_batches = len(spaq_loader)
+        spaq_loader_with_progress = tqdm(
+            spaq_loader,
+            desc='  SPAQ',
+            total=total_batches,
+            unit='batch',
+            mininterval=1.0
+        )
+        
+        with torch.no_grad():  # Disable gradient computation for faster inference
+            for img, label in spaq_loader_with_progress:
+                img = img.to(self.device)
+                label = label.float().to(self.device)
                 
-                paras = self.model_hyper(img_tensor)
+                paras = self.model_hyper(img)
                 model_target = models.TargetNet(paras).to(self.device)
                 model_target.train(False)
                 pred = model_target(paras['target_in_vec'])
-                patch_preds.append(float(pred.item()))
-            
-            pred_scores.append(np.mean(patch_preds))
-            gt_scores.append(score)
+                
+                pred_scores.append(float(pred.item()))
+                gt_scores = gt_scores + label.cpu().tolist()
         
         if len(pred_scores) == 0:
             self.model_hyper.train(True)
             return None, None
         
-        pred_scores = np.array(pred_scores)
-        gt_scores = np.array(gt_scores)
+        # Reshape and average patches per image (same as KonIQ test)
+        pred_scores = np.mean(np.reshape(np.array(pred_scores), (-1, self.test_patch_num)), axis=1)
+        gt_scores = np.mean(np.reshape(np.array(gt_scores), (-1, self.test_patch_num)), axis=1)
         
         spaq_srcc, _ = stats.spearmanr(pred_scores, gt_scores)
         spaq_plcc, _ = stats.pearsonr(pred_scores, gt_scores)
