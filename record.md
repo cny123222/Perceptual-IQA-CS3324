@@ -35,6 +35,18 @@ PLCC	0.9326	0.917	✅ 超出 1.70%
 
 ---
 
+## Swin Transformer Tiny + Ranking Loss (alpha=0.3)
+python train_swin.py --dataset koniq-10k --epochs 10 --train_test_num 1 --batch_size 96 --train_patch_num 20 --test_patch_num 20 --ranking_loss_alpha 0.3 --ranking_loss_margin 0.1
+
+指标	最佳结果 (Epoch 1)	论文	对比
+SRCC	0.9206	0.906	✅ 超出 1.61%
+PLCC	0.9334	0.917	✅ 超出 1.79%
+
+训练详情：
+- Epoch 1: Train_Loss: 5.409 (L1: 5.182, Rank: 0.756), Train_SRCC: 0.8686, **Test_SRCC: 0.9206, Test_PLCC: 0.9334** (最佳) ⭐
+
+---
+
 ## Swin Transformer Tiny + Ranking Loss (alpha=1.0)
 python train_swin.py --dataset koniq-10k --epochs 10 --train_test_num 1 --batch_size 96 --train_patch_num 20 --test_patch_num 20 --ranking_loss_alpha 1.0 --ranking_loss_margin 0.1
 
