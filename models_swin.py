@@ -21,10 +21,11 @@ class HyperNet(nn.Module):
         For size match, input args must satisfy: 'target_fc(i)_size * target_fc(i+1)_size' is divisible by 'feature_size ^ 2'.
 
     """
-    def __init__(self, lda_out_channels, hyper_in_channels, target_in_size, target_fc1_size, target_fc2_size, target_fc3_size, target_fc4_size, feature_size):
+    def __init__(self, lda_out_channels, hyper_in_channels, target_in_size, target_fc1_size, target_fc2_size, target_fc3_size, target_fc4_size, feature_size, use_multiscale=False):
         super(HyperNet, self).__init__()
 
         self.hyperInChn = hyper_in_channels
+        self.use_multiscale = use_multiscale  # 多尺度融合标志
         self.target_in_size = target_in_size
         self.f1 = target_fc1_size
         self.f2 = target_fc2_size
@@ -36,9 +37,12 @@ class HyperNet(nn.Module):
 
         self.pool = nn.AdaptiveAvgPool2d((1, 1))
 
-        # Conv layers for swin output features (768 channels -> 112 channels)
+        # Conv layers for swin output features
+        # 如果使用多尺度：1440 channels (96+192+384+768) -> 112 channels
+        # 如果使用单尺度：768 channels -> 112 channels
+        input_channels = 1440 if use_multiscale else 768
         self.conv1 = nn.Sequential(
-            nn.Conv2d(768, 512, 1, padding=(0, 0)),
+            nn.Conv2d(input_channels, 512, 1, padding=(0, 0)),
             nn.ReLU(inplace=True),
             nn.Conv2d(512, 256, 1, padding=(0, 0)),
             nn.ReLU(inplace=True),
@@ -76,7 +80,21 @@ class HyperNet(nn.Module):
         target_in_vec = swin_out['target_in_vec'].view(-1, self.target_in_size, 1, 1)
 
         # input features for hyper net
-        hyper_in_feat = self.conv1(swin_out['hyper_in_feat']).view(-1, self.hyperInChn, feature_size, feature_size)
+        if self.use_multiscale and 'hyper_in_feat_multi' in swin_out:
+            # 多尺度融合模式
+            feat0, feat1, feat2, feat3 = swin_out['hyper_in_feat_multi']
+            # 将所有阶段特征统一到 7x7 空间尺寸
+            feat0_pooled = F.adaptive_avg_pool2d(feat0, (feature_size, feature_size))  # [B, 96, 7, 7]
+            feat1_pooled = F.adaptive_avg_pool2d(feat1, (feature_size, feature_size))  # [B, 192, 7, 7]
+            feat2_pooled = F.adaptive_avg_pool2d(feat2, (feature_size, feature_size))  # [B, 384, 7, 7]
+            feat3_pooled = feat3  # [B, 768, 7, 7] 已经是目标尺寸
+            
+            # 在通道维度拼接：96 + 192 + 384 + 768 = 1440 channels
+            hyper_in_feat_raw = torch.cat([feat0_pooled, feat1_pooled, feat2_pooled, feat3_pooled], dim=1)  # [B, 1440, 7, 7]
+            hyper_in_feat = self.conv1(hyper_in_feat_raw).view(-1, self.hyperInChn, feature_size, feature_size)
+        else:
+            # 单尺度模式（向后兼容）
+            hyper_in_feat = self.conv1(swin_out['hyper_in_feat']).view(-1, self.hyperInChn, feature_size, feature_size)
 
         # generating target net weights & biases
         target_fc1w = self.fc1w_conv(hyper_in_feat).view(-1, self.f1, self.target_in_size, 1, 1)
@@ -263,7 +281,8 @@ class SwinBackbone(nn.Module):
         vec = torch.cat((lda_1, lda_2, lda_3, lda_4), 1)
         
         out = {}
-        out['hyper_in_feat'] = feat3  # Use final stage features for hyper network [B, 768, 7, 7]
+        out['hyper_in_feat'] = feat3  # 保持向后兼容：使用最终阶段特征 [B, 768, 7, 7]
+        out['hyper_in_feat_multi'] = [feat0, feat1, feat2, feat3]  # 新增：返回所有阶段特征用于多尺度融合
         out['target_in_vec'] = vec
         
         return out

@@ -43,7 +43,7 @@ class HyperIQASolver(object):
         os.makedirs(self.save_dir, exist_ok=True)
         print(f'Model checkpoints will be saved to: {self.save_dir}')
 
-        self.model_hyper = models.HyperNet(16, 112, 224, 112, 56, 28, 14, 7).to(self.device)
+        self.model_hyper = models.HyperNet(16, 112, 224, 112, 56, 28, 14, 7, use_multiscale=True).to(self.device)
         self.model_hyper.train(True)
 
         self.l1_loss = torch.nn.L1Loss().to(self.device)
