@@ -360,10 +360,16 @@ class HyperIQASolver(object):
                 self._resized_cache = {}
                 # Pre-load and resize unique images
                 unique_paths = list(set([s[0] for s in samples]))
-                for path in unique_paths:
+                print(f'  Pre-loading {len(unique_paths)} SPAQ images into cache...')
+                for path in tqdm(unique_paths, desc='  Loading SPAQ images', unit='img'):
                     if os.path.exists(path):
-                        img = pil_loader(path)
-                        self._resized_cache[path] = self.resize_transform(img)
+                        try:
+                            img = pil_loader(path)
+                            self._resized_cache[path] = self.resize_transform(img)
+                        except Exception as e:
+                            print(f'  Warning: Failed to load {path}: {e}')
+                            continue
+                print(f'  Cached {len(self._resized_cache)} SPAQ images successfully')
             
             def __getitem__(self, index):
                 path, target = self.samples[index]
