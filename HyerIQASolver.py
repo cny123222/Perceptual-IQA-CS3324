@@ -140,8 +140,8 @@ class HyperIQASolver(object):
                 print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
                       (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc, spaq_srcc, spaq_plcc))
             else:
-            print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
-                  (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc))
+                print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
+                      (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc))
 
             # Save checkpoint every epoch
             if self.spaq_path is not None and spaq_srcc is not None:
