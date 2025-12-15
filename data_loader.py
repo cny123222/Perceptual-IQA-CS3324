@@ -71,8 +71,10 @@ class DataLoader(object):
             self.data = folders.CSIQFolder(
                 root=path, index=img_indx, transform=transforms, patch_num=patch_num)
         elif dataset == 'koniq-10k':
+            print(f'Loading Koniq-10k dataset from {path}...')
             self.data = folders.Koniq_10kFolder(
                 root=path, index=img_indx, transform=transforms, patch_num=patch_num)
+            print(f'Dataset loaded. Total samples: {len(self.data)}')
         elif dataset == 'bid':
             self.data = folders.BIDFolder(
                 root=path, index=img_indx, transform=transforms, patch_num=patch_num)

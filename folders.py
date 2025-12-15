@@ -6,6 +6,7 @@ import scipy.io
 import numpy as np
 import csv
 from openpyxl import load_workbook
+from tqdm import tqdm
 
 
 class LIVEFolder(data.Dataset):
@@ -215,7 +216,8 @@ class Koniq_10kFolder(data.Dataset):
         existing_train = set(os.listdir(train_dir)) if os.path.exists(train_dir) else set()
         existing_test = set(os.listdir(test_dir)) if os.path.exists(test_dir) else set()
         
-        for i, item in enumerate(index):
+        print(f'Building sample list from {len(index)} images...')
+        for i, item in enumerate(tqdm(index, desc='  Preparing samples', unit='img')):
             img_filename = imgname[item]
             # Determine if image is in train or test folder
             img_path = None
@@ -237,6 +239,7 @@ class Koniq_10kFolder(data.Dataset):
             
             for aug in range(patch_num):
                 sample.append((img_path, mos_all[item]))
+        print(f'  Total samples created: {len(sample)}')
 
         self.samples = sample
         self.transform = transform
@@ -266,7 +269,8 @@ class Koniq_10kFolder(data.Dataset):
         unique_paths = list(set([s[0] for s in sample]))
         
         # Pre-load and resize unique images (avoids repeated file I/O and resizing)
-        for path in unique_paths:
+        print(f'Pre-loading {len(unique_paths)} unique images into cache...')
+        for path in tqdm(unique_paths, desc='  Loading images', unit='img'):
             if os.path.exists(path):
                 try:
                     img = pil_loader(path)
@@ -276,9 +280,11 @@ class Koniq_10kFolder(data.Dataset):
                     else:
                         # If no Resize in transform, cache original image
                         self._resized_cache[path] = img
-                except Exception:
-                    # Skip images that can't be loaded
+                except Exception as e:
+                    # Skip images that can't be loaded, but log the error
+                    print(f'  Warning: Failed to load {path}: {e}')
                     continue
+        print(f'  Cached {len(self._resized_cache)} images successfully')
 
     def __getitem__(self, index):
         """
@@ -289,33 +295,37 @@ class Koniq_10kFolder(data.Dataset):
             tuple: (sample, target) where target is class_index of the target class.
         """
         path, target = self.samples[index]
-        
-        # Get cached image (pre-resized if Resize was in transform)
-        cached_img = self._resized_cache.get(path)
-        if cached_img is None:
-            # Fallback: load and process on the fly
-            img = pil_loader(path)
-            if self.resize_transform is not None and self.transform is not None:
-                # Check if Resize is in transform
-                import torchvision
-                has_resize = any(isinstance(t, torchvision.transforms.Resize) for t in self.transform.transforms)
-                if has_resize:
-                    cached_img = self.resize_transform(img)
-                    self._resized_cache[path] = cached_img
+        try:
+            # Get cached image (pre-resized if Resize was in transform)
+            cached_img = self._resized_cache.get(path)
+            if cached_img is None:
+                # Fallback: load and process on the fly
+                img = pil_loader(path)
+                if self.resize_transform is not None and self.transform is not None:
+                    # Check if Resize is in transform
+                    import torchvision
+                    has_resize = any(isinstance(t, torchvision.transforms.Resize) for t in self.transform.transforms)
+                    if has_resize:
+                        cached_img = self.resize_transform(img)
+                        self._resized_cache[path] = cached_img
+                    else:
+                        cached_img = img
                 else:
                     cached_img = img
+            
+            # Apply remaining transforms (RandomCrop, ToTensor, Normalize, etc.)
+            if self.crop_transform is not None:
+                sample = self.crop_transform(cached_img)
+            elif self.transform is not None:
+                # If no split was possible, use original transform
+                sample = self.transform(cached_img)
             else:
-                cached_img = img
-        
-        # Apply remaining transforms (RandomCrop, ToTensor, Normalize, etc.)
-        if self.crop_transform is not None:
-            sample = self.crop_transform(cached_img)
-        elif self.transform is not None:
-            # If no split was possible, use original transform
-            sample = self.transform(cached_img)
-        else:
-            sample = cached_img
-        return sample, target
+                sample = cached_img
+            return sample, target
+        except Exception as e:
+            print(f'Error loading image at index {index}: {path}')
+            print(f'Error: {e}')
+            raise
 
     def __len__(self):
         length = len(self.samples)
@@ -440,6 +450,11 @@ def getTIDFileName(path, suffix):
 
 
 def pil_loader(path):
-    with open(path, 'rb') as f:
-        img = Image.open(f)
-        return img.convert('RGB')
+    try:
+        with open(path, 'rb') as f:
+            img = Image.open(f)
+            return img.convert('RGB')
+    except Exception as e:
+        print(f'Error in pil_loader for path: {path}')
+        print(f'Error: {e}')
+        raise
