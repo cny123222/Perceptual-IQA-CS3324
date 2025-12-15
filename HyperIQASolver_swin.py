@@ -65,6 +65,7 @@ class HyperIQASolver(object):
         
         # 初始化SPAQ数据集用于跨数据集测试（如果存在）
         self.spaq_path = None
+        self.spaq_loader = None
         base_dir = os.path.dirname(os.path.abspath(__file__))
         spaq_base_path = os.path.join(base_dir, 'spaq-test')
         spaq_json_path = os.path.join(spaq_base_path, 'spaq_test.json') if os.path.exists(spaq_base_path) else None
@@ -72,6 +73,8 @@ class HyperIQASolver(object):
         if spaq_json_path and os.path.exists(spaq_json_path):
             self.spaq_path = spaq_base_path
             print(f'SPAQ test dataset found at: {self.spaq_path}')
+            # 在初始化时加载SPAQ数据集，避免每个epoch重复加载
+            self._init_spaq_dataset()
         else:
             print('SPAQ dataset not found. SPAQ testing will be skipped.')
         
@@ -289,30 +292,20 @@ class HyperIQASolver(object):
         self.model_hyper.train(True)
         return test_srcc, test_plcc
 
-    def test_spaq(self):
-        """Test on SPAQ dataset for cross-dataset evaluation"""
-        if self.spaq_path is None:
-            return None, None
-        
+    def _init_spaq_dataset(self):
+        """Initialize SPAQ dataset in __init__ to avoid reloading every epoch"""
         import json
         from PIL import Image
         import torchvision
         
         json_path = os.path.join(self.spaq_path, 'spaq_test.json')
         if not os.path.exists(json_path):
-            return None, None
+            self.spaq_loader = None
+            return
         
         # Load SPAQ test data
         with open(json_path) as f:
             spaq_data = json.load(f)
-        
-        # Use same transforms as koniq-10k
-        transforms = torchvision.transforms.Compose([
-            torchvision.transforms.Resize((512, 384)),
-            torchvision.transforms.RandomCrop(size=224),
-            torchvision.transforms.ToTensor(),
-            torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
-                                             std=(0.229, 0.224, 0.225))])
         
         def pil_loader(path):
             with open(path, 'rb') as f:
@@ -331,7 +324,8 @@ class HyperIQASolver(object):
                 samples.append((img_path, score))
         
         if len(samples) == 0:
-            return None, None
+            self.spaq_loader = None
+            return
         
         # Create a dataset class with optimized caching: pre-resize images
         # SPAQ images are much larger (13MP vs 0.8MP), so pre-resizing saves significant time
@@ -379,21 +373,27 @@ class HyperIQASolver(object):
                 return len(self.samples)
         
         # Create DataLoader (same as KonIQ test)
-        spaq_dataset = SPAQDataset(samples, transforms)
-        spaq_loader = torch.utils.data.DataLoader(
+        spaq_dataset = SPAQDataset(samples, None)  # transform not used, handled in class
+        self.spaq_loader = torch.utils.data.DataLoader(
             spaq_dataset, batch_size=1, shuffle=False, num_workers=0, pin_memory=False)
+        self.spaq_num_images = len(spaq_data)
+        print(f'  SPAQ dataset initialized: {self.spaq_num_images} images, {len(samples)} patches')
+    
+    def test_spaq(self):
+        """Test on SPAQ dataset for cross-dataset evaluation"""
+        if self.spaq_loader is None:
+            return None, None
         
         self.model_hyper.train(False)
         pred_scores = []
         gt_scores = []
         
-        num_images = len(spaq_data)
-        print(f'  Testing on SPAQ dataset ({num_images} images)...')
+        print(f'  Testing on SPAQ dataset ({self.spaq_num_images} images)...')
         
         # Use tqdm for progress bar (same as KonIQ test)
-        total_batches = len(spaq_loader)
+        total_batches = len(self.spaq_loader)
         spaq_loader_with_progress = tqdm(
-            spaq_loader,
+            self.spaq_loader,
             desc='  SPAQ',
             total=total_batches,
             unit='batch',
