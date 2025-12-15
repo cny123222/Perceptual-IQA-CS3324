@@ -74,7 +74,7 @@ class HyperIQASolver(object):
         if self.spaq_path is not None:
             print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC\tSPAQ_SRCC\tSPAQ_PLCC')
         else:
-        print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC')
+            print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC')
         for t in range(self.epochs):
             epoch_loss = []
             pred_scores = []
