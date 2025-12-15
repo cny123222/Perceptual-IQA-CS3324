@@ -1,0 +1,11 @@
+Training and testing on koniq-10k dataset for 1 rounds...
+KonIQ-10k: 7046 train images, 2010 test images
+Round 1
+  Train: 7046 images, Test: 2010 images
+Using device: cuda
+Model checkpoints will be saved to: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251215_153351
+SPAQ test dataset found at: /root/Perceptual-IQA-CS3324/spaq-test
+Epoch	Train_Loss	Train_SRCC	Test_SRCC	Test_PLCC	SPAQ_SRCC	SPAQ_PLCC
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+Epoch 1/1:   0%|          | 0/1468 [00:00<?, ?batch/s]Epoch 1/1:   0%|          | 0/1468 [00:01<?, ?batch/s, loss=57.6703]Epoch 1/1:   0%|          | 1/1468 [00:01<45:29,  1.86s/batch, loss=57.6703]Epoch 1/1:   0%|          | 2/1468 [00:03<37:26,  1.53s/batch, loss=57.6703]Epoch 1/1:   0%|          | 3/1468 [00:04<34:50,  1.43s/batch, loss=57.6703]Epoch 1/1:   0%|          | 4/1468 [00:05<33:38,  1.38s/batch, loss=57.6703]Epoch 1/1:   0%|          | 5/1468 [00:06<32:45,  1.34s/batch, loss=57.6703]

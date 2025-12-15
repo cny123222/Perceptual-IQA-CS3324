@@ -240,6 +240,45 @@ class Koniq_10kFolder(data.Dataset):
 
         self.samples = sample
         self.transform = transform
+        
+        # Optimization: Pre-resize images and cache them for faster access
+        # This avoids repeated file I/O and expensive resize operations
+        import torchvision
+        self.resize_transform = torchvision.transforms.Resize((512, 384))
+        
+        # Extract remaining transforms (excluding Resize if present)
+        if transform is not None:
+            transform_list = []
+            has_resize = False
+            for t in transform.transforms:
+                if isinstance(t, torchvision.transforms.Resize):
+                    has_resize = True
+                    # Skip Resize, we'll do it once and cache
+                    continue
+                transform_list.append(t)
+            self.crop_transform = torchvision.transforms.Compose(transform_list) if transform_list else None
+        else:
+            self.crop_transform = None
+            has_resize = False
+        
+        # Cache resized images for faster access
+        self._resized_cache = {}
+        unique_paths = list(set([s[0] for s in sample]))
+        
+        # Pre-load and resize unique images (avoids repeated file I/O and resizing)
+        for path in unique_paths:
+            if os.path.exists(path):
+                try:
+                    img = pil_loader(path)
+                    # Only cache if Resize is part of transform
+                    if has_resize:
+                        self._resized_cache[path] = self.resize_transform(img)
+                    else:
+                        # If no Resize in transform, cache original image
+                        self._resized_cache[path] = img
+                except Exception:
+                    # Skip images that can't be loaded
+                    continue
 
     def __getitem__(self, index):
         """
@@ -250,8 +289,32 @@ class Koniq_10kFolder(data.Dataset):
             tuple: (sample, target) where target is class_index of the target class.
         """
         path, target = self.samples[index]
-        sample = pil_loader(path)
-        sample = self.transform(sample)
+        
+        # Get cached image (pre-resized if Resize was in transform)
+        cached_img = self._resized_cache.get(path)
+        if cached_img is None:
+            # Fallback: load and process on the fly
+            img = pil_loader(path)
+            if self.resize_transform is not None and self.transform is not None:
+                # Check if Resize is in transform
+                import torchvision
+                has_resize = any(isinstance(t, torchvision.transforms.Resize) for t in self.transform.transforms)
+                if has_resize:
+                    cached_img = self.resize_transform(img)
+                    self._resized_cache[path] = cached_img
+                else:
+                    cached_img = img
+            else:
+                cached_img = img
+        
+        # Apply remaining transforms (RandomCrop, ToTensor, Normalize, etc.)
+        if self.crop_transform is not None:
+            sample = self.crop_transform(cached_img)
+        elif self.transform is not None:
+            # If no split was possible, use original transform
+            sample = self.transform(cached_img)
+        else:
+            sample = cached_img
         return sample, target
 
     def __len__(self):
