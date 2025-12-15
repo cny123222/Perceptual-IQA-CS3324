@@ -40,8 +40,7 @@ class HyperIQASolver(object):
         self.l1_loss = torch.nn.L1Loss().to(self.device)
 
         backbone_params = list(map(id, self.model_hyper.res.parameters()))
-        # FIX: Convert filter to list to avoid iterator exhaustion bug
-        self.hypernet_params = list(filter(lambda p: id(p) not in backbone_params, self.model_hyper.parameters()))
+        self.hypernet_params = filter(lambda p: id(p) not in backbone_params, self.model_hyper.parameters())
         self.lr = config.lr
         self.lrratio = config.lr_ratio
         self.weight_decay = config.weight_decay
@@ -151,22 +150,13 @@ class HyperIQASolver(object):
             torch.save(self.model_hyper.state_dict(), model_path)
             print(f'  Model saved to: {model_path}')
 
-            # FIX: Update optimizer learning rates (backbone LR now also decays, optimizer state preserved)
-            backbone_lr = self.lr / pow(10, (t // 6))  # Backbone LR also decays
-            hypernet_lr = backbone_lr * self.lrratio
-            if t > 8:
-                self.lrratio = 1
-                hypernet_lr = backbone_lr  # When lrratio becomes 1, hypernet LR = backbone LR
+            # Original implementation: recreate optimizer each epoch, only hypernet LR decays
+            hypernet_lr = self.lr * self.lrratio / pow(10, (t // 6))
+            backbone_lr = self.lr  # Backbone LR stays constant
             
-            if t == 0:
-                # First epoch: create optimizer
-                self.paras = [{'params': self.hypernet_params, 'lr': hypernet_lr},
-                              {'params': self.model_hyper.res.parameters(), 'lr': backbone_lr}]
-                self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay)
-            else:
-                # Subsequent epochs: only update learning rates (preserves Adam momentum state)
-                self.solver.param_groups[0]['lr'] = hypernet_lr
-                self.solver.param_groups[1]['lr'] = backbone_lr
+            self.paras = [{'params': self.hypernet_params, 'lr': hypernet_lr},
+                          {'params': self.model_hyper.res.parameters(), 'lr': backbone_lr}]
+            self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay)
 
         print('Best test SRCC %f, PLCC %f' % (best_srcc, best_plcc))
 

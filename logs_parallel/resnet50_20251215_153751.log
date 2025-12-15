@@ -1,0 +1,42 @@
+Training and testing on koniq-10k dataset for 1 rounds...
+KonIQ-10k: 7046 train images, 2010 test images
+Round 1
+  Train: 7046 images, Test: 2010 images
+Using device: cuda
+Model checkpoints will be saved to: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251215_153753
+SPAQ test dataset found at: /root/Perceptual-IQA-CS3324/spaq-test
+Epoch	Train_Loss	Train_SRCC	Test_SRCC	Test_PLCC	SPAQ_SRCC	SPAQ_PLCC
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+Epoch 1/10:   0%|          | 0/1468 [00:00<?, ?batch/s]Epoch 1/10:   0%|          | 0/1468 [00:01<?, ?batch/s, loss=57.5292]Epoch 1/10:   0%|          | 1/1468 [00:01<46:18,  1.89s/batch, loss=57.5292]Epoch 1/10:   0%|          | 2/1468 [00:03<38:02,  1.56s/batch, loss=57.5292]Epoch 1/10:   0%|          | 2/1468 [00:03<43:50,  1.79s/batch, loss=57.5292]
+Traceback (most recent call last):
+  File "/root/Perceptual-IQA-CS3324/train_test_IQA.py", line 137, in <module>
+    main(config)
+  File "/root/Perceptual-IQA-CS3324/train_test_IQA.py", line 98, in main
+    srcc_all[i], plcc_all[i] = solver.train()
+                               ^^^^^^^^^^^^^^
+  File "/root/Perceptual-IQA-CS3324/HyerIQASolver.py", line 97, in train
+    for batch_idx, (img, label) in enumerate(train_loader_with_progress):
+  File "/root/miniconda3/lib/python3.12/site-packages/tqdm/std.py", line 1181, in __iter__
+    for obj in iterable:
+  File "/root/miniconda3/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 734, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 790, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/torch/utils/data/_utils/fetch.py", line 52, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+            ~~~~~~~~~~~~^^^^^
+  File "/root/Perceptual-IQA-CS3324/folders.py", line 253, in __getitem__
+    sample = pil_loader(path)
+             ^^^^^^^^^^^^^^^^
+  File "/root/Perceptual-IQA-CS3324/folders.py", line 381, in pil_loader
+    img = Image.open(f)
+          ^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/PIL/Image.py", line 3526, in open
+    preinit()
+  File "/root/miniconda3/lib/python3.12/site-packages/PIL/Image.py", line 338, in preinit
+    def preinit() -> None:
+    
+KeyboardInterrupt
