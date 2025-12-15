@@ -321,7 +321,7 @@ class Koniq_10kFolder(data.Dataset):
                 sample = self.transform(cached_img)
             else:
                 sample = cached_img
-        return sample, target
+            return sample, target
         except Exception as e:
             print(f'Error loading image at index {index}: {path}')
             print(f'Error: {e}')
