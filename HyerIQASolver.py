@@ -188,10 +188,10 @@ class HyperIQASolver(object):
             mininterval=1.0
         )
         with torch.no_grad():  # Disable gradient computation for faster inference (same as SPAQ test)
-        for img, label in test_loader_with_progress:
-            # DataLoader returns tensors, so use .to() directly to avoid warning
-            img = img.to(self.device)
-            label = label.float().to(self.device)  # MPS/CUDA 需要 float32
+            for img, label in test_loader_with_progress:
+                # DataLoader returns tensors, so use .to() directly to avoid warning
+                img = img.to(self.device)
+                label = label.float().to(self.device)  # MPS/CUDA 需要 float32
 
             paras = self.model_hyper(img)
             model_target = models.TargetNet(paras).to(self.device)
