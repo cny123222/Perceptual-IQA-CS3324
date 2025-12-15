@@ -321,7 +321,7 @@ class Koniq_10kFolder(data.Dataset):
                 sample = self.transform(cached_img)
             else:
                 sample = cached_img
-            return sample, target
+        return sample, target
         except Exception as e:
             print(f'Error loading image at index {index}: {path}')
             print(f'Error: {e}')
@@ -451,9 +451,9 @@ def getTIDFileName(path, suffix):
 
 def pil_loader(path):
     try:
-    with open(path, 'rb') as f:
-        img = Image.open(f)
-        return img.convert('RGB')
+        with open(path, 'rb') as f:
+            img = Image.open(f)
+            return img.convert('RGB')
     except Exception as e:
         print(f'Error in pil_loader for path: {path}')
         print(f'Error: {e}')
