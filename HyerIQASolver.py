@@ -193,13 +193,13 @@ class HyperIQASolver(object):
                 img = img.to(self.device)
                 label = label.float().to(self.device)  # MPS/CUDA 需要 float32
 
-            paras = self.model_hyper(img)
-            model_target = models.TargetNet(paras).to(self.device)
-            model_target.train(False)
-            pred = model_target(paras['target_in_vec'])
+                paras = self.model_hyper(img)
+                model_target = models.TargetNet(paras).to(self.device)
+                model_target.train(False)
+                pred = model_target(paras['target_in_vec'])
 
-            pred_scores.append(float(pred.item()))
-            gt_scores = gt_scores + label.cpu().tolist()
+                pred_scores.append(float(pred.item()))
+                gt_scores = gt_scores + label.cpu().tolist()
 
         pred_scores = np.mean(np.reshape(np.array(pred_scores), (-1, self.test_patch_num)), axis=1)
         gt_scores = np.mean(np.reshape(np.array(gt_scores), (-1, self.test_patch_num)), axis=1)
