@@ -5,6 +5,7 @@ import models
 import data_loader
 from tqdm import tqdm
 import os
+from datetime import datetime
 
 # 自动检测可用设备：优先使用 CUDA，然后是 MPS (macOS GPU)，最后使用 CPU
 def get_device():
@@ -26,8 +27,10 @@ class HyperIQASolver(object):
         self.test_patch_num = config.test_patch_num
         self.dataset = config.dataset
         
-        # 创建模型保存目录
-        self.save_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'checkpoints', self.dataset)
+        # 创建模型保存目录（带时间戳防止覆盖）
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        save_dir_name = f"{self.dataset}-resnet_{timestamp}"
+        self.save_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'checkpoints', save_dir_name)
         os.makedirs(self.save_dir, exist_ok=True)
         print(f'Model checkpoints will be saved to: {self.save_dir}')
 
@@ -37,6 +40,7 @@ class HyperIQASolver(object):
         self.l1_loss = torch.nn.L1Loss().to(self.device)
 
         backbone_params = list(map(id, self.model_hyper.res.parameters()))
+        # FIX: Convert filter to list to avoid iterator exhaustion bug
         self.hypernet_params = list(filter(lambda p: id(p) not in backbone_params, self.model_hyper.parameters()))
         self.lr = config.lr
         self.lrratio = config.lr_ratio
@@ -50,12 +54,27 @@ class HyperIQASolver(object):
         test_loader = data_loader.DataLoader(config.dataset, path, test_idx, config.patch_size, config.test_patch_num, istrain=False)
         self.train_data = train_loader.get_data()
         self.test_data = test_loader.get_data()
+        
+        # 初始化SPAQ数据集用于跨数据集测试（如果存在）
+        self.spaq_path = None
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        spaq_base_path = os.path.join(base_dir, 'spaq-test')
+        spaq_json_path = os.path.join(spaq_base_path, 'spaq_test.json') if os.path.exists(spaq_base_path) else None
+        
+        if spaq_json_path and os.path.exists(spaq_json_path):
+            self.spaq_path = spaq_base_path
+            print(f'SPAQ test dataset found at: {self.spaq_path}')
+        else:
+            print('SPAQ dataset not found. SPAQ testing will be skipped.')
 
     def train(self):
         """Training"""
         best_srcc = 0.0
         best_plcc = 0.0
-        print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC')
+        if self.spaq_path is not None:
+            print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC\tSPAQ_SRCC\tSPAQ_PLCC')
+        else:
+            print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC')
         for t in range(self.epochs):
             epoch_loss = []
             pred_scores = []
@@ -110,23 +129,44 @@ class HyperIQASolver(object):
             if test_srcc > best_srcc:
                 best_srcc = test_srcc
                 best_plcc = test_plcc
-            print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
-                  (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc))
+            
+            # 在SPAQ数据集上测试
+            spaq_srcc, spaq_plcc = None, None
+            if self.spaq_path is not None:
+                spaq_srcc, spaq_plcc = self.test_spaq()
+            
+            # Print epoch results
+            if self.spaq_path is not None and spaq_srcc is not None:
+                print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
+                      (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc, spaq_srcc, spaq_plcc))
+            else:
+                print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
+                      (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc))
 
-            # 每两个epoch保存一次模型
-            if (t + 1) % 2 == 0:
+            # Save checkpoint every epoch
+            if self.spaq_path is not None and spaq_srcc is not None:
+                model_path = os.path.join(self.save_dir, f'checkpoint_epoch_{t+1}_srcc_{test_srcc:.4f}_plcc_{test_plcc:.4f}_spaq_srcc_{spaq_srcc:.4f}_plcc_{spaq_plcc:.4f}.pkl')
+            else:
                 model_path = os.path.join(self.save_dir, f'checkpoint_epoch_{t+1}_srcc_{test_srcc:.4f}_plcc_{test_plcc:.4f}.pkl')
-                torch.save(self.model_hyper.state_dict(), model_path)
-                print(f'  Model saved to: {model_path}')
+            torch.save(self.model_hyper.state_dict(), model_path)
+            print(f'  Model saved to: {model_path}')
 
-            # Update optimizer
-            lr = self.lr / pow(10, (t // 6))
+            # FIX: Update optimizer learning rates (backbone LR now also decays, optimizer state preserved)
+            backbone_lr = self.lr / pow(10, (t // 6))  # Backbone LR also decays
+            hypernet_lr = backbone_lr * self.lrratio
             if t > 8:
                 self.lrratio = 1
-            self.paras = [{'params': self.hypernet_params, 'lr': lr * self.lrratio},
-                          {'params': self.model_hyper.res.parameters(), 'lr': self.lr}
-                          ]
-            self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay)
+                hypernet_lr = backbone_lr  # When lrratio becomes 1, hypernet LR = backbone LR
+            
+            if t == 0:
+                # First epoch: create optimizer
+                self.paras = [{'params': self.hypernet_params, 'lr': hypernet_lr},
+                              {'params': self.model_hyper.res.parameters(), 'lr': backbone_lr}]
+                self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay)
+            else:
+                # Subsequent epochs: only update learning rates (preserves Adam momentum state)
+                self.solver.param_groups[0]['lr'] = hypernet_lr
+                self.solver.param_groups[1]['lr'] = backbone_lr
 
         print('Best test SRCC %f, PLCC %f' % (best_srcc, best_plcc))
 
@@ -167,3 +207,73 @@ class HyperIQASolver(object):
 
         self.model_hyper.train(True)
         return test_srcc, test_plcc
+
+    def test_spaq(self):
+        """Test on SPAQ dataset for cross-dataset evaluation"""
+        if self.spaq_path is None:
+            return None, None
+        
+        import json
+        from PIL import Image
+        
+        json_path = os.path.join(self.spaq_path, 'spaq_test.json')
+        if not os.path.exists(json_path):
+            return None, None
+        
+        # Load SPAQ test data
+        with open(json_path) as f:
+            spaq_data = json.load(f)
+        
+        # Use same transforms as koniq-10k
+        import torchvision
+        transforms = torchvision.transforms.Compose([
+            torchvision.transforms.Resize((512, 384)),
+            torchvision.transforms.RandomCrop(size=224),
+            torchvision.transforms.ToTensor(),
+            torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
+                                             std=(0.229, 0.224, 0.225))])
+        
+        def pil_loader(path):
+            with open(path, 'rb') as f:
+                img = Image.open(f)
+                return img.convert('RGB')
+        
+        self.model_hyper.train(False)
+        pred_scores = []
+        gt_scores = []
+        
+        print(f'  Testing on SPAQ dataset ({len(spaq_data)} images)...')
+        for item in tqdm(spaq_data, desc='  SPAQ', unit='img'):
+            img_path = os.path.join(self.spaq_path, os.path.basename(item['image']))
+            if not os.path.exists(img_path):
+                continue
+            
+            score = float(item['score'])
+            
+            # Generate multiple patches per image
+            patch_preds = []
+            for _ in range(self.test_patch_num):
+                img = pil_loader(img_path)
+                img_tensor = transforms(img).unsqueeze(0).to(self.device)
+                
+                paras = self.model_hyper(img_tensor)
+                model_target = models.TargetNet(paras).to(self.device)
+                model_target.train(False)
+                pred = model_target(paras['target_in_vec'])
+                patch_preds.append(float(pred.item()))
+            
+            pred_scores.append(np.mean(patch_preds))
+            gt_scores.append(score)
+        
+        if len(pred_scores) == 0:
+            self.model_hyper.train(True)
+            return None, None
+        
+        pred_scores = np.array(pred_scores)
+        gt_scores = np.array(gt_scores)
+        
+        spaq_srcc, _ = stats.spearmanr(pred_scores, gt_scores)
+        spaq_plcc, _ = stats.pearsonr(pred_scores, gt_scores)
+        
+        self.model_hyper.train(True)
+        return spaq_srcc, spaq_plcc

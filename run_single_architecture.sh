@@ -1,5 +1,6 @@
 #!/bin/bash
 # 单个架构实验脚本
+# 全部在 ranking-loss 分支运行
 # 用法: ./run_single_architecture.sh [resnet|swin|swin-ranking]
 
 set -e
@@ -18,13 +19,14 @@ RANKING_LOSS_MARGIN=0.1
 
 echo "========================================="
 echo "运行架构: $ARCHITECTURE"
+echo "分支: ranking-loss"
 echo "========================================="
 
 case "$ARCHITECTURE" in
     "resnet")
-        echo "切换到 master 分支..."
-        git checkout master
-        echo "开始训练 ResNet-50..."
+        echo "实验: ResNet-50 (原始架构)"
+        echo "训练脚本: train_test_IQA.py"
+        echo ""
         python train_test_IQA.py \
             --dataset "$DATASET" \
             --epochs "$EPOCHS" \
@@ -34,9 +36,10 @@ case "$ARCHITECTURE" in
             --test_patch_num "$TEST_PATCH_NUM"
         ;;
     "swin")
-        echo "切换到 swin-transformer-backbone 分支..."
-        git checkout swin-transformer-backbone
-        echo "开始训练 Swin Transformer..."
+        echo "实验: Swin Transformer (无 Ranking Loss)"
+        echo "训练脚本: train_swin.py"
+        echo "Ranking Loss Alpha: 0 (禁用)"
+        echo ""
         python train_swin.py \
             --dataset "$DATASET" \
             --epochs "$EPOCHS" \
@@ -47,9 +50,11 @@ case "$ARCHITECTURE" in
             --ranking_loss_alpha 0
         ;;
     "swin-ranking")
-        echo "切换到 ranking-loss 分支..."
-        git checkout ranking-loss
-        echo "开始训练 Swin Transformer + Ranking Loss..."
+        echo "实验: Swin Transformer + Ranking Loss"
+        echo "训练脚本: train_swin.py"
+        echo "Ranking Loss Alpha: $RANKING_LOSS_ALPHA"
+        echo "Ranking Loss Margin: $RANKING_LOSS_MARGIN"
+        echo ""
         python train_swin.py \
             --dataset "$DATASET" \
             --epochs "$EPOCHS" \
@@ -67,5 +72,5 @@ case "$ARCHITECTURE" in
         ;;
 esac
 
+echo ""
 echo "✓ 训练完成！"
-

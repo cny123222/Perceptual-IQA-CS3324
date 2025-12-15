@@ -1,9 +1,23 @@
 # 架构对比实验指南
 
-本指南帮助您运行和对比三个不同的架构：
+本指南帮助您运行和对比三个不同的架构，**全部在 ranking-loss 分支运行**：
 1. **ResNet-50** (原始架构)
 2. **Swin Transformer** (无 Ranking Loss)
 3. **Swin Transformer + Ranking Loss**
+
+---
+
+## 重要说明
+
+✅ **所有实验都在 ranking-loss 分支运行，无需切换分支**
+
+✅ **所有实验都包含以下功能：**
+- 每个epoch保存checkpoint（带时间戳的文件夹名，防止覆盖）
+- 在SPAQ数据集上进行跨数据集测试（如果数据集存在）
+- 训练稳定性修复：
+  - Filter iterator exhaustion bug 修复
+  - Backbone learning rate decay 修复
+  - Optimizer state preservation 修复
 
 ---
 
@@ -17,11 +31,10 @@ chmod +x run_architecture_comparison.sh
 ```
 
 **功能：**
-- 自动切换分支
-- 依次运行三个实验
+- 自动依次运行三个实验
 - 自动收集结果
 - 生成对比报告
-- 恢复原始分支
+- 所有实验在同一分支（ranking-loss）
 
 **结果保存位置：**
 - 对比报告: `comparison_results/comparison_YYYYMMDD_HHMMSS.txt`
@@ -39,7 +52,7 @@ chmod +x run_single_architecture.sh
 # 运行 ResNet-50
 ./run_single_architecture.sh resnet
 
-# 运行 Swin Transformer
+# 运行 Swin Transformer (无 Ranking Loss)
 ./run_single_architecture.sh swin
 
 # 运行 Swin Transformer + Ranking Loss
@@ -53,7 +66,9 @@ chmod +x run_single_architecture.sh
 ### 实验1: ResNet-50
 
 ```bash
-git checkout master
+# 确保在 ranking-loss 分支
+git checkout ranking-loss
+
 python train_test_IQA.py \
     --dataset koniq-10k \
     --epochs 10 \
@@ -63,10 +78,17 @@ python train_test_IQA.py \
     --test_patch_num 20
 ```
 
+**特点：**
+- 使用 `train_test_IQA.py`
+- 使用 `HyerIQASolver.py` (ResNet backbone)
+- Checkpoint保存在: `checkpoints/koniq-10k-resnet_TIMESTAMP/`
+
 ### 实验2: Swin Transformer
 
 ```bash
-git checkout swin-transformer-backbone
+# 确保在 ranking-loss 分支
+git checkout ranking-loss
+
 python train_swin.py \
     --dataset koniq-10k \
     --epochs 10 \
@@ -77,10 +99,18 @@ python train_swin.py \
     --ranking_loss_alpha 0
 ```
 
+**特点：**
+- 使用 `train_swin.py`
+- 使用 `HyperIQASolver_swin.py` (Swin backbone)
+- `--ranking_loss_alpha 0` 禁用 Ranking Loss
+- Checkpoint保存在: `checkpoints/koniq-10k-swin_TIMESTAMP/`
+
 ### 实验3: Swin Transformer + Ranking Loss
 
 ```bash
+# 确保在 ranking-loss 分支
 git checkout ranking-loss
+
 python train_swin.py \
     --dataset koniq-10k \
     --epochs 10 \
@@ -91,6 +121,12 @@ python train_swin.py \
     --ranking_loss_alpha 0.3 \
     --ranking_loss_margin 0.1
 ```
+
+**特点：**
+- 使用 `train_swin.py`
+- 使用 `HyperIQASolver_swin.py` (Swin backbone)
+- `--ranking_loss_alpha 0.3` 启用 Ranking Loss
+- Checkpoint保存在: `checkpoints/koniq-10k-swin-ranking-alpha0.3_TIMESTAMP/`
 
 ---
 
@@ -106,8 +142,18 @@ python train_swin.py \
 | `--batch_size` | `96` | 批次大小 |
 | `--train_patch_num` | `20` | 训练时每张图片的patch数 |
 | `--test_patch_num` | `20` | 测试时每张图片的patch数 |
-| `--ranking_loss_alpha` | `0.3` | Ranking Loss权重（仅实验3） |
-| `--ranking_loss_margin` | `0.1` | Ranking Loss边界（仅实验3） |
+| `--ranking_loss_alpha` | `0` (实验2) / `0.3` (实验3) | Ranking Loss权重 |
+| `--ranking_loss_margin` | `0.1` (仅实验3) | Ranking Loss边界 |
+
+---
+
+## 三个架构对比
+
+| 架构 | 训练脚本 | Solver | Backbone | Ranking Loss | Checkpoint目录 |
+|------|----------|--------|----------|--------------|----------------|
+| ResNet-50 | `train_test_IQA.py` | `HyerIQASolver.py` | ResNet-50 | ❌ | `koniq-10k-resnet_TIMESTAMP` |
+| Swin Transformer | `train_swin.py` | `HyperIQASolver_swin.py` | Swin Tiny | ❌ | `koniq-10k-swin_TIMESTAMP` |
+| Swin + Ranking Loss | `train_swin.py` | `HyperIQASolver_swin.py` | Swin Tiny | ✅ (α=0.3) | `koniq-10k-swin-ranking-alpha0.3_TIMESTAMP` |
 
 ---
 
@@ -125,30 +171,56 @@ cat comparison_results/comparison_*.txt
 
 **ResNet-50:**
 - 查找: `Best test SRCC`
+- 查看: KonIQ-10k Test SRCC/PLCC, SPAQ SRCC/PLCC
 
 **Swin Transformer:**
 - 查找: `Best test SRCC`
+- 查看: KonIQ-10k Test SRCC/PLCC, SPAQ SRCC/PLCC
 
 **Swin Transformer + Ranking Loss:**
 - 查找: `Best test SRCC`
+- 查看: KonIQ-10k Test SRCC/PLCC, SPAQ SRCC/PLCC
 
 ### 对比表格模板
 
-| 架构 | 最佳Epoch | Test SRCC | Test PLCC | 论文基准 | 超出幅度 |
-|------|-----------|-----------|-----------|----------|----------|
-| ResNet-50 | ? | ? | ? | 0.906 / 0.917 | ? |
-| Swin Transformer | ? | ? | ? | 0.906 / 0.917 | ? |
-| Swin Transformer + Ranking Loss | ? | ? | ? | 0.906 / 0.917 | ? |
+| 架构 | 最佳Epoch | KonIQ-10k Test SRCC | KonIQ-10k Test PLCC | SPAQ SRCC | SPAQ PLCC | 论文基准 | 超出幅度 |
+|------|-----------|---------------------|---------------------|-----------|-----------|----------|----------|
+| ResNet-50 | ? | ? | ? | ? | ? | 0.906 / 0.917 | ? |
+| Swin Transformer | ? | ? | ? | ? | ? | 0.906 / 0.917 | ? |
+| Swin + Ranking Loss | ? | ? | ? | ? | ? | 0.906 / 0.917 | ? |
+
+---
+
+## Checkpoint和测试
+
+### Checkpoint保存
+
+- **每个epoch都保存**（不再是每2个epoch）
+- **文件夹名包含时间戳**（防止覆盖）
+- **文件名包含SRCC和PLCC**（便于识别最佳模型）
+- **如果SPAQ测试可用，文件名也包含SPAQ指标**
+
+示例文件名：
+```
+checkpoint_epoch_10_srcc_0.9206_plcc_0.9334_spaq_srcc_0.8234_spaq_plcc_0.8456.pkl
+```
+
+### SPAQ跨数据集测试
+
+- **自动检测**：如果 `spaq-test/spaq_test.json` 存在，自动进行SPAQ测试
+- **每个epoch后测试**：训练完每个epoch后自动在SPAQ上测试
+- **结果记录**：SPAQ的SRCC和PLCC会显示在训练输出和checkpoint文件名中
 
 ---
 
 ## 注意事项
 
-1. **分支切换**: 脚本会自动切换分支，但请确保所有分支都已拉取最新代码
+1. **分支**: 所有实验都在 `ranking-loss` 分支运行，无需切换
 2. **训练时间**: 每个实验大约需要数小时，请确保有足够时间
-3. **磁盘空间**: 每个实验会生成checkpoint，确保有足够空间
+3. **磁盘空间**: 每个实验会生成10个checkpoint（每个epoch一个），确保有足够空间
 4. **GPU内存**: 如果GPU内存不足，可以减小 `--batch_size`
 5. **结果保存**: 所有checkpoint保存在 `checkpoints/` 目录下，带时间戳的文件夹
+6. **SPAQ数据集**: 如果SPAQ测试数据集不存在，实验仍会正常运行，只是不会报告SPAQ指标
 
 ---
 
@@ -168,26 +240,24 @@ TEST_PATCH_NUM=10
 
 ## 故障排除
 
-### 问题1: 分支不存在
-```bash
-# 确保所有分支都已拉取
-git fetch origin
-git checkout -b master origin/master
-git checkout -b swin-transformer-backbone origin/swin-transformer-backbone
-git checkout -b ranking-loss origin/ranking-loss
-```
+### 问题1: 训练脚本不存在
 
-### 问题2: 训练脚本不存在
-确保在正确的分支上有对应的训练脚本：
-- `master`: `train_test_IQA.py`
-- `swin-transformer-backbone`: `train_swin.py`
-- `ranking-loss`: `train_swin.py`
+确保在 ranking-loss 分支有以下文件：
+- `train_test_IQA.py` (ResNet)
+- `train_swin.py` (Swin)
+- `HyerIQASolver.py` (ResNet solver)
+- `HyperIQASolver_swin.py` (Swin solver)
 
-### 问题3: 依赖问题
-确保所有分支的依赖都已安装：
+### 问题2: 依赖问题
+
+确保所有依赖都已安装：
 ```bash
 pip install -r requirements.txt
 ```
+
+### 问题3: SPAQ测试失败
+
+SPAQ测试是可选的。如果 `spaq-test/spaq_test.json` 不存在，实验仍会正常运行，只是不会报告SPAQ指标。
 
 ---
 
@@ -198,3 +268,17 @@ pip install -r requirements.txt
 3. **深入实验**: 对最佳架构进行更详细的超参数调优
 4. **记录结果**: 更新 `record.md` 文件
 
+---
+
+## 训练稳定性修复
+
+所有实验都包含以下三个关键修复，确保训练稳定性：
+
+1. **Filter Iterator Exhaustion Bug**: 修复了 `filter()` 对象被多次使用导致的参数列表为空的问题
+2. **Backbone Learning Rate Decay**: Backbone的学习率现在也会按计划衰减
+3. **Optimizer State Preservation**: Adam优化器的momentum状态在epoch间得到保留，不再每epoch重新创建
+
+这些修复确保了：
+- 训练过程更加稳定
+- 测试指标（SRCC/PLCC）不会在早期达到峰值后下降
+- 模型能够持续改进而不是过早过拟合
