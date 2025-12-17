@@ -64,7 +64,17 @@ class HyperIQASolver(object):
         else:
             print('Multi-scale feature fusion: DISABLED')
         
-        self.model_hyper = models.HyperNet(16, 112, 224, 112, 56, 28, 14, 7, use_multiscale=self.use_multiscale).to(self.device)
+        # Attention-based fusion (default: disabled, enable with --attention_fusion)
+        self.use_attention = getattr(config, 'use_attention', False)
+        if self.use_attention and self.use_multiscale:
+            print('Attention mechanism: ENABLED (dynamic adaptive fusion)')
+        elif self.use_attention and not self.use_multiscale:
+            print('Warning: Attention mechanism requires multi-scale fusion. Ignoring --attention_fusion.')
+            self.use_attention = False
+        
+        self.model_hyper = models.HyperNet(16, 112, 224, 112, 56, 28, 14, 7, 
+                                           use_multiscale=self.use_multiscale, 
+                                           use_attention=self.use_attention).to(self.device)
         self.model_hyper.train(True)
 
         self.l1_loss = torch.nn.L1Loss().to(self.device)
