@@ -148,6 +148,7 @@ if __name__ == '__main__':
     parser.add_argument('--ranking_loss_margin', dest='ranking_loss_margin', type=float, default=0.1, help='Margin for hinge loss in ranking loss')
     parser.add_argument('--patience', dest='patience', type=int, default=5, help='Early stopping patience: stop if no improvement for N epochs')
     parser.add_argument('--no_early_stopping', dest='early_stopping', action='store_false', help='Disable early stopping (enabled by default)')
+    parser.add_argument('--no_multiscale', dest='use_multiscale', action='store_false', help='Disable multi-scale feature fusion (enabled by default)')
 
     config = parser.parse_args()
     main(config)
