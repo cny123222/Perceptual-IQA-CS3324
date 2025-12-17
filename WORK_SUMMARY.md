@@ -186,7 +186,95 @@ python train_swin.py --dataset koniq-10k --epochs 20 --no_early_stopping
 
 ---
 
-### 改进 4️⃣: 数据加载优化
+### 改进 4️⃣: CosineAnnealingLR 学习率调度器
+
+#### 动机
+原始的阶梯式学习率衰减存在问题：
+- 学习率每6个epoch突然除以10，可能导致训练不稳定
+- Epoch 12后学习率已经很小（1e-6），后续训练效果有限
+
+#### 实现方法
+
+**原始 Step Decay**:
+```
+Epoch 0-5:  LR = 1e-4
+Epoch 6-11: LR = 1e-5  ⬇ 突然下降
+Epoch 12+:  LR = 1e-6  ⬇ 过早过小
+```
+
+**CosineAnnealingLR**:
+```
+Epoch 0:  LR = 1e-4  (max)
+Epoch 10: LR ≈ 2e-5  (平滑下降)
+Epoch 20: LR ≈ 1e-6  (min)
+```
+
+**命令行参数**:
+- `--lr_scheduler cosine`: 使用余弦退火（默认）
+- `--lr_scheduler step`: 使用原始阶梯衰减
+- `--no_lr_scheduler`: 固定学习率
+
+**代码实现**:
+```python
+from torch.optim.lr_scheduler import CosineAnnealingLR
+
+scheduler = CosineAnnealingLR(
+    optimizer, 
+    T_max=epochs,    # 总epoch数
+    eta_min=1e-6     # 最小学习率
+)
+
+# 每个epoch后
+scheduler.step()
+```
+
+#### 实验结果
+
+**状态**: ✅ **已实现并集成**
+
+**功能**:
+- ✅ 支持三种模式：Cosine（默认）/ Step（原始）/ None（固定）
+- ✅ 自动打印每个epoch的当前学习率
+- ✅ 同时支持 Swin 和 ResNet 版本
+- ✅ 与 Early Stopping 无缝配合
+
+**优势**:
+- **平滑过渡**: 避免学习率突变导致的训练不稳定
+- **灵活控制**: 通过 `T_max` 控制衰减速度
+- **后期微调**: 末期学习率仍有调整空间
+- **易于切换**: 命令行参数即可切换不同策略
+
+**使用示例**:
+```bash
+# 默认：CosineAnnealingLR
+python train_swin.py --dataset koniq-10k --epochs 20
+
+# 原始阶梯衰减（复现原文）
+python train_swin.py --dataset koniq-10k --epochs 20 --lr_scheduler step
+
+# 固定学习率（调试用）
+python train_swin.py --dataset koniq-10k --epochs 20 --no_lr_scheduler
+```
+
+**输出示例**:
+```
+Learning rate scheduler: CosineAnnealingLR (T_max=20, eta_min=1e-6)
+Epoch 1: ...
+  Learning rates: HyperNet=0.000095, Backbone=0.000095
+Epoch 2: ...
+  Learning rates: HyperNet=0.000081, Backbone=0.000081
+```
+
+**预期效果**:
+- 更稳定的训练曲线
+- 可能延迟峰值出现时间（但最终性能更好）
+- 减少过早收敛到局部最优的风险
+
+**结论**: CosineAnnealingLR 是现代深度学习的最佳实践，推荐作为默认选项。详见 `LR_SCHEDULER_GUIDE.md`。
+
+---
+
+### 改进 5️⃣: 数据加载优化
 
 #### 实现内容
 
@@ -234,7 +322,7 @@ python train_swin.py --dataset koniq-10k --epochs 20 --no_early_stopping
 
 ---
 
-### 改进 5️⃣: 训练稳定性修复（三个关键修复）
+### 改进 6️⃣: 训练稳定性修复（三个关键修复）
 
 #### 修复内容
 
@@ -383,7 +471,14 @@ python train_swin.py --dataset koniq-10k --epochs 20 --no_early_stopping
    - 可用 `--no_early_stopping` 禁用
    - 详细文档：`EARLY_STOPPING_GUIDE.md`
 
-4. **验证 baseline 性能**
+4. **✅ 已完成：CosineAnnealingLR 学习率调度器**
+   - 平滑的余弦退火学习率衰减
+   - 替代原始的阶梯式衰减（每6 epochs ÷10）
+   - 避免学习率突变，更稳定的训练
+   - 支持三种模式：cosine（默认）/ step（原始）/ none（固定LR）
+   - 详细文档：`LR_SCHEDULER_GUIDE.md`
+
+5. **验证 baseline 性能**
    - 在单尺度 Swin + 纯 L1 Loss 上测试
    - 确认改进的实际提升幅度
 
