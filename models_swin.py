@@ -34,8 +34,10 @@ class MultiScaleAttention(nn.Module):
         # Initialize weights
         for m in self.attention_net.modules():
             if isinstance(m, nn.Linear):
-                nn.init.kaiming_normal_(m.weight)
+                # Use smaller initialization for more balanced initial weights
+                nn.init.normal_(m.weight, mean=0, std=0.01)
                 if m.bias is not None:
+                    # Initialize bias to encourage uniform attention at start
                     nn.init.constant_(m.bias, 0)
     
     def forward(self, feat_list):
