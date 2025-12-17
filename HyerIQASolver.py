@@ -76,7 +76,7 @@ class HyperIQASolver(object):
         if self.spaq_path is not None:
             print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC\tSPAQ_SRCC\tSPAQ_PLCC')
         else:
-            print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC')
+        print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC')
         for t in range(self.epochs):
             epoch_loss = []
             pred_scores = []
@@ -142,8 +142,8 @@ class HyperIQASolver(object):
                 print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
                       (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc, spaq_srcc, spaq_plcc))
             else:
-                print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
-                      (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc))
+            print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
+                  (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc))
 
             # Save checkpoint every epoch
             if self.spaq_path is not None and spaq_srcc is not None:
@@ -181,18 +181,18 @@ class HyperIQASolver(object):
             mininterval=1.0
         )
         with torch.no_grad():  # Disable gradient computation for faster inference (same as SPAQ test)
-            for img, label in test_loader_with_progress:
-                # DataLoader returns tensors, so use .to() directly to avoid warning
-                img = img.to(self.device)
-                label = label.float().to(self.device)  # MPS/CUDA 需要 float32
+        for img, label in test_loader_with_progress:
+            # DataLoader returns tensors, so use .to() directly to avoid warning
+            img = img.to(self.device)
+            label = label.float().to(self.device)  # MPS/CUDA 需要 float32
 
-                paras = self.model_hyper(img)
-                model_target = models.TargetNet(paras).to(self.device)
-                model_target.train(False)
-                pred = model_target(paras['target_in_vec'])
+            paras = self.model_hyper(img)
+            model_target = models.TargetNet(paras).to(self.device)
+            model_target.train(False)
+            pred = model_target(paras['target_in_vec'])
 
-                pred_scores.append(float(pred.item()))
-                gt_scores = gt_scores + label.cpu().tolist()
+            pred_scores.append(float(pred.item()))
+            gt_scores = gt_scores + label.cpu().tolist()
 
         pred_scores = np.mean(np.reshape(np.array(pred_scores), (-1, self.test_patch_num)), axis=1)
         gt_scores = np.mean(np.reshape(np.array(gt_scores), (-1, self.test_patch_num)), axis=1)
@@ -244,8 +244,9 @@ class HyperIQASolver(object):
                 self.samples = samples
                 # Split transform: Resize is expensive for large images, cache it
                 self.resize_transform = torchvision.transforms.Resize((512, 384))
+                # Use CenterCrop for testing (reproducible results)
                 self.crop_transform = torchvision.transforms.Compose([
-                    torchvision.transforms.RandomCrop(size=224),
+                    torchvision.transforms.CenterCrop(size=224),
                     torchvision.transforms.ToTensor(),
                     torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
                                                      std=(0.229, 0.224, 0.225))])
@@ -275,7 +276,7 @@ class HyperIQASolver(object):
                     resized_img = self.resize_transform(img)
                     self._resized_cache[path] = resized_img
                 
-                # Only do RandomCrop + ToTensor + Normalize (fast)
+                # Only do CenterCrop + ToTensor + Normalize (fast, deterministic)
                 sample = self.crop_transform(resized_img)
                 return sample, target
             

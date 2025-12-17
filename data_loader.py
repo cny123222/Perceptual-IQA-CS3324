@@ -20,10 +20,10 @@ class DataLoader(object):
                     torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
                                                      std=(0.229, 0.224, 0.225))
                 ])
-            # Test transforms
+            # Test transforms (use CenterCrop for reproducibility)
             else:
                 transforms = torchvision.transforms.Compose([
-                    torchvision.transforms.RandomCrop(size=patch_size),
+                    torchvision.transforms.CenterCrop(size=patch_size),
                     torchvision.transforms.ToTensor(),
                     torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
                                                      std=(0.229, 0.224, 0.225))
@@ -40,7 +40,7 @@ class DataLoader(object):
             else:
                 transforms = torchvision.transforms.Compose([
                     torchvision.transforms.Resize((512, 384)),
-                    torchvision.transforms.RandomCrop(size=patch_size),
+                    torchvision.transforms.CenterCrop(size=patch_size),
                     torchvision.transforms.ToTensor(),
                     torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
                                                      std=(0.229, 0.224, 0.225))])
@@ -56,7 +56,7 @@ class DataLoader(object):
             else:
                 transforms = torchvision.transforms.Compose([
                     torchvision.transforms.Resize((512, 512)),
-                    torchvision.transforms.RandomCrop(size=patch_size),
+                    torchvision.transforms.CenterCrop(size=patch_size),
                     torchvision.transforms.ToTensor(),
                     torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
                                                      std=(0.229, 0.224, 0.225))])

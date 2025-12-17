@@ -334,8 +334,9 @@ class HyperIQASolver(object):
                 self.samples = samples
                 # Split transform: Resize is expensive for large images, cache it
                 self.resize_transform = torchvision.transforms.Resize((512, 384))
+                # Use CenterCrop for testing (reproducible results)
                 self.crop_transform = torchvision.transforms.Compose([
-                    torchvision.transforms.RandomCrop(size=224),
+                    torchvision.transforms.CenterCrop(size=224),
                     torchvision.transforms.ToTensor(),
                     torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
                                                      std=(0.229, 0.224, 0.225))])
@@ -365,7 +366,7 @@ class HyperIQASolver(object):
                     resized_img = self.resize_transform(img)
                     self._resized_cache[path] = resized_img
                 
-                # Only do RandomCrop + ToTensor + Normalize (fast)
+                # Only do CenterCrop + ToTensor + Normalize (fast, deterministic)
                 sample = self.crop_transform(resized_img)
                 return sample, target
             

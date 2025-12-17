@@ -53,6 +53,17 @@ def get_koniq_train_test_indices(root_path):
 
 
 def main(config):
+    # Set random seeds for reproducibility
+    seed = 42
+    random.seed(seed)
+    np.random.seed(seed)
+    import torch
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    print(f'Random seed set to {seed} for reproducibility')
 
     # 获取当前脚本所在目录的绝对路径
     base_dir = os.path.dirname(os.path.abspath(__file__))
