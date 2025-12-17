@@ -33,6 +33,10 @@ class HyperIQASolver(object):
         self.ranking_loss_alpha = getattr(config, 'ranking_loss_alpha', 0.5)
         self.ranking_loss_margin = getattr(config, 'ranking_loss_margin', 0.1)
         
+        # Early stopping parameters
+        self.patience = getattr(config, 'patience', 5)  # Default: stop after 5 epochs with no improvement
+        self.early_stopping_enabled = getattr(config, 'early_stopping', True)  # Enable by default
+        
         # 创建模型保存目录（带时间戳防止覆盖）
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         save_dir_suffix = '-swin'
@@ -85,6 +89,14 @@ class HyperIQASolver(object):
         """Training"""
         best_srcc = 0.0
         best_plcc = 0.0
+        
+        # Early stopping variables
+        epochs_no_improve = 0
+        best_model_path = None
+        
+        if self.early_stopping_enabled:
+            print(f'Early stopping enabled with patience={self.patience}')
+        
         if self.spaq_path is not None:
             print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC\tSPAQ_SRCC\tSPAQ_PLCC')
         else:
@@ -163,9 +175,16 @@ class HyperIQASolver(object):
             train_srcc, _ = stats.spearmanr(pred_scores, gt_scores)
 
             test_srcc, test_plcc = self.test(self.test_data)
+            
+            # Check if this is the best model so far
+            improved = False
             if test_srcc > best_srcc:
                 best_srcc = test_srcc
                 best_plcc = test_plcc
+                improved = True
+                epochs_no_improve = 0
+            else:
+                epochs_no_improve += 1
             
             # 在SPAQ数据集上测试
             spaq_srcc, spaq_plcc = None, None
@@ -198,6 +217,24 @@ class HyperIQASolver(object):
                 model_path = os.path.join(self.save_dir, f'checkpoint_epoch_{t+1}_srcc_{test_srcc:.4f}_plcc_{test_plcc:.4f}.pkl')
             torch.save(self.model_hyper.state_dict(), model_path)
             print(f'  Model saved to: {model_path}')
+            
+            # Save best model separately
+            if improved:
+                if self.spaq_path is not None and spaq_srcc is not None:
+                    best_model_path = os.path.join(self.save_dir, f'best_model_srcc_{best_srcc:.4f}_plcc_{best_plcc:.4f}_spaq_srcc_{spaq_srcc:.4f}_plcc_{spaq_plcc:.4f}.pkl')
+                else:
+                    best_model_path = os.path.join(self.save_dir, f'best_model_srcc_{best_srcc:.4f}_plcc_{best_plcc:.4f}.pkl')
+                torch.save(self.model_hyper.state_dict(), best_model_path)
+                print(f'  ⭐ New best model saved! SRCC: {best_srcc:.4f}, PLCC: {best_plcc:.4f}')
+                print(f'     Path: {best_model_path}')
+            
+            # Early stopping check
+            if self.early_stopping_enabled and epochs_no_improve >= self.patience:
+                print(f'\n🛑 Early stopping triggered!')
+                print(f'   No improvement for {self.patience} consecutive epochs.')
+                print(f'   Best SRCC: {best_srcc:.4f}, Best PLCC: {best_plcc:.4f}')
+                print(f'   Best model saved at: {best_model_path}')
+                break
 
             # Original implementation: recreate optimizer each epoch, only hypernet LR decays
             hypernet_lr = self.lr * self.lrratio / pow(10, (t // 6))

@@ -146,6 +146,8 @@ if __name__ == '__main__':
     parser.add_argument('--train_test_num', dest='train_test_num', type=int, default=10, help='Train-test times')
     parser.add_argument('--ranking_loss_alpha', dest='ranking_loss_alpha', type=float, default=0.5, help='Weight for ranking loss (set to 0 to disable)')
     parser.add_argument('--ranking_loss_margin', dest='ranking_loss_margin', type=float, default=0.1, help='Margin for hinge loss in ranking loss')
+    parser.add_argument('--patience', dest='patience', type=int, default=5, help='Early stopping patience: stop if no improvement for N epochs')
+    parser.add_argument('--no_early_stopping', dest='early_stopping', action='store_false', help='Disable early stopping (enabled by default)')
 
     config = parser.parse_args()
     main(config)
