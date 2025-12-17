@@ -35,6 +35,9 @@ class HyperIQASolver(object):
         self.use_lr_scheduler = getattr(config, 'use_lr_scheduler', True)  # Enable by default
         self.lr_scheduler_type = getattr(config, 'lr_scheduler_type', 'cosine')  # 'cosine' or 'step'
         
+        # Test crop method
+        self.test_random_crop = getattr(config, 'test_random_crop', False)  # Default: CenterCrop for reproducibility
+        
         # 创建模型保存目录（带时间戳防止覆盖）
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         save_dir_name = f"{self.dataset}-resnet_{timestamp}"
@@ -58,7 +61,7 @@ class HyperIQASolver(object):
         self.solver = torch.optim.Adam(paras, weight_decay=self.weight_decay)
 
         train_loader = data_loader.DataLoader(config.dataset, path, train_idx, config.patch_size, config.train_patch_num, batch_size=config.batch_size, istrain=True)
-        test_loader = data_loader.DataLoader(config.dataset, path, test_idx, config.patch_size, config.test_patch_num, istrain=False)
+        test_loader = data_loader.DataLoader(config.dataset, path, test_idx, config.patch_size, config.test_patch_num, istrain=False, test_random_crop=self.test_random_crop)
         self.train_data = train_loader.get_data()
         self.test_data = test_loader.get_data()
         

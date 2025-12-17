@@ -203,6 +203,7 @@ if __name__ == '__main__':
     parser.add_argument('--no_multiscale', dest='use_multiscale', action='store_false', help='Disable multi-scale feature fusion (enabled by default)')
     parser.add_argument('--lr_scheduler', dest='lr_scheduler_type', type=str, default='cosine', choices=['cosine', 'step', 'none'], help='Learning rate scheduler: cosine (default), step (original), or none')
     parser.add_argument('--no_lr_scheduler', dest='use_lr_scheduler', action='store_false', help='Disable learning rate scheduler')
+    parser.add_argument('--test_random_crop', dest='test_random_crop', action='store_true', help='Use RandomCrop for testing (original paper setup, less reproducible)')
 
     config = parser.parse_args()
     main(config)

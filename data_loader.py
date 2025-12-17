@@ -5,7 +5,7 @@ import folders
 class DataLoader(object):
     """Dataset class for IQA databases"""
 
-    def __init__(self, dataset, path, img_indx, patch_size, patch_num, batch_size=1, istrain=True):
+    def __init__(self, dataset, path, img_indx, patch_size, patch_num, batch_size=1, istrain=True, test_random_crop=False):
 
         self.batch_size = batch_size
         self.istrain = istrain
@@ -20,14 +20,24 @@ class DataLoader(object):
                     torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
                                                      std=(0.229, 0.224, 0.225))
                 ])
-            # Test transforms (use CenterCrop for reproducibility)
+            # Test transforms (CenterCrop for reproducibility, or RandomCrop to match original paper)
             else:
-                transforms = torchvision.transforms.Compose([
-                    torchvision.transforms.CenterCrop(size=patch_size),
-                    torchvision.transforms.ToTensor(),
-                    torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
-                                                     std=(0.229, 0.224, 0.225))
-                ])
+                if test_random_crop:
+                    # Original paper setup: RandomCrop for testing
+                    transforms = torchvision.transforms.Compose([
+                        torchvision.transforms.RandomCrop(size=patch_size),
+                        torchvision.transforms.ToTensor(),
+                        torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
+                                                         std=(0.229, 0.224, 0.225))
+                    ])
+                else:
+                    # CenterCrop for reproducibility (recommended)
+                    transforms = torchvision.transforms.Compose([
+                        torchvision.transforms.CenterCrop(size=patch_size),
+                        torchvision.transforms.ToTensor(),
+                        torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
+                                                         std=(0.229, 0.224, 0.225))
+                    ])
         elif dataset == 'koniq-10k':
             if istrain:
                 transforms = torchvision.transforms.Compose([
@@ -38,12 +48,22 @@ class DataLoader(object):
                     torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
                                                      std=(0.229, 0.224, 0.225))])
             else:
-                transforms = torchvision.transforms.Compose([
-                    torchvision.transforms.Resize((512, 384)),
-                    torchvision.transforms.CenterCrop(size=patch_size),
-                    torchvision.transforms.ToTensor(),
-                    torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
-                                                     std=(0.229, 0.224, 0.225))])
+                if test_random_crop:
+                    # Original paper setup: RandomCrop for testing
+                    transforms = torchvision.transforms.Compose([
+                        torchvision.transforms.Resize((512, 384)),
+                        torchvision.transforms.RandomCrop(size=patch_size),
+                        torchvision.transforms.ToTensor(),
+                        torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
+                                                         std=(0.229, 0.224, 0.225))])
+                else:
+                    # CenterCrop for reproducibility (recommended)
+                    transforms = torchvision.transforms.Compose([
+                        torchvision.transforms.Resize((512, 384)),
+                        torchvision.transforms.CenterCrop(size=patch_size),
+                        torchvision.transforms.ToTensor(),
+                        torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
+                                                         std=(0.229, 0.224, 0.225))])
         elif dataset == 'bid':
             if istrain:
                 transforms = torchvision.transforms.Compose([
@@ -54,12 +74,22 @@ class DataLoader(object):
                     torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
                                                      std=(0.229, 0.224, 0.225))])
             else:
-                transforms = torchvision.transforms.Compose([
-                    torchvision.transforms.Resize((512, 512)),
-                    torchvision.transforms.CenterCrop(size=patch_size),
-                    torchvision.transforms.ToTensor(),
-                    torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
-                                                     std=(0.229, 0.224, 0.225))])
+                if test_random_crop:
+                    # Original paper setup: RandomCrop for testing
+                    transforms = torchvision.transforms.Compose([
+                        torchvision.transforms.Resize((512, 512)),
+                        torchvision.transforms.RandomCrop(size=patch_size),
+                        torchvision.transforms.ToTensor(),
+                        torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
+                                                         std=(0.229, 0.224, 0.225))])
+                else:
+                    # CenterCrop for reproducibility (recommended)
+                    transforms = torchvision.transforms.Compose([
+                        torchvision.transforms.Resize((512, 512)),
+                        torchvision.transforms.CenterCrop(size=patch_size),
+                        torchvision.transforms.ToTensor(),
+                        torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
+                                                         std=(0.229, 0.224, 0.225))])
 
         if dataset == 'live':
             self.data = folders.LIVEFolder(
