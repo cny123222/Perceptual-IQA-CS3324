@@ -201,6 +201,8 @@ if __name__ == '__main__':
     parser.add_argument('--patience', dest='patience', type=int, default=5, help='Early stopping patience: stop if no improvement for N epochs')
     parser.add_argument('--no_early_stopping', dest='early_stopping', action='store_false', help='Disable early stopping (enabled by default)')
     parser.add_argument('--no_multiscale', dest='use_multiscale', action='store_false', help='Disable multi-scale feature fusion (enabled by default)')
+    parser.add_argument('--lr_scheduler', dest='lr_scheduler_type', type=str, default='cosine', choices=['cosine', 'step', 'none'], help='Learning rate scheduler: cosine (default), step (original), or none')
+    parser.add_argument('--no_lr_scheduler', dest='use_lr_scheduler', action='store_false', help='Disable learning rate scheduler')
 
     config = parser.parse_args()
     main(config)

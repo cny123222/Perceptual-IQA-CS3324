@@ -31,6 +31,10 @@ class HyperIQASolver(object):
         self.patience = getattr(config, 'patience', 5)  # Default: stop after 5 epochs with no improvement
         self.early_stopping_enabled = getattr(config, 'early_stopping', True)  # Enable by default
         
+        # Learning rate scheduler parameters
+        self.use_lr_scheduler = getattr(config, 'use_lr_scheduler', True)  # Enable by default
+        self.lr_scheduler_type = getattr(config, 'lr_scheduler_type', 'cosine')  # 'cosine' or 'step'
+        
         # 创建模型保存目录（带时间戳防止覆盖）
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         save_dir_name = f"{self.dataset}-resnet_{timestamp}"
@@ -81,6 +85,22 @@ class HyperIQASolver(object):
         # Early stopping variables
         epochs_no_improve = 0
         best_model_path = None
+        
+        # Learning rate scheduler
+        if self.use_lr_scheduler:
+            if self.lr_scheduler_type == 'cosine':
+                from torch.optim.lr_scheduler import CosineAnnealingLR
+                self.scheduler = CosineAnnealingLR(self.solver, T_max=self.epochs, eta_min=1e-6)
+                print(f'Learning rate scheduler: CosineAnnealingLR (T_max={self.epochs}, eta_min=1e-6)')
+            elif self.lr_scheduler_type == 'step':
+                print('Learning rate scheduler: Step decay (original, divide by 10 every 6 epochs)')
+                self.scheduler = None  # Will use manual step decay
+            else:
+                print(f'Unknown scheduler type: {self.lr_scheduler_type}, using step decay')
+                self.scheduler = None
+        else:
+            print('Learning rate scheduler: DISABLED (constant LR)')
+            self.scheduler = None
         
         if self.early_stopping_enabled:
             print(f'Early stopping enabled with patience={self.patience}')
@@ -190,13 +210,23 @@ class HyperIQASolver(object):
                 print(f'   Best model saved at: {best_model_path}')
                 break
 
-            # Original implementation: recreate optimizer each epoch, only hypernet LR decays
-            hypernet_lr = self.lr * self.lrratio / pow(10, (t // 6))
-            backbone_lr = self.lr  # Backbone LR stays constant
-            
-            self.paras = [{'params': self.hypernet_params, 'lr': hypernet_lr},
-                          {'params': self.model_hyper.res.parameters(), 'lr': backbone_lr}]
-            self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay)
+            # Learning rate update
+            if self.use_lr_scheduler and self.scheduler is not None:
+                # Use PyTorch scheduler (e.g., CosineAnnealingLR)
+                self.scheduler.step()
+                current_lr_hypernet = self.solver.param_groups[0]['lr']
+                current_lr_backbone = self.solver.param_groups[1]['lr']
+                print(f'  Learning rates: HyperNet={current_lr_hypernet:.6f}, Backbone={current_lr_backbone:.6f}')
+            elif self.use_lr_scheduler and self.lr_scheduler_type == 'step':
+                # Original step decay: recreate optimizer each epoch
+                hypernet_lr = self.lr * self.lrratio / pow(10, (t // 6))
+                backbone_lr = self.lr  # Backbone LR stays constant
+                
+                self.paras = [{'params': self.hypernet_params, 'lr': hypernet_lr},
+                              {'params': self.model_hyper.res.parameters(), 'lr': backbone_lr}]
+                self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay)
+                print(f'  Learning rates: HyperNet={hypernet_lr:.6f}, Backbone={hypernet_lr:.6f}')
+            # else: constant LR, no update needed
 
         print('Best test SRCC %f, PLCC %f' % (best_srcc, best_plcc))
 
