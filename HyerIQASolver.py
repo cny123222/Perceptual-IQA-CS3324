@@ -38,6 +38,9 @@ class HyperIQASolver(object):
         # Test crop method
         self.test_random_crop = getattr(config, 'test_random_crop', False)  # Default: CenterCrop for reproducibility
         
+        # SPAQ cross-dataset testing
+        self.test_spaq = getattr(config, 'test_spaq', True)  # Default: enable SPAQ testing
+        
         # 创建模型保存目录（带时间戳防止覆盖）
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         save_dir_name = f"{self.dataset}-resnet_{timestamp}"
@@ -72,13 +75,16 @@ class HyperIQASolver(object):
         spaq_base_path = os.path.join(base_dir, 'spaq-test')
         spaq_json_path = os.path.join(spaq_base_path, 'spaq_test.json') if os.path.exists(spaq_base_path) else None
         
-        if spaq_json_path and os.path.exists(spaq_json_path):
-            self.spaq_path = spaq_base_path
-            print(f'SPAQ test dataset found at: {self.spaq_path}')
-            # 在初始化时加载SPAQ数据集，避免每个epoch重复加载
-            self._init_spaq_dataset()
+        if self.test_spaq:
+            if spaq_json_path and os.path.exists(spaq_json_path):
+                self.spaq_path = spaq_base_path
+                print(f'SPAQ test dataset found at: {self.spaq_path}')
+                # 在初始化时加载SPAQ数据集，避免每个epoch重复加载
+                self._init_spaq_dataset()
+            else:
+                print('SPAQ dataset not found. SPAQ testing will be skipped.')
         else:
-            print('SPAQ dataset not found. SPAQ testing will be skipped.')
+            print('SPAQ cross-dataset testing: DISABLED (use --test_spaq to enable)')
 
     def train(self):
         """Training"""
