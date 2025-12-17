@@ -148,7 +148,10 @@ class HyperNet(nn.Module):
         # initialize
         for i, m_name in enumerate(self._modules):
             if i > 2:
-                nn.init.kaiming_normal_(self._modules[m_name].weight.data)
+                module = self._modules[m_name]
+                # Only initialize modules that have weight attribute (Conv2d, Linear)
+                if hasattr(module, 'weight') and module.weight is not None:
+                    nn.init.kaiming_normal_(module.weight.data)
 
     def forward(self, img):
         feature_size = self.feature_size
