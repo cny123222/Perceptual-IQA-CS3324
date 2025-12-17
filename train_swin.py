@@ -1,13 +1,33 @@
 import os
+import sys
 import argparse
 import random
 import numpy as np
 import csv
 import json
+from datetime import datetime
 from HyperIQASolver_swin import HyperIQASolver
 
 # 设置 CUDA 设备（如果使用 CUDA，取消注释下面一行并指定 GPU ID）
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'  # 使用第一个 GPU，可以改为 '0,1' 使用多个 GPU
+
+
+class Logger(object):
+    """Logger that writes to both console and file"""
+    def __init__(self, log_file):
+        self.terminal = sys.stdout
+        self.log = open(log_file, 'w', buffering=1)  # Line buffered
+        
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+        
+    def flush(self):
+        self.terminal.flush()
+        self.log.flush()
+        
+    def close(self):
+        self.log.close()
 
 
 def get_koniq_train_test_indices(root_path):
@@ -53,6 +73,33 @@ def get_koniq_train_test_indices(root_path):
 
 
 def main(config):
+    # 获取当前脚本所在目录的绝对路径
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Setup logging
+    log_dir = os.path.join(base_dir, 'logs')
+    os.makedirs(log_dir, exist_ok=True)
+    
+    # Generate log filename with timestamp and configuration
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_filename = f"swin"
+    if hasattr(config, 'use_multiscale') and config.use_multiscale:
+        log_filename += "_multiscale"
+    if config.ranking_loss_alpha > 0:
+        log_filename += f"_ranking_alpha{config.ranking_loss_alpha}"
+    else:
+        log_filename += "_ranking_alpha0"
+    log_filename += f"_{timestamp}.log"
+    log_path = os.path.join(log_dir, log_filename)
+    
+    # Redirect stdout to both console and file
+    logger = Logger(log_path)
+    sys.stdout = logger
+    sys.stderr = logger
+    
+    print(f"Training log will be saved to: {log_path}")
+    print("=" * 80)
+    
     # Set random seeds for reproducibility
     seed = 42
     random.seed(seed)
@@ -64,9 +111,6 @@ def main(config):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
     print(f'Random seed set to {seed} for reproducibility')
-
-    # 获取当前脚本所在目录的绝对路径
-    base_dir = os.path.dirname(os.path.abspath(__file__))
     
     folder_path = {
         'live': '/home/ssl/Database/databaserelease2/',
@@ -128,6 +172,14 @@ def main(config):
     plcc_med = np.median(plcc_all)
 
     print('Testing median SRCC %4.4f,\tmedian PLCC %4.4f' % (srcc_med, plcc_med))
+    
+    # Close logger
+    print("=" * 80)
+    print(f"Training completed. Log saved to: {log_path}")
+    if hasattr(sys.stdout, 'close'):
+        sys.stdout.close()
+    sys.stdout = sys.__stdout__
+    sys.stderr = sys.__stderr__
 
     # return srcc_med, plcc_med
 
