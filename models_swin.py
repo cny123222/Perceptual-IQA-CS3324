@@ -70,9 +70,9 @@ class HyperNet(nn.Module):
         self.fc5w_fc = nn.Linear(self.hyperInChn, self.f4)
         self.fc5b_fc = nn.Linear(self.hyperInChn, 1)
 
-        # initialize
+        # initialize (skip modules without weights like Dropout)
         for i, m_name in enumerate(self._modules):
-            if i > 2:
+            if i > 2 and hasattr(self._modules[m_name], 'weight'):
                 nn.init.kaiming_normal_(self._modules[m_name].weight.data)
 
     def forward(self, img):
