@@ -44,8 +44,7 @@ class DataLoader(object):
                     torchvision.transforms.RandomHorizontalFlip(),
                     torchvision.transforms.Resize((512, 384)),
                     torchvision.transforms.RandomCrop(size=patch_size),
-                    # Light ColorJitter for regularization (very conservative to not affect quality scores)
-                    torchvision.transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.05),
+                    # ColorJitter removed: too slow (3x slowdown), Dropout+StochasticDepth provide sufficient regularization
                     torchvision.transforms.ToTensor(),
                     torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
                                                      std=(0.229, 0.224, 0.225))])
