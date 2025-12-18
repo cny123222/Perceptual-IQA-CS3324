@@ -1,13 +1,33 @@
 import os
+import sys
 import argparse
 import random
 import numpy as np
 import csv
 import json
+from datetime import datetime
 from HyperIQASolver_swin import HyperIQASolver
 
 # 设置 CUDA 设备（如果使用 CUDA，取消注释下面一行并指定 GPU ID）
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'  # 使用第一个 GPU，可以改为 '0,1' 使用多个 GPU
+
+
+class Logger(object):
+    """Logger that writes to both console and file"""
+    def __init__(self, log_file):
+        self.terminal = sys.stdout
+        self.log = open(log_file, 'w', buffering=1)  # Line buffered
+        
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+        
+    def flush(self):
+        self.terminal.flush()
+        self.log.flush()
+        
+    def close(self):
+        self.log.close()
 
 
 def get_koniq_train_test_indices(root_path):
@@ -53,9 +73,44 @@ def get_koniq_train_test_indices(root_path):
 
 
 def main(config):
-
     # 获取当前脚本所在目录的绝对路径
     base_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Setup logging
+    log_dir = os.path.join(base_dir, 'logs')
+    os.makedirs(log_dir, exist_ok=True)
+    
+    # Generate log filename with timestamp and configuration
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_filename = f"swin"
+    if hasattr(config, 'use_multiscale') and config.use_multiscale:
+        log_filename += "_multiscale"
+    if config.ranking_loss_alpha > 0:
+        log_filename += f"_ranking_alpha{config.ranking_loss_alpha}"
+    else:
+        log_filename += "_ranking_alpha0"
+    log_filename += f"_{timestamp}.log"
+    log_path = os.path.join(log_dir, log_filename)
+    
+    # Redirect stdout to both console and file
+    logger = Logger(log_path)
+    sys.stdout = logger
+    sys.stderr = logger
+    
+    print(f"Training log will be saved to: {log_path}")
+    print("=" * 80)
+    
+    # Set random seeds for reproducibility
+    seed = 42
+    random.seed(seed)
+    np.random.seed(seed)
+    import torch
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    print(f'Random seed set to {seed} for reproducibility')
     
     folder_path = {
         'live': '/home/ssl/Database/databaserelease2/',
@@ -117,6 +172,14 @@ def main(config):
     plcc_med = np.median(plcc_all)
 
     print('Testing median SRCC %4.4f,\tmedian PLCC %4.4f' % (srcc_med, plcc_med))
+    
+    # Close logger
+    print("=" * 80)
+    print(f"Training completed. Log saved to: {log_path}")
+    if hasattr(sys.stdout, 'close'):
+        sys.stdout.close()
+    sys.stdout = sys.__stdout__
+    sys.stderr = sys.__stderr__
 
     # return srcc_med, plcc_med
 
@@ -135,6 +198,13 @@ if __name__ == '__main__':
     parser.add_argument('--train_test_num', dest='train_test_num', type=int, default=10, help='Train-test times')
     parser.add_argument('--ranking_loss_alpha', dest='ranking_loss_alpha', type=float, default=0.5, help='Weight for ranking loss (set to 0 to disable)')
     parser.add_argument('--ranking_loss_margin', dest='ranking_loss_margin', type=float, default=0.1, help='Margin for hinge loss in ranking loss')
+    parser.add_argument('--patience', dest='patience', type=int, default=5, help='Early stopping patience: stop if no improvement for N epochs')
+    parser.add_argument('--no_early_stopping', dest='early_stopping', action='store_false', help='Disable early stopping (enabled by default)')
+    parser.add_argument('--no_multiscale', dest='use_multiscale', action='store_false', help='Disable multi-scale feature fusion (enabled by default)')
+    parser.add_argument('--lr_scheduler', dest='lr_scheduler_type', type=str, default='cosine', choices=['cosine', 'step', 'none'], help='Learning rate scheduler: cosine (default), step (original), or none')
+    parser.add_argument('--no_lr_scheduler', dest='use_lr_scheduler', action='store_false', help='Disable learning rate scheduler')
+    parser.add_argument('--test_random_crop', dest='test_random_crop', action='store_true', help='Use RandomCrop for testing (original paper setup, less reproducible)')
+    parser.add_argument('--no_spaq', dest='test_spaq', action='store_false', help='Disable SPAQ cross-dataset testing (saves time and memory)')
 
     config = parser.parse_args()
     main(config)

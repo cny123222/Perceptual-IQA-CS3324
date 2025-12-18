@@ -33,6 +33,20 @@ class HyperIQASolver(object):
         self.ranking_loss_alpha = getattr(config, 'ranking_loss_alpha', 0.5)
         self.ranking_loss_margin = getattr(config, 'ranking_loss_margin', 0.1)
         
+        # Early stopping parameters
+        self.patience = getattr(config, 'patience', 5)  # Default: stop after 5 epochs with no improvement
+        self.early_stopping_enabled = getattr(config, 'early_stopping', True)  # Enable by default
+        
+        # Learning rate scheduler parameters
+        self.use_lr_scheduler = getattr(config, 'use_lr_scheduler', True)  # Enable by default
+        self.lr_scheduler_type = getattr(config, 'lr_scheduler_type', 'cosine')  # 'cosine' or 'step'
+        
+        # Test crop method
+        self.test_random_crop = getattr(config, 'test_random_crop', False)  # Default: CenterCrop for reproducibility
+        
+        # SPAQ cross-dataset testing
+        self.test_spaq = getattr(config, 'test_spaq', True)  # Default: enable SPAQ testing
+        
         # 创建模型保存目录（带时间戳防止覆盖）
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         save_dir_suffix = '-swin'
@@ -43,7 +57,14 @@ class HyperIQASolver(object):
         os.makedirs(self.save_dir, exist_ok=True)
         print(f'Model checkpoints will be saved to: {self.save_dir}')
 
-        self.model_hyper = models.HyperNet(16, 112, 224, 112, 56, 28, 14, 7).to(self.device)
+        # Multi-scale feature fusion (default: enabled)
+        self.use_multiscale = getattr(config, 'use_multiscale', True)
+        if self.use_multiscale:
+            print('Multi-scale feature fusion: ENABLED')
+        else:
+            print('Multi-scale feature fusion: DISABLED')
+        
+        self.model_hyper = models.HyperNet(16, 112, 224, 112, 56, 28, 14, 7, use_multiscale=self.use_multiscale).to(self.device)
         self.model_hyper.train(True)
 
         self.l1_loss = torch.nn.L1Loss().to(self.device)
@@ -59,21 +80,34 @@ class HyperIQASolver(object):
         self.solver = torch.optim.Adam(paras, weight_decay=self.weight_decay)
 
         train_loader = data_loader.DataLoader(config.dataset, path, train_idx, config.patch_size, config.train_patch_num, batch_size=config.batch_size, istrain=True)
-        test_loader = data_loader.DataLoader(config.dataset, path, test_idx, config.patch_size, config.test_patch_num, istrain=False)
+        test_loader = data_loader.DataLoader(config.dataset, path, test_idx, config.patch_size, config.test_patch_num, istrain=False, test_random_crop=self.test_random_crop)
         self.train_data = train_loader.get_data()
         self.test_data = test_loader.get_data()
         
-        # 初始化SPAQ数据集用于跨数据集测试（如果存在）
-        self.spaq_path = None
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        spaq_base_path = os.path.join(base_dir, 'spaq-test')
-        spaq_json_path = os.path.join(spaq_base_path, 'spaq_test.json') if os.path.exists(spaq_base_path) else None
-        
-        if spaq_json_path and os.path.exists(spaq_json_path):
-            self.spaq_path = spaq_base_path
-            print(f'SPAQ test dataset found at: {self.spaq_path}')
+        # Print test crop method
+        if self.test_random_crop:
+            print('Test augmentation: RandomCrop (original paper, less reproducible)')
         else:
-            print('SPAQ dataset not found. SPAQ testing will be skipped.')
+            print('Test augmentation: CenterCrop (reproducible, recommended)')
+        
+        # 初始化SPAQ数据集用于跨数据集测试（如果存在且启用）
+        self.spaq_path = None
+        self.spaq_loader = None
+        
+        if self.test_spaq:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            spaq_base_path = os.path.join(base_dir, 'spaq-test')
+            spaq_json_path = os.path.join(spaq_base_path, 'spaq_test.json') if os.path.exists(spaq_base_path) else None
+            
+            if spaq_json_path and os.path.exists(spaq_json_path):
+                self.spaq_path = spaq_base_path
+                print(f'SPAQ test dataset found at: {self.spaq_path}')
+                # 在初始化时加载SPAQ数据集，避免每个epoch重复加载
+                self._init_spaq_dataset()
+            else:
+                print('SPAQ dataset not found. SPAQ testing will be skipped.')
+        else:
+            print('SPAQ cross-dataset testing: DISABLED (use --test_spaq to enable)')
         
         if self.ranking_loss_alpha > 0:
             print(f'Ranking loss enabled: alpha={self.ranking_loss_alpha}, margin={self.ranking_loss_margin}')
@@ -82,6 +116,30 @@ class HyperIQASolver(object):
         """Training"""
         best_srcc = 0.0
         best_plcc = 0.0
+        
+        # Early stopping variables
+        epochs_no_improve = 0
+        best_model_path = None
+        
+        # Learning rate scheduler
+        if self.use_lr_scheduler:
+            if self.lr_scheduler_type == 'cosine':
+                from torch.optim.lr_scheduler import CosineAnnealingLR
+                self.scheduler = CosineAnnealingLR(self.solver, T_max=self.epochs, eta_min=1e-6)
+                print(f'Learning rate scheduler: CosineAnnealingLR (T_max={self.epochs}, eta_min=1e-6)')
+            elif self.lr_scheduler_type == 'step':
+                print('Learning rate scheduler: Step decay (original, divide by 10 every 6 epochs)')
+                self.scheduler = None  # Will use manual step decay
+            else:
+                print(f'Unknown scheduler type: {self.lr_scheduler_type}, using step decay')
+                self.scheduler = None
+        else:
+            print('Learning rate scheduler: DISABLED (constant LR)')
+            self.scheduler = None
+        
+        if self.early_stopping_enabled:
+            print(f'Early stopping enabled with patience={self.patience}')
+        
         if self.spaq_path is not None:
             print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC\tSPAQ_SRCC\tSPAQ_PLCC')
         else:
@@ -160,9 +218,16 @@ class HyperIQASolver(object):
             train_srcc, _ = stats.spearmanr(pred_scores, gt_scores)
 
             test_srcc, test_plcc = self.test(self.test_data)
+            
+            # Check if this is the best model so far
+            improved = False
             if test_srcc > best_srcc:
                 best_srcc = test_srcc
                 best_plcc = test_plcc
+                improved = True
+                epochs_no_improve = 0
+            else:
+                epochs_no_improve += 1
             
             # 在SPAQ数据集上测试
             spaq_srcc, spaq_plcc = None, None
@@ -195,14 +260,42 @@ class HyperIQASolver(object):
                 model_path = os.path.join(self.save_dir, f'checkpoint_epoch_{t+1}_srcc_{test_srcc:.4f}_plcc_{test_plcc:.4f}.pkl')
             torch.save(self.model_hyper.state_dict(), model_path)
             print(f'  Model saved to: {model_path}')
-
-            # Original implementation: recreate optimizer each epoch, only hypernet LR decays
-            hypernet_lr = self.lr * self.lrratio / pow(10, (t // 6))
-            backbone_lr = self.lr  # Backbone LR stays constant
             
-            self.paras = [{'params': self.hypernet_params, 'lr': hypernet_lr},
-                          {'params': self.model_hyper.swin.parameters(), 'lr': backbone_lr}]
-            self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay)
+            # Save best model separately
+            if improved:
+                if self.spaq_path is not None and spaq_srcc is not None:
+                    best_model_path = os.path.join(self.save_dir, f'best_model_srcc_{best_srcc:.4f}_plcc_{best_plcc:.4f}_spaq_srcc_{spaq_srcc:.4f}_plcc_{spaq_plcc:.4f}.pkl')
+                else:
+                    best_model_path = os.path.join(self.save_dir, f'best_model_srcc_{best_srcc:.4f}_plcc_{best_plcc:.4f}.pkl')
+                torch.save(self.model_hyper.state_dict(), best_model_path)
+                print(f'  ⭐ New best model saved! SRCC: {best_srcc:.4f}, PLCC: {best_plcc:.4f}')
+                print(f'     Path: {best_model_path}')
+            
+            # Early stopping check
+            if self.early_stopping_enabled and epochs_no_improve >= self.patience:
+                print(f'\n🛑 Early stopping triggered!')
+                print(f'   No improvement for {self.patience} consecutive epochs.')
+                print(f'   Best SRCC: {best_srcc:.4f}, Best PLCC: {best_plcc:.4f}')
+                print(f'   Best model saved at: {best_model_path}')
+                break
+
+            # Learning rate update
+            if self.use_lr_scheduler and self.scheduler is not None:
+                # Use PyTorch scheduler (e.g., CosineAnnealingLR)
+                self.scheduler.step()
+                current_lr_hypernet = self.solver.param_groups[0]['lr']
+                current_lr_backbone = self.solver.param_groups[1]['lr']
+                print(f'  Learning rates: HyperNet={current_lr_hypernet:.6f}, Backbone={current_lr_backbone:.6f}')
+            elif self.use_lr_scheduler and self.lr_scheduler_type == 'step':
+                # Original step decay: recreate optimizer each epoch
+                hypernet_lr = self.lr * self.lrratio / pow(10, (t // 6))
+                backbone_lr = self.lr  # Backbone LR stays constant
+                
+                self.paras = [{'params': self.hypernet_params, 'lr': hypernet_lr},
+                              {'params': self.model_hyper.swin.parameters(), 'lr': backbone_lr}]
+                self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay)
+                print(f'  Learning rates: HyperNet={hypernet_lr:.6f}, Backbone={backbone_lr:.6f}')
+            # else: constant LR, no update needed
 
         print('Best test SRCC %f, PLCC %f' % (best_srcc, best_plcc))
 
@@ -289,30 +382,20 @@ class HyperIQASolver(object):
         self.model_hyper.train(True)
         return test_srcc, test_plcc
 
-    def test_spaq(self):
-        """Test on SPAQ dataset for cross-dataset evaluation"""
-        if self.spaq_path is None:
-            return None, None
-        
+    def _init_spaq_dataset(self):
+        """Initialize SPAQ dataset in __init__ to avoid reloading every epoch"""
         import json
         from PIL import Image
         import torchvision
         
         json_path = os.path.join(self.spaq_path, 'spaq_test.json')
         if not os.path.exists(json_path):
-            return None, None
+            self.spaq_loader = None
+            return
         
         # Load SPAQ test data
         with open(json_path) as f:
             spaq_data = json.load(f)
-        
-        # Use same transforms as koniq-10k
-        transforms = torchvision.transforms.Compose([
-            torchvision.transforms.Resize((512, 384)),
-            torchvision.transforms.RandomCrop(size=224),
-            torchvision.transforms.ToTensor(),
-            torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
-                                             std=(0.229, 0.224, 0.225))])
         
         def pil_loader(path):
             with open(path, 'rb') as f:
@@ -331,7 +414,8 @@ class HyperIQASolver(object):
                 samples.append((img_path, score))
         
         if len(samples) == 0:
-            return None, None
+            self.spaq_loader = None
+            return
         
         # Create a dataset class with optimized caching: pre-resize images
         # SPAQ images are much larger (13MP vs 0.8MP), so pre-resizing saves significant time
@@ -340,8 +424,9 @@ class HyperIQASolver(object):
                 self.samples = samples
                 # Split transform: Resize is expensive for large images, cache it
                 self.resize_transform = torchvision.transforms.Resize((512, 384))
+                # Use CenterCrop for testing (reproducible results)
                 self.crop_transform = torchvision.transforms.Compose([
-                    torchvision.transforms.RandomCrop(size=224),
+                    torchvision.transforms.CenterCrop(size=224),
                     torchvision.transforms.ToTensor(),
                     torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
                                                      std=(0.229, 0.224, 0.225))])
@@ -371,7 +456,7 @@ class HyperIQASolver(object):
                     resized_img = self.resize_transform(img)
                     self._resized_cache[path] = resized_img
                 
-                # Only do RandomCrop + ToTensor + Normalize (fast)
+                # Only do CenterCrop + ToTensor + Normalize (fast, deterministic)
                 sample = self.crop_transform(resized_img)
                 return sample, target
             
@@ -379,21 +464,27 @@ class HyperIQASolver(object):
                 return len(self.samples)
         
         # Create DataLoader (same as KonIQ test)
-        spaq_dataset = SPAQDataset(samples, transforms)
-        spaq_loader = torch.utils.data.DataLoader(
+        spaq_dataset = SPAQDataset(samples, None)  # transform not used, handled in class
+        self.spaq_loader = torch.utils.data.DataLoader(
             spaq_dataset, batch_size=1, shuffle=False, num_workers=0, pin_memory=False)
+        self.spaq_num_images = len(spaq_data)
+        print(f'  SPAQ dataset initialized: {self.spaq_num_images} images, {len(samples)} patches')
+    
+    def test_spaq(self):
+        """Test on SPAQ dataset for cross-dataset evaluation"""
+        if self.spaq_loader is None:
+            return None, None
         
         self.model_hyper.train(False)
         pred_scores = []
         gt_scores = []
         
-        num_images = len(spaq_data)
-        print(f'  Testing on SPAQ dataset ({num_images} images)...')
+        print(f'  Testing on SPAQ dataset ({self.spaq_num_images} images)...')
         
         # Use tqdm for progress bar (same as KonIQ test)
-        total_batches = len(spaq_loader)
+        total_batches = len(self.spaq_loader)
         spaq_loader_with_progress = tqdm(
-            spaq_loader,
+            self.spaq_loader,
             desc='  SPAQ',
             total=total_batches,
             unit='batch',
