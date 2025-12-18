@@ -21,7 +21,7 @@ class HyperNet(nn.Module):
         For size match, input args must satisfy: 'target_fc(i)_size * target_fc(i+1)_size' is divisible by 'feature_size ^ 2'.
 
     """
-    def __init__(self, lda_out_channels, hyper_in_channels, target_in_size, target_fc1_size, target_fc2_size, target_fc3_size, target_fc4_size, feature_size, use_multiscale=False):
+    def __init__(self, lda_out_channels, hyper_in_channels, target_in_size, target_fc1_size, target_fc2_size, target_fc3_size, target_fc4_size, feature_size, use_multiscale=False, drop_path_rate=0.2, dropout_rate=0.3):
         super(HyperNet, self).__init__()
 
         self.hyperInChn = hyper_in_channels
@@ -32,8 +32,9 @@ class HyperNet(nn.Module):
         self.f3 = target_fc3_size
         self.f4 = target_fc4_size
         self.feature_size = feature_size
+        self.dropout_rate = dropout_rate  # Dropout rate for regularization
 
-        self.swin = swin_backbone(lda_out_channels, target_in_size, pretrained=True)
+        self.swin = swin_backbone(lda_out_channels, target_in_size, pretrained=True, drop_path_rate=drop_path_rate)
 
         self.pool = nn.AdaptiveAvgPool2d((1, 1))
 
@@ -51,6 +52,9 @@ class HyperNet(nn.Module):
         )
 
         # Hyper network part, conv for generating target fc weights, fc for generating target fc biases
+        # Add Dropout for regularization to combat overfitting
+        self.dropout = nn.Dropout(dropout_rate)
+        
         self.fc1w_conv = nn.Conv2d(self.hyperInChn, int(self.target_in_size * self.f1 / feature_size ** 2), 3,  padding=(1, 1))
         self.fc1b_fc = nn.Linear(self.hyperInChn, self.f1)
 
@@ -96,6 +100,9 @@ class HyperNet(nn.Module):
             # 单尺度模式（向后兼容）
             hyper_in_feat = self.conv1(swin_out['hyper_in_feat']).view(-1, self.hyperInChn, feature_size, feature_size)
 
+        # Apply dropout for regularization (only during training)
+        hyper_in_feat = self.dropout(hyper_in_feat)
+
         # generating target net weights & biases
         target_fc1w = self.fc1w_conv(hyper_in_feat).view(-1, self.f1, self.target_in_size, 1, 1)
         target_fc1b = self.fc1b_fc(self.pool(hyper_in_feat).squeeze()).view(-1, self.f1)
@@ -132,8 +139,10 @@ class TargetNet(nn.Module):
     """
     Target network for quality prediction.
     """
-    def __init__(self, paras):
+    def __init__(self, paras, dropout_rate=0.3):
         super(TargetNet, self).__init__()
+        self.dropout = nn.Dropout(dropout_rate)
+        
         self.l1 = nn.Sequential(
             TargetFC(paras['target_fc1w'], paras['target_fc1b']),
             nn.Sigmoid(),
@@ -156,8 +165,11 @@ class TargetNet(nn.Module):
 
     def forward(self, x):
         q = self.l1(x)
+        q = self.dropout(q)  # Dropout after l1
         q = self.l2(q)
+        q = self.dropout(q)  # Dropout after l2
         q = self.l3(q)
+        q = self.dropout(q)  # Dropout after l3
         q = self.l4(q).squeeze()
         return q
 
@@ -189,14 +201,16 @@ class SwinBackbone(nn.Module):
     """
     Swin Transformer backbone with multi-scale feature extraction and LDA modules.
     """
-    def __init__(self, lda_out_channels, in_chn):
+    def __init__(self, lda_out_channels, in_chn, drop_path_rate=0.2):
         super(SwinBackbone, self).__init__()
         
         # Load Swin Transformer Tiny with features_only mode
+        # drop_path_rate: Stochastic depth for regularization (0.2 recommended)
         self.backbone = timm.create_model(
             'swin_tiny_patch4_window7_224',
             pretrained=True,
             features_only=True,
+            drop_path_rate=drop_path_rate,  # Enable stochastic depth
             out_indices=(0, 1, 2, 3)  # Extract all 4 stages
         )
         
@@ -288,15 +302,16 @@ class SwinBackbone(nn.Module):
         return out
 
 
-def swin_backbone(lda_out_channels, in_chn, pretrained=True, **kwargs):
+def swin_backbone(lda_out_channels, in_chn, pretrained=True, drop_path_rate=0.2, **kwargs):
     """Constructs a Swin Transformer Tiny backbone.
 
     Args:
         lda_out_channels: output channels for each LDA module
         in_chn: total input channels for target network (sum of all LDA outputs)
         pretrained (bool): If True, uses pretrained weights from ImageNet
+        drop_path_rate (float): Stochastic depth rate for regularization
     """
-    model = SwinBackbone(lda_out_channels, in_chn)
+    model = SwinBackbone(lda_out_channels, in_chn, drop_path_rate=drop_path_rate)
     return model
 
 

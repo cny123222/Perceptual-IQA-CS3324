@@ -64,7 +64,17 @@ class HyperIQASolver(object):
         else:
             print('Multi-scale feature fusion: DISABLED')
         
-        self.model_hyper = models.HyperNet(16, 112, 224, 112, 56, 28, 14, 7, use_multiscale=self.use_multiscale).to(self.device)
+        # Get regularization parameters
+        self.drop_path_rate = getattr(config, 'drop_path_rate', 0.2)
+        self.dropout_rate = getattr(config, 'dropout_rate', 0.3)
+        print(f'Regularization: drop_path_rate={self.drop_path_rate:.2f}, dropout_rate={self.dropout_rate:.2f}')
+        
+        self.model_hyper = models.HyperNet(
+            16, 112, 224, 112, 56, 28, 14, 7, 
+            use_multiscale=self.use_multiscale,
+            drop_path_rate=self.drop_path_rate,
+            dropout_rate=self.dropout_rate
+        ).to(self.device)
         self.model_hyper.train(True)
 
         self.l1_loss = torch.nn.L1Loss().to(self.device)
@@ -77,7 +87,8 @@ class HyperIQASolver(object):
         paras = [{'params': self.hypernet_params, 'lr': self.lr * self.lrratio},
                  {'params': self.model_hyper.swin.parameters(), 'lr': self.lr}
                  ]
-        self.solver = torch.optim.Adam(paras, weight_decay=self.weight_decay)
+        # Use AdamW for better weight decay handling (decouples weight decay from gradient update)
+        self.solver = torch.optim.AdamW(paras, weight_decay=self.weight_decay)
 
         train_loader = data_loader.DataLoader(config.dataset, path, train_idx, config.patch_size, config.train_patch_num, batch_size=config.batch_size, istrain=True)
         test_loader = data_loader.DataLoader(config.dataset, path, test_idx, config.patch_size, config.test_patch_num, istrain=False, test_random_crop=self.test_random_crop)
@@ -175,7 +186,7 @@ class HyperIQASolver(object):
                 paras = self.model_hyper(img)
 
                 # Building target network
-                model_target = models.TargetNet(paras).to(self.device)
+                model_target = models.TargetNet(paras, dropout_rate=self.dropout_rate).to(self.device)
                 for param in model_target.parameters():
                     param.requires_grad = False
 
@@ -204,6 +215,8 @@ class HyperIQASolver(object):
                 
                 epoch_loss.append(total_loss.item())
                 total_loss.backward()
+                # Gradient clipping to prevent exploding gradients and stabilize training
+                torch.nn.utils.clip_grad_norm_(self.model_hyper.parameters(), max_norm=1.0)
                 self.solver.step()
                 
                 # Update progress bar with current loss
@@ -293,7 +306,7 @@ class HyperIQASolver(object):
                 
                 self.paras = [{'params': self.hypernet_params, 'lr': hypernet_lr},
                               {'params': self.model_hyper.swin.parameters(), 'lr': backbone_lr}]
-                self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay)
+                self.solver = torch.optim.AdamW(self.paras, weight_decay=self.weight_decay)
                 print(f'  Learning rates: HyperNet={hypernet_lr:.6f}, Backbone={backbone_lr:.6f}')
             # else: constant LR, no update needed
 
@@ -367,7 +380,7 @@ class HyperIQASolver(object):
                 label = label.float().to(self.device)
 
                 paras = self.model_hyper(img)
-                model_target = models.TargetNet(paras).to(self.device)
+                model_target = models.TargetNet(paras, dropout_rate=self.dropout_rate).to(self.device)
                 model_target.train(False)
                 pred = model_target(paras['target_in_vec'])
 
@@ -497,7 +510,7 @@ class HyperIQASolver(object):
                 label = label.float().to(self.device)
                 
                 paras = self.model_hyper(img)
-                model_target = models.TargetNet(paras).to(self.device)
+                model_target = models.TargetNet(paras, dropout_rate=self.dropout_rate).to(self.device)
                 model_target.train(False)
                 pred = model_target(paras['target_in_vec'])
                 
