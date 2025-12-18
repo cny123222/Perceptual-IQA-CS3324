@@ -129,4 +129,15 @@ def __init__(self, config, path, train_idx, val_idx, test_idx=None):
    - `train_standard.sh` - 标准训练
    - `train_full.sh` - 完整训练
 
+---
+
+## 训练稳定性修复（实验项：当前不启用）
+
+我们曾尝试过三项“训练稳定性修复”（主要针对 Swin 版本）：
+- `filter(...)` 改为 `list(filter(...))`（避免 filter 迭代器被重复使用后耗尽）
+- Backbone 学习率也按 epoch 衰减（避免 backbone LR 固定）
+- 不在每个 epoch 重建 Adam（保留 optimizer state，只更新 param_groups 学习率）
+
+**结论**：在当前实验设置下（以 KonIQ 测试集 SRCC/PLCC 为主），观察到的最终指标差异不明显，因此目前已回退到原始实现，后续如需对比可再单独启用这三项修复。
+
 
