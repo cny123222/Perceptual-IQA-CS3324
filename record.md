@@ -749,17 +749,18 @@ python train_swin.py \
 
 **预期**：SRCC 0.930-0.933，稳定收敛到 Epoch 2-3
 
-### 方向 2：Swin-Small + Attention Fusion（探索性）⭐⭐⭐⭐
+### 方向 2：Swin-Base + Pure L1 Loss (alpha=0)（探索性）⭐⭐⭐⭐
 
-**目标**：验证注意力机制在更大模型上的效果
+**目标**：验证 Ranking Loss 对 Base 模型是否必要
 
 **理由**：
-- 之前在 Tiny 上失败（容量不足）
-- Small 已经很稳定，可以尝试增加复杂度
+- 在 Swin-Small 上，alpha=0 vs alpha=0.5 差异仅 0.002
+- 如果 Base 上规律相同，可以简化模型（去掉 ranking loss）
+- 使用与方向1相同的强正则化配置
 
 **预期**：
-- 成功：SRCC 0.932-0.935
-- 失败：SRCC 0.925 左右（小幅退步）
+- 与 alpha=0.5 性能接近：SRCC 0.930-0.933
+- 如果性能相同，优先使用 alpha=0（更简单）
 
 ---
 

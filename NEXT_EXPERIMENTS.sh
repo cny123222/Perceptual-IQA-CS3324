@@ -44,11 +44,11 @@ echo "=================================================="
 echo ""
 
 # ============================================================
-# 实验 B：Swin-Small + Attention Fusion（探索性）⭐⭐⭐⭐
+# 实验 B：Swin-Base + Pure L1 Loss (alpha=0)（探索性）⭐⭐⭐⭐
 # ============================================================
-echo "【实验 B】Swin-Small + Attention Fusion"
-echo "目标：验证注意力机制在更大模型上的效果"
-echo "预期：成功则 0.932-0.935，失败则 0.925"
+echo "【实验 B】Swin-Base + Pure L1 Loss (alpha=0)"
+echo "目标：验证 Ranking Loss 对 Base 模型是否必要"
+echo "预期：与 alpha=0.5 性能接近，约 0.930-0.933"
 echo ""
 echo "命令："
 cat << 'EOF'
@@ -56,26 +56,25 @@ python train_swin.py \
   --dataset koniq-10k \
   --epochs 30 \
   --patience 7 \
-  --batch_size 64 \
+  --batch_size 32 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --model_size small \
-  --ranking_loss_alpha 0.5 \
-  --lr 1e-5 \
-  --weight_decay 1e-4 \
-  --drop_path_rate 0.2 \
-  --dropout_rate 0.3 \
+  --model_size base \
+  --ranking_loss_alpha 0 \
+  --lr 5e-6 \
+  --weight_decay 2e-4 \
+  --drop_path_rate 0.3 \
+  --dropout_rate 0.4 \
   --lr_scheduler cosine \
   --test_random_crop \
-  --no_spaq \
-  --attention_fusion
+  --no_spaq
 EOF
 echo ""
 echo "关键变化："
-echo "  - 添加 --attention_fusion（注意力加权多尺度融合）"
-echo "  - 在 Swin-Tiny 上失败了（容量不足）"
-echo "  - 在 Swin-Small 上可能成功（容量充足）"
-echo "  - batch_size=64（Small 显存充足）"
+echo "  - ranking_loss_alpha: 0.5 → 0 (纯L1损失)"
+echo "  - 在 Swin-Small 上 alpha=0 vs 0.5 差异仅 0.002"
+echo "  - 验证这个规律在 Base 上是否成立"
+echo "  - 其他正则化参数与实验A相同（强正则化）"
 echo ""
 echo "=================================================="
 echo ""
@@ -120,24 +119,23 @@ if [ "$1" == "run_a" ]; then
       --no_spaq
 elif [ "$1" == "run_b" ]; then
     echo ""
-    echo "🚀 启动实验 B：Swin-Small + Attention Fusion"
+    echo "🚀 启动实验 B：Swin-Base + Pure L1 Loss (alpha=0)"
     echo ""
     python train_swin.py \
       --dataset koniq-10k \
       --epochs 30 \
       --patience 7 \
-      --batch_size 64 \
+      --batch_size 32 \
       --train_patch_num 20 \
       --test_patch_num 20 \
-      --model_size small \
-      --ranking_loss_alpha 0.5 \
-      --lr 1e-5 \
-      --weight_decay 1e-4 \
-      --drop_path_rate 0.2 \
-      --dropout_rate 0.3 \
+      --model_size base \
+      --ranking_loss_alpha 0 \
+      --lr 5e-6 \
+      --weight_decay 2e-4 \
+      --drop_path_rate 0.3 \
+      --dropout_rate 0.4 \
       --lr_scheduler cosine \
       --test_random_crop \
-      --no_spaq \
-      --attention_fusion
+      --no_spaq
 fi
 
