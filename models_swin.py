@@ -21,7 +21,7 @@ class HyperNet(nn.Module):
         For size match, input args must satisfy: 'target_fc(i)_size * target_fc(i+1)_size' is divisible by 'feature_size ^ 2'.
 
     """
-    def __init__(self, lda_out_channels, hyper_in_channels, target_in_size, target_fc1_size, target_fc2_size, target_fc3_size, target_fc4_size, feature_size, use_multiscale=False, drop_path_rate=0.2, dropout_rate=0.3):
+    def __init__(self, lda_out_channels, hyper_in_channels, target_in_size, target_fc1_size, target_fc2_size, target_fc3_size, target_fc4_size, feature_size, use_multiscale=False, drop_path_rate=0.2, dropout_rate=0.3, model_size='tiny'):
         super(HyperNet, self).__init__()
 
         self.hyperInChn = hyper_in_channels
@@ -33,15 +33,25 @@ class HyperNet(nn.Module):
         self.f4 = target_fc4_size
         self.feature_size = feature_size
         self.dropout_rate = dropout_rate  # Dropout rate for regularization
+        self.model_size = model_size  # Swin model size
 
-        self.swin = swin_backbone(lda_out_channels, target_in_size, pretrained=True, drop_path_rate=drop_path_rate)
+        self.swin = swin_backbone(lda_out_channels, target_in_size, pretrained=True, drop_path_rate=drop_path_rate, model_size=model_size)
 
         self.pool = nn.AdaptiveAvgPool2d((1, 1))
 
         # Conv layers for swin output features
-        # 如果使用多尺度：1440 channels (96+192+384+768) -> 112 channels
-        # 如果使用单尺度：768 channels -> 112 channels
-        input_channels = 1440 if use_multiscale else 768
+        # Determine input channels based on model size and whether multi-scale is used
+        if model_size == 'base':
+            # Swin-Base: [128, 256, 512, 1024]
+            single_scale_channels = 1024
+            multi_scale_channels = 128 + 256 + 512 + 1024  # 1920
+        else:
+            # Swin-Tiny/Small: [96, 192, 384, 768]
+            single_scale_channels = 768
+            multi_scale_channels = 96 + 192 + 384 + 768  # 1440
+        
+        input_channels = multi_scale_channels if use_multiscale else single_scale_channels
+        print(f'HyperNet input channels: {input_channels} (multi_scale={use_multiscale}, model={model_size})')
         self.conv1 = nn.Sequential(
             nn.Conv2d(input_channels, 512, 1, padding=(0, 0)),
             nn.ReLU(inplace=True),
@@ -201,50 +211,76 @@ class SwinBackbone(nn.Module):
     """
     Swin Transformer backbone with multi-scale feature extraction and LDA modules.
     """
-    def __init__(self, lda_out_channels, in_chn, drop_path_rate=0.2):
+    def __init__(self, lda_out_channels, in_chn, drop_path_rate=0.2, model_size='tiny'):
         super(SwinBackbone, self).__init__()
         
-        # Load Swin Transformer Tiny with features_only mode
+        # Model selection
+        model_configs = {
+            'tiny': {
+                'name': 'swin_tiny_patch4_window7_224',
+                'channels': [96, 192, 384, 768],
+                'params': '~28M'
+            },
+            'small': {
+                'name': 'swin_small_patch4_window7_224',
+                'channels': [96, 192, 384, 768],
+                'params': '~50M'
+            },
+            'base': {
+                'name': 'swin_base_patch4_window7_224',
+                'channels': [128, 256, 512, 1024],
+                'params': '~88M'
+            }
+        }
+        
+        if model_size not in model_configs:
+            raise ValueError(f"model_size must be one of {list(model_configs.keys())}")
+        
+        config = model_configs[model_size]
+        self.channels = config['channels']
+        print(f"Loading Swin Transformer {model_size.upper()} ({config['params']} parameters)")
+        
+        # Load Swin Transformer with features_only mode
         # drop_path_rate: Stochastic depth for regularization (0.2 recommended)
         self.backbone = timm.create_model(
-            'swin_tiny_patch4_window7_224',
+            config['name'],
             pretrained=True,
             features_only=True,
             drop_path_rate=drop_path_rate,  # Enable stochastic depth
             out_indices=(0, 1, 2, 3)  # Extract all 4 stages
         )
         
-        # Get feature dimensions and sizes for Swin-T
-        # Stage 1: 96 channels, 56x56
-        # Stage 2: 192 channels, 28x28
-        # Stage 3: 384 channels, 14x14
-        # Stage 4: 768 channels, 7x7
+        # Get feature dimensions and sizes
+        # Stage 1: channels[0], 56x56
+        # Stage 2: channels[1], 28x28
+        # Stage 3: channels[2], 14x14
+        # Stage 4: channels[3], 7x7
         
-        # Local distortion aware modules for each stage
-        # Stage 1: 96 ch, 56x56 -> pool to 8x8
+        # Local distortion aware modules for each stage (dynamic based on model size)
+        # Stage 1: channels[0], 56x56 -> pool to 8x8
         self.lda1_pool = nn.Sequential(
-            nn.Conv2d(96, 16, kernel_size=1, stride=1, padding=0, bias=False),
+            nn.Conv2d(self.channels[0], 16, kernel_size=1, stride=1, padding=0, bias=False),
             nn.AvgPool2d(7, stride=7),  # 56x56 -> 8x8
         )
         self.lda1_fc = nn.Linear(16 * 64, lda_out_channels)
         
-        # Stage 2: 192 ch, 28x28 -> pool to 4x4
+        # Stage 2: channels[1], 28x28 -> pool to 4x4
         self.lda2_pool = nn.Sequential(
-            nn.Conv2d(192, 32, kernel_size=1, stride=1, padding=0, bias=False),
+            nn.Conv2d(self.channels[1], 32, kernel_size=1, stride=1, padding=0, bias=False),
             nn.AvgPool2d(7, stride=7),  # 28x28 -> 4x4
         )
         self.lda2_fc = nn.Linear(32 * 16, lda_out_channels)
         
-        # Stage 3: 384 ch, 14x14 -> pool to 2x2
+        # Stage 3: channels[2], 14x14 -> pool to 2x2
         self.lda3_pool = nn.Sequential(
-            nn.Conv2d(384, 64, kernel_size=1, stride=1, padding=0, bias=False),
+            nn.Conv2d(self.channels[2], 64, kernel_size=1, stride=1, padding=0, bias=False),
             nn.AvgPool2d(7, stride=7),  # 14x14 -> 2x2
         )
         self.lda3_fc = nn.Linear(64 * 4, lda_out_channels)
         
-        # Stage 4: 768 ch, 7x7 -> pool to 1x1
+        # Stage 4: channels[3], 7x7 -> pool to 1x1
         self.lda4_pool = nn.AvgPool2d(7, stride=7)  # 7x7 -> 1x1
-        self.lda4_fc = nn.Linear(768, in_chn - lda_out_channels * 3)
+        self.lda4_fc = nn.Linear(self.channels[3], in_chn - lda_out_channels * 3)
         
         # Initialize LDA modules
         nn.init.kaiming_normal_(self.lda1_pool._modules['0'].weight.data)
@@ -302,16 +338,17 @@ class SwinBackbone(nn.Module):
         return out
 
 
-def swin_backbone(lda_out_channels, in_chn, pretrained=True, drop_path_rate=0.2, **kwargs):
-    """Constructs a Swin Transformer Tiny backbone.
+def swin_backbone(lda_out_channels, in_chn, pretrained=True, drop_path_rate=0.2, model_size='tiny', **kwargs):
+    """Constructs a Swin Transformer backbone.
 
     Args:
         lda_out_channels: output channels for each LDA module
         in_chn: total input channels for target network (sum of all LDA outputs)
+        model_size: 'tiny' (28M), 'small' (50M), or 'base' (88M)
         pretrained (bool): If True, uses pretrained weights from ImageNet
         drop_path_rate (float): Stochastic depth rate for regularization
     """
-    model = SwinBackbone(lda_out_channels, in_chn, drop_path_rate=drop_path_rate)
+    model = SwinBackbone(lda_out_channels, in_chn, drop_path_rate=drop_path_rate, model_size=model_size)
     return model
 
 

@@ -69,11 +69,15 @@ class HyperIQASolver(object):
         self.dropout_rate = getattr(config, 'dropout_rate', 0.3)
         print(f'Regularization: drop_path_rate={self.drop_path_rate:.2f}, dropout_rate={self.dropout_rate:.2f}')
         
+        # Get model size
+        self.model_size = getattr(config, 'model_size', 'tiny')
+        
         self.model_hyper = models.HyperNet(
             16, 112, 224, 112, 56, 28, 14, 7, 
             use_multiscale=self.use_multiscale,
             drop_path_rate=self.drop_path_rate,
-            dropout_rate=self.dropout_rate
+            dropout_rate=self.dropout_rate,
+            model_size=self.model_size
         ).to(self.device)
         self.model_hyper.train(True)
 
