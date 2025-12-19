@@ -59,8 +59,13 @@ class HyperIQASolver(object):
 
         # Multi-scale feature fusion (default: enabled)
         self.use_multiscale = getattr(config, 'use_multiscale', True)
+        self.use_attention = getattr(config, 'use_attention', False)
         if self.use_multiscale:
             print('Multi-scale feature fusion: ENABLED')
+            if self.use_attention:
+                print('  → Using ATTENTION-based fusion')
+            else:
+                print('  → Using simple concatenation')
         else:
             print('Multi-scale feature fusion: DISABLED')
         
@@ -75,6 +80,7 @@ class HyperIQASolver(object):
         self.model_hyper = models.HyperNet(
             16, 112, 224, 112, 56, 28, 14, 7, 
             use_multiscale=self.use_multiscale,
+            use_attention=self.use_attention,
             drop_path_rate=self.drop_path_rate,
             dropout_rate=self.dropout_rate,
             model_size=self.model_size

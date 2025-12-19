@@ -6,6 +6,89 @@ import math
 import timm
 
 
+class MultiScaleAttention(nn.Module):
+    """
+    Lightweight channel attention for multi-scale feature fusion.
+    
+    Uses the highest-level feature (feat3) to generate attention weights
+    for all 4 scale features, enabling dynamic and adaptive fusion.
+    
+    Args:
+        in_channels_list: List of channel dimensions for each scale
+                         Tiny/Small: [96, 192, 384, 768]
+                         Base: [128, 256, 512, 1024]
+    """
+    def __init__(self, in_channels_list):
+        super(MultiScaleAttention, self).__init__()
+        self.in_channels = in_channels_list
+        self.num_scales = len(in_channels_list)
+        
+        # Attention generation network (lightweight)
+        # Uses the highest-level feature to generate weights for all scales
+        self.attention_net = nn.Sequential(
+            nn.Linear(in_channels_list[-1], 256),  # Last channel (768 or 1024) -> 256
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.5),  # Strong regularization to prevent overfitting
+            nn.Linear(256, self.num_scales),  # -> 4 weights
+            nn.Softmax(dim=1)  # Normalize to sum to 1
+        )
+        
+        # Initialize weights
+        for m in self.attention_net.modules():
+            if isinstance(m, nn.Linear):
+                # Use smaller initialization for more balanced initial weights
+                nn.init.normal_(m.weight, mean=0, std=0.01)
+                if m.bias is not None:
+                    # Initialize bias to encourage uniform attention at start
+                    nn.init.constant_(m.bias, 0)
+    
+    def forward(self, feat_list):
+        """
+        Args:
+            feat_list: List of 4 feature maps [feat0, feat1, feat2, feat3]
+                       Tiny/Small:
+                         feat0: (B, 96, H0, W0)
+                         feat1: (B, 192, H1, W1)
+                         feat2: (B, 384, H2, W2)
+                         feat3: (B, 768, 7, 7)
+                       Base:
+                         feat0: (B, 128, H0, W0)
+                         feat1: (B, 256, H1, W1)
+                         feat2: (B, 512, H2, W2)
+                         feat3: (B, 1024, 7, 7)
+        
+        Returns:
+            fused_feat: (B, sum(channels), 7, 7) - weighted concatenated features
+            attention_weights: (B, 4) - attention weights for visualization
+        """
+        B = feat_list[0].size(0)
+        
+        # 1. Unify spatial dimensions to 7x7
+        feats_pooled = []
+        for feat in feat_list:
+            feat_pooled = F.adaptive_avg_pool2d(feat, (7, 7))
+            feats_pooled.append(feat_pooled)
+        
+        # 2. Extract global representation from highest-level feature
+        feat3_global = F.adaptive_avg_pool2d(feat_list[-1], (1, 1)).squeeze(-1).squeeze(-1)  # [B, last_channel]
+        
+        # 3. Generate attention weights
+        attention_weights = self.attention_net(feat3_global)  # [B, 4]
+        
+        # 4. Apply attention weights to each scale
+        weighted_feats = []
+        for i, feat in enumerate(feats_pooled):
+            # Broadcast attention weight: [B] -> [B, 1, 1, 1]
+            weight = attention_weights[:, i].view(B, 1, 1, 1)
+            weighted_feat = feat * weight
+            weighted_feats.append(weighted_feat)
+        
+        # 5. Concatenate along channel dimension
+        fused_feat = torch.cat(weighted_feats, dim=1)  # [B, sum(channels), 7, 7]
+        
+        return fused_feat, attention_weights
+
+
 class HyperNet(nn.Module):
     """
     Hyper network for learning perceptual rules with Swin Transformer backbone.
@@ -21,11 +104,12 @@ class HyperNet(nn.Module):
         For size match, input args must satisfy: 'target_fc(i)_size * target_fc(i+1)_size' is divisible by 'feature_size ^ 2'.
 
     """
-    def __init__(self, lda_out_channels, hyper_in_channels, target_in_size, target_fc1_size, target_fc2_size, target_fc3_size, target_fc4_size, feature_size, use_multiscale=False, drop_path_rate=0.2, dropout_rate=0.3, model_size='tiny'):
+    def __init__(self, lda_out_channels, hyper_in_channels, target_in_size, target_fc1_size, target_fc2_size, target_fc3_size, target_fc4_size, feature_size, use_multiscale=False, use_attention=False, drop_path_rate=0.2, dropout_rate=0.3, model_size='tiny'):
         super(HyperNet, self).__init__()
 
         self.hyperInChn = hyper_in_channels
         self.use_multiscale = use_multiscale  # 多尺度融合标志
+        self.use_attention = use_attention  # 注意力机制标志
         self.target_in_size = target_in_size
         self.f1 = target_fc1_size
         self.f2 = target_fc2_size
@@ -38,6 +122,15 @@ class HyperNet(nn.Module):
         self.swin = swin_backbone(lda_out_channels, target_in_size, pretrained=True, drop_path_rate=drop_path_rate, model_size=model_size)
 
         self.pool = nn.AdaptiveAvgPool2d((1, 1))
+        
+        # Multi-scale attention module (if enabled)
+        if use_multiscale and use_attention:
+            if model_size == 'base':
+                channels_list = [128, 256, 512, 1024]
+            else:  # tiny or small
+                channels_list = [96, 192, 384, 768]
+            self.multiscale_attention = MultiScaleAttention(channels_list)
+            print(f'Using attention-based multi-scale feature fusion for {model_size.upper()}')
 
         # Conv layers for swin output features
         # Determine input channels based on model size and whether multi-scale is used
@@ -97,14 +190,23 @@ class HyperNet(nn.Module):
         if self.use_multiscale and 'hyper_in_feat_multi' in swin_out:
             # 多尺度融合模式
             feat0, feat1, feat2, feat3 = swin_out['hyper_in_feat_multi']
-            # 将所有阶段特征统一到 7x7 空间尺寸
-            feat0_pooled = F.adaptive_avg_pool2d(feat0, (feature_size, feature_size))  # [B, 96, 7, 7]
-            feat1_pooled = F.adaptive_avg_pool2d(feat1, (feature_size, feature_size))  # [B, 192, 7, 7]
-            feat2_pooled = F.adaptive_avg_pool2d(feat2, (feature_size, feature_size))  # [B, 384, 7, 7]
-            feat3_pooled = feat3  # [B, 768, 7, 7] 已经是目标尺寸
             
-            # 在通道维度拼接：96 + 192 + 384 + 768 = 1440 channels
-            hyper_in_feat_raw = torch.cat([feat0_pooled, feat1_pooled, feat2_pooled, feat3_pooled], dim=1)  # [B, 1440, 7, 7]
+            if self.use_attention:
+                # 使用注意力机制进行动态加权融合
+                hyper_in_feat_raw, attention_weights = self.multiscale_attention([feat0, feat1, feat2, feat3])
+                # 保存注意力权重用于可视化（可选）
+                self.last_attention_weights = attention_weights.detach()
+            else:
+                # 简单拼接融合（原始方法）
+                # 将所有阶段特征统一到 7x7 空间尺寸
+                feat0_pooled = F.adaptive_avg_pool2d(feat0, (feature_size, feature_size))  # [B, C0, 7, 7]
+                feat1_pooled = F.adaptive_avg_pool2d(feat1, (feature_size, feature_size))  # [B, C1, 7, 7]
+                feat2_pooled = F.adaptive_avg_pool2d(feat2, (feature_size, feature_size))  # [B, C2, 7, 7]
+                feat3_pooled = feat3  # [B, C3, 7, 7] 已经是目标尺寸
+                
+                # 在通道维度拼接：Tiny/Small: 96+192+384+768=1440, Base: 128+256+512+1024=1920
+                hyper_in_feat_raw = torch.cat([feat0_pooled, feat1_pooled, feat2_pooled, feat3_pooled], dim=1)
+            
             hyper_in_feat = self.conv1(hyper_in_feat_raw).view(-1, self.hyperInChn, feature_size, feature_size)
         else:
             # 单尺度模式（向后兼容）
