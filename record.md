@@ -229,4 +229,50 @@ python train_swin.py --dataset koniq-10k --epochs 30 --patience 7 --ranking_loss
 **结论**：
 - ColorJitter 对泛化能力的提升非常明显
 - 建议在最终配置中保留 ColorJitter
-- 可选优化：使用 Kornia (GPU 加速) 实现 ColorJitter 以提速
+- ⚠️ **Kornia GPU 加速失败**（见下方）：虽然速度快，但性能大幅下降
+
+---
+
+## ❌ Kornia GPU ColorJitter 加速尝试（失败）
+尝试将 CPU ColorJitter 迁移到 GPU (Kornia) 以提速 10-20x
+
+指标	Kornia GPU	Config 1 (CPU)	对比
+最佳 SRCC	0.8283 (Epoch 10)	0.9236	❌ 下降 9.5%
+最佳 PLCC	0.8523 (Epoch 10)	0.9353	❌ 下降 8.3%
+训练速度	~4-5 min/epoch	~11-12 min/epoch	✅ 快 2-3x
+
+训练详情：
+- Epoch 1: Train_SRCC: 0.7333, Test_SRCC: 0.7772, Test_PLCC: 0.8118
+- Epoch 2: Train_SRCC: 0.8511, Test_SRCC: 0.7949, Test_PLCC: 0.8263
+- Epoch 3: Train_SRCC: 0.8823, Test_SRCC: 0.8087, Test_PLCC: 0.8360
+- ...
+- Epoch 10: Train_SRCC: 0.9510, Test_SRCC: 0.8283, Test_PLCC: 0.8523 ⭐ 最佳
+- 性能持续低于 Config 1，训练集过拟合严重（Train 0.95 vs Test 0.82）
+
+**问题根源：ColorJitter 应用顺序错误** 🐛
+
+CPU 版本（正确）：
+1. `ToTensor()` → [0, 1]
+2. `ColorJitter()` → 在 [0,1] 范围内增强 ✅
+3. `Normalize()` → 归一化到 mean/std
+
+Kornia GPU 版本（错误）：
+1. `ToTensor()` → [0, 1]
+2. `Normalize()` → 归一化到 mean/std
+3. `Kornia ColorJitter()` → **在归一化数据上增强** ❌
+
+**错误分析**：
+- ColorJitter 的参数（brightness, contrast 等）是为 [0,1] 范围设计的
+- 在归一化后的数据（mean=0, std=1 附近）上应用这些参数会产生错误的增强效果
+- 导致模型学习到错误的特征分布，性能大幅下降
+
+**修复方案**（未实现）：
+1. 在 Normalize 之前应用 Kornia ColorJitter
+2. 但需要重写 data_loader，复杂度高
+3. 或者使用 kornia.enhance.normalize 的逆操作，但不值得
+
+**最终决定**：
+- ❌ **放弃 Kornia GPU 加速**
+- ✅ **保持 CPU ColorJitter**（虽慢但有效）
+- 📝 **教训**：数据增强的顺序很重要！必须在正确的数值范围内应用
+- 🎯 **Premature optimization is the root of all evil**（过早优化是万恶之源）
