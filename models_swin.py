@@ -303,35 +303,35 @@ class SwinBackbone(nn.Module):
         feat3 = features[3]
         
         # Check if features are in [B, H, W, C] format and convert to [B, C, H, W]
-        # Based on error: input[8, 56, 56, 96] suggests channels are last
-        # Expected channel counts for each stage: 96, 192, 384, 768
-        expected_channels = [96, 192, 384, 768]
+        # Use self.channels which is dynamically set based on model_size
+        # Tiny/Small: [96, 192, 384, 768], Base: [128, 256, 512, 1024]
         feats = [feat0, feat1, feat2, feat3]
         
         for i, feat in enumerate(feats):
             if len(feat.shape) == 4:
                 # Check if last dimension matches expected channel count
-                if feat.shape[-1] == expected_channels[i] and feat.shape[1] != expected_channels[i]:
+                if feat.shape[-1] == self.channels[i] and feat.shape[1] != self.channels[i]:
                     # Convert from [B, H, W, C] to [B, C, H, W]
                     feats[i] = feat.permute(0, 3, 1, 2).contiguous()
         
         feat0, feat1, feat2, feat3 = feats
         
         # Apply LDA modules to each scale
-        # Stage 1: [B, 96, 56, 56] -> pool to [B, 16, 8, 8] -> flatten -> [B, 1024] -> [B, lda_out]
+        # Stage 1: [B, C0, 56, 56] -> pool to [B, 16, 8, 8] -> flatten -> [B, 1024] -> [B, lda_out]
         lda_1 = self.lda1_fc(self.lda1_pool(feat0).view(x.size(0), -1))
-        # Stage 2: [B, 192, 28, 28] -> pool to [B, 32, 4, 4] -> flatten -> [B, 512] -> [B, lda_out]
+        # Stage 2: [B, C1, 28, 28] -> pool to [B, 32, 4, 4] -> flatten -> [B, 512] -> [B, lda_out]
         lda_2 = self.lda2_fc(self.lda2_pool(feat1).view(x.size(0), -1))
-        # Stage 3: [B, 384, 14, 14] -> pool to [B, 64, 2, 2] -> flatten -> [B, 256] -> [B, lda_out]
+        # Stage 3: [B, C2, 14, 14] -> pool to [B, 64, 2, 2] -> flatten -> [B, 256] -> [B, lda_out]
         lda_3 = self.lda3_fc(self.lda3_pool(feat2).view(x.size(0), -1))
-        # Stage 4: [B, 768, 7, 7] -> pool to [B, 768, 1, 1] -> flatten -> [B, 768] -> [B, in_chn - 3*lda_out]
+        # Stage 4: [B, C3, 7, 7] -> pool to [B, C3, 1, 1] -> flatten -> [B, C3] -> [B, in_chn - 3*lda_out]
+        # (C0,C1,C2,C3 = Tiny/Small:[96,192,384,768], Base:[128,256,512,1024])
         lda_4 = self.lda4_fc(self.lda4_pool(feat3).view(x.size(0), -1))
         
         # Concatenate all LDA features to form target_in_vec
         vec = torch.cat((lda_1, lda_2, lda_3, lda_4), 1)
         
         out = {}
-        out['hyper_in_feat'] = feat3  # 保持向后兼容：使用最终阶段特征 [B, 768, 7, 7]
+        out['hyper_in_feat'] = feat3  # 保持向后兼容：使用最终阶段特征 [B, C3, 7, 7]
         out['hyper_in_feat_multi'] = [feat0, feat1, feat2, feat3]  # 新增：返回所有阶段特征用于多尺度融合
         out['target_in_vec'] = vec
         

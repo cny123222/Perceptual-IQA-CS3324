@@ -1,0 +1,28 @@
+Training log will be saved to: /root/Perceptual-IQA-CS3324/logs/swin_multiscale_ranking_alpha0_20251218_190131.log
+================================================================================
+Random seed set to 42 for reproducibility
+Training and testing on koniq-10k dataset for 10 rounds...
+Using Swin Transformer backbone
+KonIQ-10k: 7046 train images, 2010 test images
+Round 1
+  Train: 7046 images, Test: 2010 images
+Using device: cuda
+Backbone: Swin Transformer Tiny
+Model checkpoints will be saved to: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-swin_20251218_190131
+Multi-scale feature fusion: ENABLED
+Regularization: drop_path_rate=0.20, dropout_rate=0.30
+Traceback (most recent call last):
+  File "/root/Perceptual-IQA-CS3324/train_swin.py", line 212, in <module>
+    main(config)
+  File "/root/Perceptual-IQA-CS3324/train_swin.py", line 153, in main
+    solver = HyperIQASolver(config, folder_path[config.dataset], train_index, test_index)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/Perceptual-IQA-CS3324/HyperIQASolver_swin.py", line 72, in __init__
+    self.model_hyper = models.HyperNet(
+                       ^^^^^^^^^^^^^^^^
+  File "/root/Perceptual-IQA-CS3324/models_swin.py", line 76, in __init__
+    nn.init.kaiming_normal_(self._modules[m_name].weight.data)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1962, in __getattr__
+    raise AttributeError(
+AttributeError: 'Dropout' object has no attribute 'weight'
