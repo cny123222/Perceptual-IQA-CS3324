@@ -112,6 +112,43 @@ def main(config):
     torch.backends.cudnn.benchmark = False
     print(f'Random seed set to {seed} for reproducibility')
     
+    # Print all configuration parameters
+    print("\n" + "=" * 80)
+    print("EXPERIMENT CONFIGURATION")
+    print("=" * 80)
+    print(f"Dataset:                    {config.dataset}")
+    print(f"Model Size:                 {config.model_size}")
+    print(f"Epochs:                     {config.epochs}")
+    print(f"Batch Size:                 {config.batch_size}")
+    print(f"Learning Rate:              {config.lr}")
+    print(f"LR Ratio (backbone):        {config.lr_ratio}")
+    print(f"Weight Decay:               {config.weight_decay}")
+    print(f"Train Patch Num:            {config.train_patch_num}")
+    print(f"Test Patch Num:             {config.test_patch_num}")
+    print("-" * 80)
+    print("Loss Function:")
+    print(f"  Ranking Loss Alpha:       {config.ranking_loss_alpha}")
+    print(f"  Ranking Loss Margin:      {config.ranking_loss_margin}")
+    print("-" * 80)
+    print("Regularization:")
+    print(f"  Drop Path Rate:           {config.drop_path_rate}")
+    print(f"  Dropout Rate:             {config.dropout_rate}")
+    print(f"  Early Stopping:           {config.early_stopping}")
+    print(f"  Patience:                 {config.patience}")
+    print("-" * 80)
+    print("Training Strategy:")
+    print(f"  LR Scheduler:             {config.lr_scheduler_type}")
+    print(f"  Multi-Scale Fusion:       {config.use_multiscale}")
+    print(f"  Attention Fusion:         {config.use_attention}")
+    print(f"  Test Random Crop:         {config.test_random_crop}")
+    print(f"  SPAQ Cross-Dataset Test:  {config.test_spaq}")
+    print("-" * 80)
+    print("Reproducibility:")
+    print(f"  Random Seed:              {seed}")
+    print(f"  CuDNN Deterministic:      True")
+    print(f"  CuDNN Benchmark:          False")
+    print("=" * 80 + "\n")
+    
     folder_path = {
         'live': '/home/ssl/Database/databaserelease2/',
         'csiq': '/home/ssl/Database/CSIQ/',

@@ -133,8 +133,55 @@ class HyperIQASolver(object):
         if self.ranking_loss_alpha > 0:
             print(f'Ranking loss enabled: alpha={self.ranking_loss_alpha}, margin={self.ranking_loss_margin}')
 
+    def _count_parameters(self):
+        """Count total trainable parameters in millions"""
+        return sum(p.numel() for p in self.model_hyper.parameters() if p.requires_grad) / 1e6
+
     def train(self):
         """Training"""
+        # Print detailed training configuration
+        print("\n" + "=" * 80)
+        print("TRAINING CONFIGURATION SUMMARY")
+        print("=" * 80)
+        print(f"Model Architecture:")
+        print(f"  Backbone:                 Swin Transformer {self.model_size.upper()}")
+        print(f"  Multi-Scale Fusion:       {'ENABLED' if self.use_multiscale else 'DISABLED'}")
+        if self.use_multiscale:
+            print(f"  Fusion Method:            {'Attention' if self.use_attention else 'Concatenation'}")
+        print(f"  Parameters:               ~{self._count_parameters():.1f}M")
+        print("-" * 80)
+        print(f"Loss Function:")
+        if self.ranking_loss_alpha > 0:
+            print(f"  Type:                     L1 + Ranking Loss")
+            print(f"  Ranking Alpha:            {self.ranking_loss_alpha}")
+            print(f"  Ranking Margin:           {self.ranking_loss_margin}")
+        else:
+            print(f"  Type:                     L1 Only")
+        print("-" * 80)
+        print(f"Regularization:")
+        print(f"  Drop Path Rate:           {self.drop_path_rate}")
+        print(f"  Dropout Rate:             {self.dropout_rate}")
+        print(f"  Weight Decay:             {self.weight_decay}")
+        print(f"  Early Stopping:           {'ENABLED' if self.early_stopping_enabled else 'DISABLED'}")
+        if self.early_stopping_enabled:
+            print(f"  Patience:                 {self.patience} epochs")
+        print("-" * 80)
+        print(f"Optimization:")
+        print(f"  Learning Rate (HyperNet): {self.lr * self.lrratio}")
+        print(f"  Learning Rate (Backbone): {self.lr}")
+        print(f"  LR Scheduler:             {self.lr_scheduler_type if self.use_lr_scheduler else 'None'}")
+        print(f"  Optimizer:                Adam")
+        print("-" * 80)
+        print(f"Data:")
+        print(f"  Test Crop Method:         {'RandomCrop' if self.test_random_crop else 'CenterCrop'}")
+        print(f"  Test Patch Num:           {self.test_patch_num}")
+        print(f"  Cross-Dataset Test:       {'SPAQ' if self.spaq_path else 'None'}")
+        print("-" * 80)
+        print(f"Training:")
+        print(f"  Epochs:                   {self.epochs}")
+        print(f"  Checkpoint Directory:     {self.save_dir}")
+        print("=" * 80 + "\n")
+        
         best_srcc = 0.0
         best_plcc = 0.0
         
