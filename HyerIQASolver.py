@@ -230,15 +230,7 @@ class HyperIQASolver(object):
                 print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
                       (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc))
 
-            # Save checkpoint every epoch
-            if self.spaq_path is not None and spaq_srcc is not None:
-                model_path = os.path.join(self.save_dir, f'checkpoint_epoch_{t+1}_srcc_{test_srcc:.4f}_plcc_{test_plcc:.4f}_spaq_srcc_{spaq_srcc:.4f}_plcc_{spaq_plcc:.4f}.pkl')
-            else:
-                model_path = os.path.join(self.save_dir, f'checkpoint_epoch_{t+1}_srcc_{test_srcc:.4f}_plcc_{test_plcc:.4f}.pkl')
-            torch.save(self.model_hyper.state_dict(), model_path)
-            print(f'  Model saved to: {model_path}')
-            
-            # Save best model separately
+            # Only save best model (not every epoch to save disk space)
             if improved:
                 if self.spaq_path is not None and spaq_srcc is not None:
                     best_model_path = os.path.join(self.save_dir, f'best_model_srcc_{best_srcc:.4f}_plcc_{best_plcc:.4f}_spaq_srcc_{spaq_srcc:.4f}_plcc_{spaq_plcc:.4f}.pkl')
