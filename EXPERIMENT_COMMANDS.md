@@ -71,6 +71,9 @@ python train_test_IQA.py \
 - 使用原始 ResNet-50 骨干网络
 - 10 epochs 足够（通常 epoch 1-2 达到最佳）
 - 这是所有改进的对比基准
+- ✅ **日志自动保存**：`logs/resnet50_baseline_TIMESTAMP.log`
+- ✅ **参数自动打印**：包含所有配置信息
+- ✅ **可复现性**：随机种子固定为 42
 
 ---
 
