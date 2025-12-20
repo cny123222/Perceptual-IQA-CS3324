@@ -240,11 +240,13 @@ python train_test_IQA.py \
   --epochs 10 \
   --batch_size 96 \
   --train_patch_num 20 \
-  --test_patch_num 20
+  --test_patch_num 20 \
+  --no_spaq
 ```
 
 **预期效果**：SRCC ~0.9009 (-3.27%)  
-**说明**：证明 Swin Transformer 架构是性能提升的主要来源
+**说明**：证明 Swin Transformer 架构是性能提升的主要来源  
+**注意**：`--no_spaq` 跳过 SPAQ 测试以加快实验
 
 ---
 

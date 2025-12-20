@@ -111,6 +111,9 @@ def main(config):
     print(f"Patch Size:                 {config.patch_size}")
     print(f"Train-Test Rounds:          {config.train_test_num}")
     print("-" * 80)
+    print("Testing:")
+    print(f"  SPAQ Cross-Dataset Test:  {config.test_spaq}")
+    print("-" * 80)
     print("Reproducibility:")
     print(f"  Random Seed:              {seed}")
     print(f"  CuDNN Deterministic:      True")
@@ -192,6 +195,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', dest='epochs', type=int, default=16, help='Epochs for training')
     parser.add_argument('--patch_size', dest='patch_size', type=int, default=224, help='Crop size for training & testing image patches')
     parser.add_argument('--train_test_num', dest='train_test_num', type=int, default=10, help='Train-test times')
+    parser.add_argument('--no_spaq', dest='test_spaq', action='store_false', help='Disable SPAQ cross-dataset testing (enabled by default, use this flag to skip)')
 
     config = parser.parse_args()
     main(config)
