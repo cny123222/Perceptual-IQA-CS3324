@@ -4,6 +4,8 @@ import random
 import numpy as np
 import csv
 import json
+import sys
+from datetime import datetime
 from HyerIQASolver import HyperIQASolver
 
 # 设置 CUDA 设备（如果使用 CUDA，取消注释下面一行并指定 GPU ID）
@@ -57,6 +59,64 @@ def main(config):
     # 获取当前脚本所在目录的绝对路径
     base_dir = os.path.dirname(os.path.abspath(__file__))
     
+    # Set random seeds for reproducibility
+    seed = 42
+    random.seed(seed)
+    np.random.seed(seed)
+    import torch
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    print(f'Random seed set to {seed} for reproducibility')
+    
+    # Setup logging
+    log_dir = os.path.join(base_dir, 'logs')
+    os.makedirs(log_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_filename = f'resnet50_baseline_{timestamp}.log'
+    log_path = os.path.join(log_dir, log_filename)
+    
+    # Redirect stdout to both console and log file
+    class Logger(object):
+        def __init__(self, filename):
+            self.terminal = sys.stdout
+            self.log = open(filename, 'w')
+        def write(self, message):
+            self.terminal.write(message)
+            self.log.write(message)
+            self.log.flush()
+        def flush(self):
+            self.terminal.flush()
+            self.log.flush()
+    
+    sys.stdout = Logger(log_path)
+    print(f"Training log will be saved to: {log_path}")
+    print("=" * 80)
+    
+    # Print all configuration parameters
+    print("\n" + "=" * 80)
+    print("BASELINE EXPERIMENT CONFIGURATION (Original HyperIQA - ResNet-50)")
+    print("=" * 80)
+    print(f"Dataset:                    {config.dataset}")
+    print(f"Model:                      ResNet-50")
+    print(f"Epochs:                     {config.epochs}")
+    print(f"Batch Size:                 {config.batch_size}")
+    print(f"Learning Rate:              {config.lr}")
+    print(f"LR Ratio (backbone):        {config.lr_ratio}")
+    print(f"Weight Decay:               {config.weight_decay}")
+    print(f"Train Patch Num:            {config.train_patch_num}")
+    print(f"Test Patch Num:             {config.test_patch_num}")
+    print(f"Patch Size:                 {config.patch_size}")
+    print(f"Train-Test Rounds:          {config.train_test_num}")
+    print("-" * 80)
+    print("Reproducibility:")
+    print(f"  Random Seed:              {seed}")
+    print(f"  CuDNN Deterministic:      True")
+    print(f"  CuDNN Benchmark:          False")
+    print("=" * 80 + "\n")
+    
     folder_path = {
         'live': '/home/ssl/Database/databaserelease2/',
         'csiq': '/home/ssl/Database/CSIQ/',
@@ -100,15 +160,15 @@ def main(config):
         # Original logic for other datasets
         sel_num = img_num[config.dataset]
         
-    for i in range(config.train_test_num):
-        print('Round %d' % (i+1))
-        # Randomly select 80% images for training and the rest for testing
-        random.shuffle(sel_num)
-        train_index = sel_num[0:int(round(0.8 * len(sel_num)))]
-        test_index = sel_num[int(round(0.8 * len(sel_num))):len(sel_num)]
+        for i in range(config.train_test_num):
+            print('Round %d' % (i+1))
+            # Randomly select 80% images for training and the rest for testing
+            random.shuffle(sel_num)
+            train_index = sel_num[0:int(round(0.8 * len(sel_num)))]
+            test_index = sel_num[int(round(0.8 * len(sel_num))):len(sel_num)]
 
-        solver = HyperIQASolver(config, folder_path[config.dataset], train_index, test_index)
-        srcc_all[i], plcc_all[i] = solver.train()
+            solver = HyperIQASolver(config, folder_path[config.dataset], train_index, test_index)
+            srcc_all[i], plcc_all[i] = solver.train()
 
     # print(srcc_all)
     # print(plcc_all)
