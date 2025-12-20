@@ -32,6 +32,7 @@ python train_swin.py \
   --ranking_loss_alpha 0.5 \
   --ranking_loss_margin 0.1 \
   --lr 5e-6 \
+  --weight_decay 2e-4 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
   --lr_scheduler cosine \
@@ -42,8 +43,8 @@ python train_swin.py \
 **注意事项**：
 - `--no_spaq`：跳过 SPAQ 跨数据集测试（节省时间，后续可单独测试）
 - `--test_random_crop`：使用 RandomCrop 测试（匹配原论文，但可复现性稍差）
+- `--weight_decay 2e-4`：关键参数，强正则化防止过拟合
 - ColorJitter 自动启用（在 `data_loader.py` 中，koniq-10k 训练集默认开启）
-- Weight decay = 2e-4（在代码中设置，需要确认）
 
 ---
 
@@ -90,7 +91,7 @@ python train_test_IQA.py \
 - ✅ Multi-Scale 特征融合（默认启用）
 - ❌ 无 Ranking Loss (alpha=0)
 - ❌ 无 ColorJitter（需要暂时禁用）
-- ❌ 弱正则化（drop_path=0.1, dropout=0.2）
+- ❌ 弱正则化（drop_path=0.1, dropout=0.2, weight_decay=1e-4）
 - ❌ 无 LR Scheduling
 
 **预期性能**：SRCC ~0.925-0.930
@@ -107,6 +108,7 @@ python train_swin.py \
   --test_patch_num 20 \
   --ranking_loss_alpha 0 \
   --lr 1e-5 \
+  --weight_decay 1e-4 \
   --drop_path_rate 0.1 \
   --dropout_rate 0.2 \
   --lr_scheduler none \
@@ -146,6 +148,7 @@ python train_swin.py \
   --ranking_loss_alpha 0.5 \
   --ranking_loss_margin 0.1 \
   --lr 1e-5 \
+  --weight_decay 1e-4 \
   --drop_path_rate 0.1 \
   --dropout_rate 0.2 \
   --lr_scheduler none \
@@ -182,6 +185,7 @@ python train_swin.py \
   --ranking_loss_alpha 0.5 \
   --ranking_loss_margin 0.1 \
   --lr 1e-5 \
+  --weight_decay 1e-4 \
   --drop_path_rate 0.1 \
   --dropout_rate 0.2 \
   --lr_scheduler none \
@@ -199,6 +203,7 @@ python train_swin.py \
 
 **新增**：
 - ✅ Strong Regularization:
+  - weight_decay: 1e-4 → 2e-4 (2x)
   - drop_path_rate: 0.1 → 0.3 (3x)
   - dropout_rate: 0.2 → 0.4 (2x)
 
@@ -219,6 +224,7 @@ python train_swin.py \
   --ranking_loss_alpha 0.5 \
   --ranking_loss_margin 0.1 \
   --lr 1e-5 \
+  --weight_decay 2e-4 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
   --lr_scheduler none \
@@ -253,6 +259,7 @@ python train_swin.py \
   --ranking_loss_alpha 0.5 \
   --ranking_loss_margin 0.1 \
   --lr 5e-6 \
+  --weight_decay 2e-4 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
   --lr_scheduler cosine \
