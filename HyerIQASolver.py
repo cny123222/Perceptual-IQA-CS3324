@@ -33,7 +33,7 @@ class HyperIQASolver(object):
         
         # Learning rate scheduler parameters
         self.use_lr_scheduler = getattr(config, 'use_lr_scheduler', True)  # Enable by default
-        self.lr_scheduler_type = getattr(config, 'lr_scheduler_type', 'cosine')  # 'cosine' or 'step'
+        self.lr_scheduler_type = getattr(config, 'lr_scheduler_type', 'step')  # 'step' (original) or 'cosine'
         
         # Test crop method
         self.test_random_crop = getattr(config, 'test_random_crop', False)  # Default: CenterCrop for reproducibility
