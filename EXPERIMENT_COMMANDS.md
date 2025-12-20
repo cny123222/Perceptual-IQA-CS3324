@@ -29,7 +29,6 @@ python train_swin.py \
   --patience 7 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --train_test_num 1 \
   --ranking_loss_alpha 0.5 \
   --ranking_loss_margin 0.1 \
   --lr 5e-6 \
@@ -42,7 +41,6 @@ python train_swin.py \
 ```
 
 **注意事项**：
-- `--train_test_num 1`：**重要！** 只运行1轮训练，避免10轮×12.5小时=125小时
 - `--no_spaq`：跳过 SPAQ 跨数据集测试（节省时间，后续可单独测试）
 - `--test_random_crop`：使用 RandomCrop 测试（匹配原论文，但可复现性稍差）
 - `--weight_decay 2e-4`：关键参数，强正则化防止过拟合
