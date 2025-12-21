@@ -69,33 +69,19 @@
 
 ---
 
-### Experiment A3: Remove Multi-scale Features ⏰ **TODO**
+### Experiment A3: Remove Multi-scale Features ✅ **DONE**
 
 **What's removed**: Multi-scale → Single-scale (last layer only)
 
-**Implementation**: Add `--no_multiscale` flag to disable multi-scale features
+**Results** (Epoch 3):
+- SRCC: **0.9309** (-0.34%)
+- PLCC: **0.9432** (-0.31%)
+- Log: `logs/swin_ranking_alpha0.5_20251221_204356.log`
+- Checkpoint: `checkpoints/koniq-10k-swin-ranking-alpha0.5_20251221_204356/best_model_srcc_0.9309_plcc_0.9432.pkl`
 
-**Command**:
-```bash
-cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
-  --dataset koniq-10k \
-  --model_size base \
-  --batch_size 32 \
-  --epochs 5 \
-  --patience 5 \
-  --train_patch_num 20 \
-  --test_patch_num 20 \
-  --ranking_loss_alpha 0.5 \
-  --attention_fusion \
-  --no_multiscale \
-  --lr 5e-6 \
-  --weight_decay 2e-4 \
-  --drop_path_rate 0.3 \
-  --dropout_rate 0.4 \
-  --lr_scheduler cosine \
-  --test_random_crop \
-  --no_spaq
-```
+**Contribution**: Multi-scale features provide **+0.34% SRCC, +0.31% PLCC**
+
+**Note**: Multi-scale features have the second-largest contribution among all enhancements (after Swin Transformer backbone).
 
 **Evidence from Swin-Tiny**:
 - Single-scale: SRCC 0.9154
@@ -737,8 +723,9 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 | A0 | Full Model (Base + Att + Rank0.5) | 0.9343 | ✅ Done | Baseline |
 | A1 | Remove Attention | 0.9316 | ✅ Done | Patience=7 (acceptable) |
 | A2 | Remove Ranking Loss (Alpha=0) | 0.9338 | ✅ Done | +0.05% contribution only! ⚠️ |
+| A3 | Remove Multi-scale Features | 0.9309 | ✅ Done | +0.34% contribution |
 
-**Total Completed**: 3 experiments
+**Total Completed**: 4 experiments
 
 ---
 
@@ -754,14 +741,14 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 
 ---
 
-### 🔥 Priority 1: Core Ablations (Must Do - 1 experiment)
+### 🔥 Priority 1: Core Ablations (Must Do - COMPLETE! ✅)
 
 | ID | Experiment | Command | Time | Status |
 |----|-----------|---------|------|--------|
 | ~~**A2**~~ | ~~**Remove Ranking Loss**~~ | - | - | ✅ Done |
-| **A3** | **Remove Multi-scale** | See Section "Experiment A3" | 1.5h | ⏰ TODO |
+| ~~**A3**~~ | ~~**Remove Multi-scale**~~ | - | - | ✅ Done |
 
-**Remaining**: 1 experiment (1.5 hours)
+**Remaining**: 0 experiments - **ALL CORE ABLATIONS COMPLETE!** 🎉
 
 ---
 
