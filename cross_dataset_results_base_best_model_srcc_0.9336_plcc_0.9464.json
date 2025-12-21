@@ -2,11 +2,27 @@
   "checkpoint": "checkpoints/koniq-10k-swin-ranking-alpha0.5_20251220_091014/best_model_srcc_0.9336_plcc_0.9464.pkl",
   "model_size": "base",
   "test_patch_num": 20,
-  "test_random_crop": false,
+  "test_random_crop": true,
   "results": {
-    "KonIQ-10k Test Set": null,
-    "SPAQ": null,
-    "KADID-10K": null,
-    "AGIQA-3K": null
+    "KonIQ-10k Test Set": {
+      "srcc": 0.9323900299212113,
+      "plcc": 0.9455180680142663,
+      "num_images": 2010
+    },
+    "SPAQ": {
+      "srcc": 0.8675986722366268,
+      "plcc": 0.8662170797474681,
+      "num_images": 2224
+    },
+    "KADID-10K": {
+      "srcc": 0.5285327195153363,
+      "plcc": 0.5582002764014209,
+      "num_images": 2000
+    },
+    "AGIQA-3K": {
+      "srcc": 0.6640957452931084,
+      "plcc": 0.7109384265805719,
+      "num_images": 2982
+    }
   }
 }
