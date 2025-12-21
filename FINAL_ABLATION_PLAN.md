@@ -126,23 +126,91 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
 
 ---
 
-## Part B: Model Size Comparison ✅ **ALL DONE**
+## Part B: Model Size Comparison ⏰ **NEEDS REDO**
 
-**Goal**: Justify Swin-Base choice
+**Goal**: Justify Swin-Base choice with IDENTICAL configuration
 
-| Model | Params | FLOPs | SRCC | PLCC | Status |
-|-------|--------|-------|------|------|--------|
-| Swin-Tiny | 28M | 4.5G | 0.9236 | 0.9361 | ✅ Done |
-| Swin-Small | 50M | 8.7G | 0.9303 | 0.9444 | ✅ Done |
-| **Swin-Base** | 88M | 15.3G | **0.9343** | **0.9463** | ✅ Done |
+**Problem**: Previous runs used different configurations for different model sizes. For fair comparison, all models should use the SAME configuration (Best Model config).
 
-**Configuration**: Multi-scale + Ranking(0.5) + Strong Reg
-- **Tiny & Small**: Without Attention (simpler configuration)
-- **Base**: With Attention (best configuration)
+**Configuration for ALL models**:
+- Multi-scale: ✅ Enabled
+- Attention: ✅ Enabled
+- Ranking Loss: α=0.5
+- Strong Regularization: wd=2e-4, dp=0.3, do=0.4
+- LR: 5e-6, Batch: 32, Patience: 5
 
-**Note**: This is architecture selection, not ablation. Different model sizes may use different optimal configurations.
+### B1: Swin-Tiny ⏰ **TODO**
 
-**Conclusion**: Performance scales with model size, Base is optimal
+**Command**:
+```bash
+cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
+  --dataset koniq-10k \
+  --model_size tiny \
+  --batch_size 32 \
+  --epochs 5 \
+  --patience 5 \
+  --train_patch_num 20 \
+  --test_patch_num 20 \
+  --ranking_loss_alpha 0.5 \
+  --attention_fusion \
+  --lr 5e-6 \
+  --weight_decay 2e-4 \
+  --drop_path_rate 0.3 \
+  --dropout_rate 0.4 \
+  --lr_scheduler cosine \
+  --test_random_crop \
+  --no_spaq
+```
+
+**Expected**: SRCC ≈ 0.9240-0.9250
+
+**Time**: ~1.5 hours
+
+---
+
+### B2: Swin-Small ⏰ **TODO**
+
+**Command**:
+```bash
+cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
+  --dataset koniq-10k \
+  --model_size small \
+  --batch_size 32 \
+  --epochs 5 \
+  --patience 5 \
+  --train_patch_num 20 \
+  --test_patch_num 20 \
+  --ranking_loss_alpha 0.5 \
+  --attention_fusion \
+  --lr 5e-6 \
+  --weight_decay 2e-4 \
+  --drop_path_rate 0.3 \
+  --dropout_rate 0.4 \
+  --lr_scheduler cosine \
+  --test_random_crop \
+  --no_spaq
+```
+
+**Expected**: SRCC ≈ 0.9310-0.9320
+
+**Time**: ~1.5 hours
+
+---
+
+### B3: Swin-Base ✅ **DONE**
+
+**Results**:
+- SRCC: **0.9343**
+- PLCC: **0.9463**
+- Log: `logs/swin_multiscale_ranking_alpha0.5_20251221_155013.log`
+
+**Status**: ✅ Already done with correct configuration
+
+---
+
+**Note**: This is architecture selection to show performance scales with model capacity. All models use identical hyperparameters for fair comparison.
+
+**Conclusion**: Performance scales with model size, Base provides best performance
 
 ---
 
@@ -249,14 +317,13 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
 
 ## Part D: Regularization Sensitivity ⏰ **TODO**
 
-**Goal**: Test robustness to regularization strength
+**Goal**: Test robustness to each regularization parameter **independently**
 
-### D1: Weak Regularization ⏰ **TODO**
+**Strategy**: Change ONE parameter at a time for clear attribution and easy plotting
 
-**Changes**:
-- `weight_decay`: 2e-4 → 1e-4 (50% reduction)
-- `drop_path_rate`: 0.3 → 0.2 (33% reduction)
-- `dropout_rate`: 0.4 → 0.3 (25% reduction)
+### D1: Lower Weight Decay ⏰ **TODO**
+
+**Change**: `weight_decay`: 2e-4 → 1e-4 (50% reduction)
 
 **Command**:
 ```bash
@@ -272,25 +339,84 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
   --attention_fusion \
   --lr 5e-6 \
   --weight_decay 1e-4 \
+  --drop_path_rate 0.3 \
+  --dropout_rate 0.4 \
+  --lr_scheduler cosine \
+  --test_random_crop \
+  --no_spaq
+```
+
+**Expected**: SRCC ≈ 0.9330-0.9340
+
+**Time**: ~1.5 hours
+
+---
+
+### D2: Lower Drop Path Rate ⏰ **TODO**
+
+**Change**: `drop_path_rate`: 0.3 → 0.2 (33% reduction)
+
+**Command**:
+```bash
+cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
+  --dataset koniq-10k \
+  --model_size base \
+  --batch_size 32 \
+  --epochs 5 \
+  --patience 5 \
+  --train_patch_num 20 \
+  --test_patch_num 20 \
+  --ranking_loss_alpha 0.5 \
+  --attention_fusion \
+  --lr 5e-6 \
+  --weight_decay 2e-4 \
   --drop_path_rate 0.2 \
+  --dropout_rate 0.4 \
+  --lr_scheduler cosine \
+  --test_random_crop \
+  --no_spaq
+```
+
+**Expected**: SRCC ≈ 0.9335-0.9345
+
+**Time**: ~1.5 hours
+
+---
+
+### D3: Lower Dropout Rate ⏰ **TODO**
+
+**Change**: `dropout_rate`: 0.4 → 0.3 (25% reduction)
+
+**Command**:
+```bash
+cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
+  --dataset koniq-10k \
+  --model_size base \
+  --batch_size 32 \
+  --epochs 5 \
+  --patience 5 \
+  --train_patch_num 20 \
+  --test_patch_num 20 \
+  --ranking_loss_alpha 0.5 \
+  --attention_fusion \
+  --lr 5e-6 \
+  --weight_decay 2e-4 \
+  --drop_path_rate 0.3 \
   --dropout_rate 0.3 \
   --lr_scheduler cosine \
   --test_random_crop \
   --no_spaq
 ```
 
-**Expected**: SRCC ≈ 0.9310-0.9320, may show overfitting
+**Expected**: SRCC ≈ 0.9335-0.9345
 
 **Time**: ~1.5 hours
 
 ---
 
-### D2: Very Strong Regularization ⏰ **TODO**
+### D4: Higher Weight Decay 🔵 **OPTIONAL**
 
-**Changes**:
-- `weight_decay`: 2e-4 → 3e-4 (50% increase)
-- `drop_path_rate`: 0.3 → 0.4 (33% increase)
-- `dropout_rate`: 0.4 → 0.5 (25% increase)
+**Change**: `weight_decay`: 2e-4 → 3e-4 (50% increase)
 
 **Command**:
 ```bash
@@ -306,14 +432,76 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
   --attention_fusion \
   --lr 5e-6 \
   --weight_decay 3e-4 \
+  --drop_path_rate 0.3 \
+  --dropout_rate 0.4 \
+  --lr_scheduler cosine \
+  --test_random_crop \
+  --no_spaq
+```
+
+**Expected**: SRCC ≈ 0.9330-0.9340
+
+**Time**: ~1.5 hours
+
+---
+
+### D5: Higher Drop Path Rate 🔵 **OPTIONAL**
+
+**Change**: `drop_path_rate`: 0.3 → 0.4 (33% increase)
+
+**Command**:
+```bash
+cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
+  --dataset koniq-10k \
+  --model_size base \
+  --batch_size 32 \
+  --epochs 5 \
+  --patience 5 \
+  --train_patch_num 20 \
+  --test_patch_num 20 \
+  --ranking_loss_alpha 0.5 \
+  --attention_fusion \
+  --lr 5e-6 \
+  --weight_decay 2e-4 \
   --drop_path_rate 0.4 \
+  --dropout_rate 0.4 \
+  --lr_scheduler cosine \
+  --test_random_crop \
+  --no_spaq
+```
+
+**Expected**: SRCC ≈ 0.9330-0.9340
+
+**Time**: ~1.5 hours
+
+---
+
+### D6: Higher Dropout Rate 🔵 **OPTIONAL**
+
+**Change**: `dropout_rate`: 0.4 → 0.5 (25% increase)
+
+**Command**:
+```bash
+cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
+  --dataset koniq-10k \
+  --model_size base \
+  --batch_size 32 \
+  --epochs 5 \
+  --patience 5 \
+  --train_patch_num 20 \
+  --test_patch_num 20 \
+  --ranking_loss_alpha 0.5 \
+  --attention_fusion \
+  --lr 5e-6 \
+  --weight_decay 2e-4 \
+  --drop_path_rate 0.3 \
   --dropout_rate 0.5 \
   --lr_scheduler cosine \
   --test_random_crop \
   --no_spaq
 ```
 
-**Expected**: SRCC ≈ 0.9320-0.9330 (may underfit)
+**Expected**: SRCC ≈ 0.9330-0.9340
 
 **Time**: ~1.5 hours
 
@@ -498,11 +686,26 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 
 ### Regularization Sensitivity
 
-| Config | SRCC | Note |
-|--------|------|------|
-| Weak | ~0.9315 | May overfit |
-| **Strong** | **0.9343** | **Optimal** ✅ |
-| Very Strong | ~0.9325 | May underfit |
+**Weight Decay** (others fixed at optimal):
+| Value | SRCC | Note |
+|-------|------|------|
+| 1e-4 | ~0.9335 | Lower |
+| **2e-4** | **0.9343** | **Optimal** ✅ |
+| 3e-4 | ~0.9335 | Higher |
+
+**Drop Path Rate** (others fixed at optimal):
+| Value | SRCC | Note |
+|-------|------|------|
+| 0.2 | ~0.9340 | Lower |
+| **0.3** | **0.9343** | **Optimal** ✅ |
+| 0.4 | ~0.9335 | Higher |
+
+**Dropout Rate** (others fixed at optimal):
+| Value | SRCC | Note |
+|-------|------|------|
+| 0.3 | ~0.9340 | Lower |
+| **0.4** | **0.9343** | **Optimal** ✅ |
+| 0.5 | ~0.9335 | Higher |
 
 ### LR Sensitivity
 
@@ -549,11 +752,8 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 |----|-----------|------|--------|-------|
 | A0 | Full Model (Base + Att + Rank0.5) | 0.9343 | ✅ Done | Baseline |
 | A1 | Remove Attention | 0.9316 | ✅ Done | Patience=7 (acceptable) |
-| B1 | Swin-Tiny | 0.9236 | ✅ Done | Architecture selection |
-| B2 | Swin-Small | 0.9303 | ✅ Done | Architecture selection |
-| B3 | Swin-Base | 0.9343 | ✅ Done | Architecture selection |
 
-**Total Completed**: 5 experiments
+**Total Completed**: 2 experiments
 
 ---
 
@@ -561,9 +761,11 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 
 | ID | Experiment | Issue | Status |
 |----|-----------|-------|--------|
+| B1 | Swin-Tiny | Used different config (no Attention) | ⚠️ Redo for fair comparison |
+| B2 | Swin-Small | Used different config (no Attention) | ⚠️ Redo for fair comparison |
 | C1 | Alpha = 0.3 | Missing `--attention_fusion` | ⚠️ Must redo |
 
-**Total Needing Redo**: 1 experiment
+**Total Needing Redo**: 3 experiments
 
 ---
 
@@ -590,18 +792,39 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 
 ---
 
-### 🔵 Priority 3: Regularization Sensitivity (Nice to Have - 2 experiments)
+### 🔵 Priority 3: Model Size Comparison (Should Do - 2 experiments)
 
 | ID | Experiment | Command | Time |
 |----|-----------|---------|------|
-| **D1** | **Weak Regularization** | See Section "D1" | 1.5h |
-| **D2** | **Very Strong Reg** | See Section "D2" | 1.5h |
+| **B1** | **Swin-Tiny (Redo)** | See Section "B1" | 1.5h |
+| **B2** | **Swin-Small (Redo)** | See Section "B2" | 1.5h |
 
 **Can run in parallel**: 1.5 hours total
 
+**Why redo**: Previous runs used simpler config (no Attention). Need identical config (with Attention) for fair comparison and proper scaling analysis.
+
 ---
 
-### 🟢 Priority 4: LR Sensitivity (Nice to Have - 2 experiments)
+### 🟡 Priority 4: Regularization Sensitivity (Nice to Have - 3-6 experiments)
+
+| ID | Experiment | Command | Time | Priority |
+|----|-----------|---------|------|----------|
+| **D1** | **Lower Weight Decay** | See Section "D1" | 1.5h | ⭐ Core |
+| **D2** | **Lower Drop Path** | See Section "D2" | 1.5h | ⭐ Core |
+| **D3** | **Lower Dropout** | See Section "D3" | 1.5h | ⭐ Core |
+| **D4** | Higher Weight Decay | See Section "D4" | 1.5h | 🔵 Optional |
+| **D5** | Higher Drop Path | See Section "D5" | 1.5h | 🔵 Optional |
+| **D6** | Higher Dropout | See Section "D6" | 1.5h | 🔵 Optional |
+
+**Can run in parallel**: 
+- Core (D1-D3): 1.5 hours (3 terminals)
+- Optional (D4-D6): 1.5 hours (3 terminals)
+
+**Strategy**: Each experiment changes ONE parameter only for clear attribution and easy plotting
+
+---
+
+### 🟢 Priority 5: LR Sensitivity (Nice to Have - 2 experiments)
 
 | ID | Experiment | Command | Time |
 |----|-----------|---------|------|
@@ -634,17 +857,30 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 
 ---
 
-### Stage 3: Regularization Analysis 🔵
+### Stage 3: Model Size Comparison 🔵
 
 **Parallel Execution** (1.5 hours):
-- Terminal 1: **D1** (Weak Reg)
-- Terminal 2: **D2** (Very Strong Reg)
+- Terminal 1: **B1** (Swin-Tiny with full config)
+- Terminal 2: **B2** (Swin-Small with full config)
 
-**Why**: Understand model robustness to regularization changes.
+**Why**: Show that performance scales with model capacity (with identical hyperparameters).
 
 ---
 
-### Stage 4: LR Sensitivity 🟢
+### Stage 4: Regularization Analysis 🟡
+
+**Parallel Execution** (1.5 hours):
+- Terminal 1: **D1** (Lower Weight Decay)
+- Terminal 2: **D2** (Lower Drop Path)
+- Terminal 3: **D3** (Lower Dropout)
+
+**Why**: Understand sensitivity to each regularization parameter independently.
+
+**Note**: D4-D6 (higher values) are optional for exploring the other direction.
+
+---
+
+### Stage 5: LR Sensitivity 🟢
 
 **Parallel Execution** (1.5 hours):
 - Terminal 1: **E1** (Lower LR)
@@ -660,12 +896,14 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 |--------|-------------|-----------------|----------|
 | **Stage 1** | A2 + A3 | 1.5h | 🔥 Must |
 | **Stage 2** | C1 + C3/C4 | 1.5h | ⭐ Should |
-| **Stage 3** | D1 + D2 | 1.5h | 🔵 Nice |
-| **Stage 4** | E1 + E2 | 1.5h | 🟢 Nice |
+| **Stage 3** | B1 + B2 | 1.5h | 🔵 Should |
+| **Stage 4** | D1 + D2 + D3 | 1.5h | 🟡 Nice |
+| **Stage 5** | E1 + E2 | 1.5h | 🟢 Nice |
 
 **Minimum (Stage 1 only)**: 1.5 hours (2 experiments)
-**Recommended (Stage 1+2)**: 3 hours (4-5 experiments)  
-**Complete (All stages)**: 6 hours (10 experiments)
+**Recommended (Stage 1+2+3)**: 4.5 hours (6-7 experiments)  
+**Complete (All core)**: 7.5 hours (13 experiments, not counting D4-D6 optional)
+**Full (With D4-D6)**: 9 hours (16 experiments)
 
 ---
 
@@ -686,8 +924,13 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 ---
 
 **Summary**: 
-- **5 experiments ✅ done**
-- **1 experiment ⚠️ needs redo** (C1)
-- **8 experiments ⏰ TODO** (A2, A3, C3, C4, D1, D2, E1, E2)
-- **Total new work**: 9 experiments (can be done in 4.5-6 hours with parallel execution)
+- **2 experiments ✅ done** (A0, A1)
+- **3 experiments ⚠️ need redo** (B1, B2, C1 - for fair comparison and correct config)
+- **10+ experiments ⏰ TODO** 
+  - Core ablations: A2, A3 (2)
+  - Ranking sensitivity: C3, C4 (2, plus C1 redo)
+  - Model sizes: B1, B2 (2, redo)
+  - Regularization: D1-D3 core (3), D4-D6 optional (3)
+  - LR sensitivity: E1, E2 (2)
+- **Total new work**: 13-16 experiments (7.5-9 hours with parallel execution)
 
