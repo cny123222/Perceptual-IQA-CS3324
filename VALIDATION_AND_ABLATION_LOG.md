@@ -13,13 +13,32 @@
 
 | Dataset | Domain | # Images | SRCC | PLCC | Status | Log File | Notes |
 |---------|--------|----------|------|------|--------|----------|-------|
-| **KonIQ-10k Test** | In-domain | 2,010 | 0.9343 | 0.9463 | ✅ Done | `logs/swin_multiscale_ranking_alpha0.5_20251221_155013.log` | Training test set |
-| **SPAQ** | Cross-domain | ? | ? | ? | ⏳ Running | `logs/cross_dataset_test_base_20251221_193204.log` | Smartphone photos |
-| **KADID-10K** | Cross-domain | ? | ? | ? | ⏳ Running | `logs/cross_dataset_test_base_20251221_193204.log` | Synthetic distortions |
-| **AGIQA-3K** | Cross-domain | ? | ? | ? | ⏳ Running | `logs/cross_dataset_test_base_20251221_193204.log` | AI-generated images |
+| **KonIQ-10k Test** | In-domain | 2,010 | **0.9347** | **0.9466** | ✅ Done | `logs/cross_dataset_test_base_20251221_193204.log` | Test set (RandomCrop) |
+| **SPAQ** | Cross-domain | 2,224 | **0.8788** | **0.8751** | ✅ Done | `logs/cross_dataset_test_base_20251221_193204.log` | Smartphone photos |
+| **KADID-10K** | Cross-domain | 2,000 | **0.5208** | **0.5456** | ✅ Done | `logs/cross_dataset_test_base_20251221_193204.log` | Synthetic distortions |
+| **AGIQA-3K** | Cross-domain | 2,982 | **0.6704** | **0.7190** | ✅ Done | `logs/cross_dataset_test_base_20251221_193204.log` | AI-generated images |
 
 **Started**: Dec 21, 2025 19:32  
-**Estimated Completion**: ~60 minutes from start
+**Completed**: Dec 21, 2025 ~20:35  
+**Total Time**: ~63 minutes  
+**JSON Results**: `cross_dataset_results_base_best_model_srcc_0.9343_plcc_0.9463.json`
+
+### Analysis
+
+**In-Domain Performance (KonIQ-10k)**:
+- ✅ Excellent: SRCC 0.9347 ≈ training result (0.9343)
+- ✅ Consistent with training performance
+
+**Cross-Domain Performance**:
+- 🟡 **SPAQ (Smartphone)**: SRCC 0.8788 - Good generalization (-5.6%)
+- 🔴 **KADID-10K (Synthetic)**: SRCC 0.5208 - Poor generalization (-44.3%)
+- 🔴 **AGIQA-3K (AI-generated)**: SRCC 0.6704 - Moderate generalization (-28.3%)
+
+**Key Findings**:
+1. Model generalizes well to **authentic images** (SPAQ: natural smartphone photos)
+2. Model struggles with **synthetic distortions** (KADID-10K: artificially generated distortions)
+3. Model has moderate performance on **AI-generated** images (AGIQA-3K: GAN/diffusion images)
+4. Training on KonIQ-10k (authentic distortions) → good transfer to similar domains
 
 ---
 
@@ -35,7 +54,7 @@
 |-----------|---------------------|-------------------|--------------|
 | **Backbone** | ResNet-50 (23M) | Swin Transformer Base (88M) | +3.34% SRCC |
 | **Feature Extraction** | Single-scale (last layer) | Multi-scale (4 layers) | +0.83% SRCC |
-| **Feature Fusion** | N/A | Attention-based | +0.07% SRCC |
+| **Feature Fusion** | N/A | Attention-based | +0.27% SRCC |
 | **Loss Function** | L1 only | L1 + Ranking (α=0.5) | +0.36% SRCC |
 | **Regularization** | Basic (wd=1e-4) | Strong (wd=2e-4, dp=0.3, do=0.4) | +0.28% SRCC |
 | **Learning Rate** | 1e-4 | 5e-6 (0.5x) | Enables stable training |
@@ -47,7 +66,7 @@
 | Experiment | Configuration | SRCC | PLCC | SRCC Δ | PLCC Δ | Status | Log File | Training Time |
 |------------|---------------|------|------|--------|--------|--------|----------|---------------|
 | **Full Model** | Base + Att + Rank(0.5) + Strong Reg | **0.9343** | **0.9463** | - | - | ✅ Done | `logs/swin_multiscale_ranking_alpha0.5_20251221_155013.log` | 10 epochs |
-| **Remove Attention** | Base + Rank(0.5) + Strong Reg | 0.9336 | 0.9464 | -0.0007 | +0.0001 | ✅ Done | `logs/swin_multiscale_ranking_alpha0.5_20251221_003537.log` | 30 epochs |
+| **Remove Attention** | Base + Rank(0.5) + Strong Reg | 0.9316 | 0.9450 | -0.0027 | -0.0013 | ✅ Done | `logs/swin_multiscale_ranking_alpha0.5_20251221_003537.log` | Round 1 result |
 | **Remove Ranking Loss** | Base + Att + L1 Only + Strong Reg | ~0.9307 | ~0.9450 | ~-0.0036 | ~-0.0013 | ⏰ Pending | - | ~10 hours |
 | **Weak Regularization** | Base + Att + Rank(0.5) + Weak Reg | ~0.9315 | ~0.9455 | ~-0.0028 | ~-0.0008 | ⏰ Pending | - | ~10 hours |
 
@@ -59,7 +78,7 @@
 | **Multi-Scale Features** | +0.83% | - | 🥈 Very Important |
 | **Ranking Loss (α=0.5)** | +0.36% | +0.17% | 🥉 Very Important |
 | **Strong Regularization** | +0.28% (est.) | - | 🏅 Very Important |
-| **Attention Fusion** | +0.07% | -0.01% | 🏅 Helpful |
+| **Attention Fusion** | +0.27% | +0.13% | 🥉 Important |
 
 **Key Insight**: The Swin Transformer backbone accounts for **~96%** of the total improvement, while all enhancements together contribute **~4%**.
 

@@ -72,7 +72,7 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
   --train_patch_num 20 \
   --test_patch_num 20 \
   --ranking_loss_alpha 0 \
-  --use_attention \
+  --attention_fusion \
   --lr 5e-6 \
   --weight_decay 2e-4 \
   --drop_path_rate 0.3 \
@@ -231,7 +231,7 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
   --train_patch_num 20 \
   --test_patch_num 20 \
   --ranking_loss_alpha 0.7 \
-  --use_attention \
+  --attention_fusion \
   --lr 5e-6 \
   --weight_decay 2e-4 \
   --drop_path_rate 0.3 \
@@ -273,7 +273,7 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
   --train_patch_num 20 \
   --test_patch_num 20 \
   --ranking_loss_alpha 0.5 \
-  --use_attention \
+  --attention_fusion \
   --lr 5e-6 \
   --weight_decay 1e-4 \
   --drop_path_rate 0.2 \
@@ -324,7 +324,7 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
   --train_patch_num 20 \
   --test_patch_num 20 \
   --ranking_loss_alpha 0.5 \
-  --use_attention \
+  --attention_fusion \
   --lr 2.5e-6 \
   --weight_decay 2e-4 \
   --drop_path_rate 0.3 \
@@ -401,7 +401,7 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
 **Parallel Track 1**:
 ```bash
 # A2: Remove Ranking Loss (Terminal 1)
-python train_swin.py ... --ranking_loss_alpha 0 --use_attention ...
+python train_swin.py ... --ranking_loss_alpha 0 --attention_fusion ...
 ```
 
 **Parallel Track 2**:
@@ -444,7 +444,7 @@ Run if time permits
 
 ### A2: Remove Ranking Loss
 ```bash
-cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --model_size base --batch_size 32 --epochs 5 --patience 10 --train_patch_num 20 --test_patch_num 20 --ranking_loss_alpha 0 --use_attention --lr 5e-6 --weight_decay 2e-4 --drop_path_rate 0.3 --dropout_rate 0.4 --lr_scheduler cosine --test_random_crop --no_spaq 2>&1 | tee logs/ablation_remove_ranking_loss.log
+cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --model_size base --batch_size 32 --epochs 5 --patience 10 --train_patch_num 20 --test_patch_num 20 --ranking_loss_alpha 0 --attention_fusion --lr 5e-6 --weight_decay 2e-4 --drop_path_rate 0.3 --dropout_rate 0.4 --lr_scheduler cosine --test_random_crop --no_spaq 2>&1 | tee logs/ablation_remove_ranking_loss.log
 ```
 
 ### A3: Remove Both
@@ -454,12 +454,12 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 
 ### D1: Weak Regularization
 ```bash
-cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --model_size base --batch_size 32 --epochs 5 --patience 10 --train_patch_num 20 --test_patch_num 20 --ranking_loss_alpha 0.5 --use_attention --lr 5e-6 --weight_decay 1e-4 --drop_path_rate 0.2 --dropout_rate 0.3 --lr_scheduler cosine --test_random_crop --no_spaq 2>&1 | tee logs/sensitivity_weak_reg.log
+cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --model_size base --batch_size 32 --epochs 5 --patience 10 --train_patch_num 20 --test_patch_num 20 --ranking_loss_alpha 0.5 --attention_fusion --lr 5e-6 --weight_decay 1e-4 --drop_path_rate 0.2 --dropout_rate 0.3 --lr_scheduler cosine --test_random_crop --no_spaq 2>&1 | tee logs/sensitivity_weak_reg.log
 ```
 
 ### D3: Lower Learning Rate
 ```bash
-cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --model_size base --batch_size 32 --epochs 5 --patience 10 --train_patch_num 20 --test_patch_num 20 --ranking_loss_alpha 0.5 --use_attention --lr 2.5e-6 --weight_decay 2e-4 --drop_path_rate 0.3 --dropout_rate 0.4 --lr_scheduler cosine --test_random_crop --no_spaq 2>&1 | tee logs/sensitivity_lower_lr.log
+cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --model_size base --batch_size 32 --epochs 5 --patience 10 --train_patch_num 20 --test_patch_num 20 --ranking_loss_alpha 0.5 --attention_fusion --lr 2.5e-6 --weight_decay 2e-4 --drop_path_rate 0.3 --dropout_rate 0.4 --lr_scheduler cosine --test_random_crop --no_spaq 2>&1 | tee logs/sensitivity_lower_lr.log
 ```
 
 ---
