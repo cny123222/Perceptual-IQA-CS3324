@@ -9,13 +9,29 @@
 
 ## ⚡ Ultra Quick Start (Copy-Paste)
 
+### 🔒 SSH-Safe方式（推荐！即使SSH断开也继续运行）
+
 ```bash
 cd /root/Perceptual-IQA-CS3324
-chmod +x run_experiments_4gpus.sh
+./start_overnight_experiments.sh
+```
+
+**就这么简单！** 脚本会在tmux中运行，**SSH断开后实验继续进行**！
+
+按 `Ctrl+B` 然后按 `D` 可以退出tmux但保持实验运行。
+
+---
+
+### ⚠️ 备选方式（不推荐，SSH断开会停止）
+
+如果你打算一直保持SSH连接：
+
+```bash
+cd /root/Perceptual-IQA-CS3324
 ./run_experiments_4gpus.sh
 ```
 
-**就这么简单！** 脚本会自动运行所有14个实验。
+**警告**: SSH断开后脚本会停止！建议使用上面的SSH-safe方式。
 
 ---
 
@@ -41,6 +57,41 @@ Batch 4 (1.5h): E3, E4            ← Learning Rate finish
 ```
 
 **Total**: ~6 hours (晚上11点 → 早上5点) ⏰
+
+---
+
+## 🔐 SSH断开问题（重要！）
+
+### ⚠️ 问题说明：
+
+如果直接运行 `./run_experiments_4gpus.sh`：
+- SSH断开 → 脚本主进程停止
+- 已启动的实验会继续运行（在tmux中）
+- 但后续batch不会启动！❌
+
+### ✅ 解决方案：
+
+**方法1: 使用 `start_overnight_experiments.sh`（最简单）**
+
+```bash
+./start_overnight_experiments.sh
+```
+
+这个脚本会在tmux中运行主脚本，SSH断开后完全没问题！
+
+**方法2: 手动使用tmux**
+
+```bash
+tmux new-session -s exp-runner "./run_experiments_4gpus.sh"
+# 按 Ctrl+B 然后 D 退出
+```
+
+**方法3: 使用nohup**
+
+```bash
+nohup ./run_experiments_4gpus.sh > experiment_runner.log 2>&1 &
+tail -f experiment_runner.log
+```
 
 ---
 
