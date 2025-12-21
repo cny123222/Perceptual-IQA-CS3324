@@ -1,12 +1,9 @@
 #!/bin/bash
 
 ################################################################################
-# 4-GPU Optimized Experiment Runner (Fixed Parameters)
+# 4-GPU Optimized Experiment Runner
 # Total: 14 experiments in 4 batches (~6 hours)
 # 
-# Parameters follow FINAL_ABLATION_PLAN.md standard format
-# Baseline: Alpha=0.3 (not 0.5)
-#
 # Execution Plan:
 #   Batch 1 (1.5h): A1, A2, A3, C1    (Core Ablations + Ranking start)
 #   Batch 2 (1.5h): C2, C3, B1, B2    (Ranking + Model Size)
@@ -65,7 +62,6 @@ wait_for_batch() {
 echo -e "${CYAN}╔════════════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${CYAN}║           🚀 4-GPU Experiment Runner (14 experiments)             ║${NC}"
 echo -e "${CYAN}║                    Estimated Time: ~6 hours                        ║${NC}"
-echo -e "${CYAN}║              Baseline: Alpha=0.3 (SRCC 0.9352)                     ║${NC}"
 echo -e "${CYAN}╚════════════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
@@ -84,7 +80,7 @@ echo -e "${GREEN}🎬 Starting experiments at $(date)${NC}"
 echo ""
 
 ################################################################################
-# BATCH 1: Core Ablations + Ranking Start (4 experiments, ~1.5 hours)
+# BATCH 1: Core Ablations Start (4 experiments, ~1.5 hours)
 ################################################################################
 
 echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
@@ -120,21 +116,19 @@ kill_tmux_session "exp-a2"
 tmux new-session -d -s "exp-a2" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=1 python train_swin.py \
   --dataset koniq-10k \
-  --model_size base \
+  --patch_size 32 \
   --batch_size 4 \
-  --epochs 100 \
-  --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --attention_fusion \
-  --ranking_loss_alpha 0 \
   --lr 5e-6 \
   --weight_decay 2e-4 \
+  --epochs 100 \
+  --model_size base \
+  --attention_fusion \
+  --ranking_loss_alpha 0 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
-  --lr_scheduler cosine \
-  --test_random_crop \
-  --no_spaq; \
+  --patience 5; \
   echo 'A2 Complete'; exec bash"
 
 # A3: Remove Multi-scale (GPU 2)
@@ -143,22 +137,20 @@ kill_tmux_session "exp-a3"
 tmux new-session -d -s "exp-a3" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=2 python train_swin.py \
   --dataset koniq-10k \
-  --model_size base \
+  --patch_size 32 \
   --batch_size 4 \
-  --epochs 100 \
-  --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
+  --lr 5e-6 \
+  --weight_decay 2e-4 \
+  --epochs 100 \
+  --model_size base \
   --no_multiscale \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
-  --lr 5e-6 \
-  --weight_decay 2e-4 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
-  --lr_scheduler cosine \
-  --test_random_crop \
-  --no_spaq; \
+  --patience 5; \
   echo 'A3 Complete'; exec bash"
 
 # C1: Alpha=0.1 (GPU 3)
@@ -167,21 +159,19 @@ kill_tmux_session "exp-c1"
 tmux new-session -d -s "exp-c1" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=3 python train_swin.py \
   --dataset koniq-10k \
-  --model_size base \
+  --patch_size 32 \
   --batch_size 4 \
-  --epochs 100 \
-  --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --attention_fusion \
-  --ranking_loss_alpha 0.1 \
   --lr 5e-6 \
   --weight_decay 2e-4 \
+  --epochs 100 \
+  --model_size base \
+  --attention_fusion \
+  --ranking_loss_alpha 0.1 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
-  --lr_scheduler cosine \
-  --test_random_crop \
-  --no_spaq; \
+  --patience 5; \
   echo 'C1 Complete'; exec bash"
 
 echo -e "${CYAN}🚀 Batch 1 started! Use 'tmux ls' to see sessions.${NC}"
@@ -203,21 +193,19 @@ kill_tmux_session "exp-c2"
 tmux new-session -d -s "exp-c2" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dataset koniq-10k \
-  --model_size base \
+  --patch_size 32 \
   --batch_size 4 \
-  --epochs 100 \
-  --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --attention_fusion \
-  --ranking_loss_alpha 0.5 \
   --lr 5e-6 \
   --weight_decay 2e-4 \
+  --epochs 100 \
+  --model_size base \
+  --attention_fusion \
+  --ranking_loss_alpha 0.5 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
-  --lr_scheduler cosine \
-  --test_random_crop \
-  --no_spaq; \
+  --patience 5; \
   echo 'C2 Complete'; exec bash"
 
 # C3: Alpha=0.7 (GPU 1)
@@ -226,21 +214,19 @@ kill_tmux_session "exp-c3"
 tmux new-session -d -s "exp-c3" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=1 python train_swin.py \
   --dataset koniq-10k \
-  --model_size base \
+  --patch_size 32 \
   --batch_size 4 \
-  --epochs 100 \
-  --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --attention_fusion \
-  --ranking_loss_alpha 0.7 \
   --lr 5e-6 \
   --weight_decay 2e-4 \
+  --epochs 100 \
+  --model_size base \
+  --attention_fusion \
+  --ranking_loss_alpha 0.7 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
-  --lr_scheduler cosine \
-  --test_random_crop \
-  --no_spaq; \
+  --patience 5; \
   echo 'C3 Complete'; exec bash"
 
 # B1: Swin-Tiny (GPU 2)
@@ -249,21 +235,19 @@ kill_tmux_session "exp-b1"
 tmux new-session -d -s "exp-b1" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=2 python train_swin.py \
   --dataset koniq-10k \
-  --model_size tiny \
+  --patch_size 32 \
   --batch_size 4 \
-  --epochs 100 \
-  --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --attention_fusion \
-  --ranking_loss_alpha 0.3 \
   --lr 5e-6 \
   --weight_decay 2e-4 \
+  --epochs 100 \
+  --model_size tiny \
+  --attention_fusion \
+  --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
-  --lr_scheduler cosine \
-  --test_random_crop \
-  --no_spaq; \
+  --patience 5; \
   echo 'B1 Complete'; exec bash"
 
 # B2: Swin-Small (GPU 3)
@@ -272,21 +256,19 @@ kill_tmux_session "exp-b2"
 tmux new-session -d -s "exp-b2" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=3 python train_swin.py \
   --dataset koniq-10k \
-  --model_size small \
+  --patch_size 32 \
   --batch_size 4 \
-  --epochs 100 \
-  --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --attention_fusion \
-  --ranking_loss_alpha 0.3 \
   --lr 5e-6 \
   --weight_decay 2e-4 \
+  --epochs 100 \
+  --model_size small \
+  --attention_fusion \
+  --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
-  --lr_scheduler cosine \
-  --test_random_crop \
-  --no_spaq; \
+  --patience 5; \
   echo 'B2 Complete'; exec bash"
 
 echo -e "${CYAN}🚀 Batch 2 started!${NC}"
@@ -303,95 +285,87 @@ echo -e "${CYAN}═════════════════════�
 echo ""
 
 # D1: Weight Decay=5e-5 (GPU 0)
-echo -e "${BLUE}[1/4]${NC} Starting D1 (WD=5e-5, very weak) on GPU 0..."
+echo -e "${BLUE}[1/4]${NC} Starting D1 (WD=5e-5) on GPU 0..."
 kill_tmux_session "exp-d1"
 tmux new-session -d -s "exp-d1" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dataset koniq-10k \
-  --model_size base \
+  --patch_size 32 \
   --batch_size 4 \
-  --epochs 100 \
-  --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --attention_fusion \
-  --ranking_loss_alpha 0.3 \
   --lr 5e-6 \
   --weight_decay 5e-5 \
+  --epochs 100 \
+  --model_size base \
+  --attention_fusion \
+  --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
-  --lr_scheduler cosine \
-  --test_random_crop \
-  --no_spaq; \
+  --patience 5; \
   echo 'D1 Complete'; exec bash"
 
 # D2: Weight Decay=1e-4 (GPU 1)
-echo -e "${BLUE}[2/4]${NC} Starting D2 (WD=1e-4, weak) on GPU 1..."
+echo -e "${BLUE}[2/4]${NC} Starting D2 (WD=1e-4) on GPU 1..."
 kill_tmux_session "exp-d2"
 tmux new-session -d -s "exp-d2" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=1 python train_swin.py \
   --dataset koniq-10k \
-  --model_size base \
+  --patch_size 32 \
   --batch_size 4 \
-  --epochs 100 \
-  --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --attention_fusion \
-  --ranking_loss_alpha 0.3 \
   --lr 5e-6 \
   --weight_decay 1e-4 \
+  --epochs 100 \
+  --model_size base \
+  --attention_fusion \
+  --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
-  --lr_scheduler cosine \
-  --test_random_crop \
-  --no_spaq; \
+  --patience 5; \
   echo 'D2 Complete'; exec bash"
 
 # D4: Weight Decay=4e-4 (GPU 2)
-echo -e "${BLUE}[3/4]${NC} Starting D4 (WD=4e-4, strong) on GPU 2..."
+echo -e "${BLUE}[3/4]${NC} Starting D4 (WD=4e-4) on GPU 2..."
 kill_tmux_session "exp-d4"
 tmux new-session -d -s "exp-d4" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=2 python train_swin.py \
   --dataset koniq-10k \
-  --model_size base \
+  --patch_size 32 \
   --batch_size 4 \
-  --epochs 100 \
-  --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --attention_fusion \
-  --ranking_loss_alpha 0.3 \
   --lr 5e-6 \
   --weight_decay 4e-4 \
+  --epochs 100 \
+  --model_size base \
+  --attention_fusion \
+  --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
-  --lr_scheduler cosine \
-  --test_random_crop \
-  --no_spaq; \
+  --patience 5; \
   echo 'D4 Complete'; exec bash"
 
 # E1: LR=2.5e-6 (GPU 3)
-echo -e "${BLUE}[4/4]${NC} Starting E1 (LR=2.5e-6, conservative) on GPU 3..."
+echo -e "${BLUE}[4/4]${NC} Starting E1 (LR=2.5e-6) on GPU 3..."
 kill_tmux_session "exp-e1"
 tmux new-session -d -s "exp-e1" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=3 python train_swin.py \
   --dataset koniq-10k \
-  --model_size base \
+  --patch_size 32 \
   --batch_size 4 \
-  --epochs 100 \
-  --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --attention_fusion \
-  --ranking_loss_alpha 0.3 \
   --lr 2.5e-6 \
   --weight_decay 2e-4 \
+  --epochs 100 \
+  --model_size base \
+  --attention_fusion \
+  --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
-  --lr_scheduler cosine \
-  --test_random_crop \
-  --no_spaq; \
+  --patience 5; \
   echo 'E1 Complete'; exec bash"
 
 echo -e "${CYAN}🚀 Batch 3 started!${NC}"
@@ -408,49 +382,45 @@ echo -e "${CYAN}═════════════════════�
 echo ""
 
 # E3: LR=7.5e-6 (GPU 0)
-echo -e "${BLUE}[1/2]${NC} Starting E3 (LR=7.5e-6, faster) on GPU 0..."
+echo -e "${BLUE}[1/2]${NC} Starting E3 (LR=7.5e-6) on GPU 0..."
 kill_tmux_session "exp-e3"
 tmux new-session -d -s "exp-e3" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dataset koniq-10k \
-  --model_size base \
+  --patch_size 32 \
   --batch_size 4 \
-  --epochs 100 \
-  --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --attention_fusion \
-  --ranking_loss_alpha 0.3 \
   --lr 7.5e-6 \
   --weight_decay 2e-4 \
+  --epochs 100 \
+  --model_size base \
+  --attention_fusion \
+  --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
-  --lr_scheduler cosine \
-  --test_random_crop \
-  --no_spaq; \
+  --patience 5; \
   echo 'E3 Complete'; exec bash"
 
 # E4: LR=1e-5 (GPU 1)
-echo -e "${BLUE}[2/2]${NC} Starting E4 (LR=1e-5, aggressive) on GPU 1..."
+echo -e "${BLUE}[2/2]${NC} Starting E4 (LR=1e-5) on GPU 1..."
 kill_tmux_session "exp-e4"
 tmux new-session -d -s "exp-e4" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=1 python train_swin.py \
   --dataset koniq-10k \
-  --model_size base \
+  --patch_size 32 \
   --batch_size 4 \
-  --epochs 100 \
-  --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --attention_fusion \
-  --ranking_loss_alpha 0.3 \
   --lr 1e-5 \
   --weight_decay 2e-4 \
+  --epochs 100 \
+  --model_size base \
+  --attention_fusion \
+  --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
-  --lr_scheduler cosine \
-  --test_random_crop \
-  --no_spaq; \
+  --patience 5; \
   echo 'E4 Complete'; exec bash"
 
 echo -e "${CYAN}🚀 Batch 4 started!${NC}"
