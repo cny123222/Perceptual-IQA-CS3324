@@ -2,24 +2,18 @@
 
 ################################################################################
 # 4-GPU Optimized Experiment Runner (Fixed Parameters)
-# Total: 14 experiments in 4 batches (~1.5 hours)
+# Total: 14 experiments in 4 batches (~6 hours)
 # 
 # Parameters follow FINAL_ABLATION_PLAN.md standard format
-# Baseline: Alpha=0.3 (SRCC 0.9352, PLCC 0.9471)
-#
-# Configuration (matches best experiment):
-#   - Batch Size: 32
-#   - Epochs: 5
-#   - Train-Test Rounds: 1
-#   - Patience: 5
+# Baseline: Alpha=0.3 (not 0.5)
 #
 # Execution Plan:
-#   Batch 1 (20min): A1, A2, A3, C1    (Core Ablations + Ranking start)
-#   Batch 2 (20min): C2, C3, B1, B2    (Ranking + Model Size)
-#   Batch 3 (20min): D1, D2, D4, E1    (Weight Decay + LR start)
-#   Batch 4 (20min): E3, E4            (Learning Rate)
+#   Batch 1 (1.5h): A1, A2, A3, C1    (Core Ablations + Ranking start)
+#   Batch 2 (1.5h): C2, C3, B1, B2    (Ranking + Model Size)
+#   Batch 3 (1.5h): D1, D2, D4, E1    (Weight Decay + LR start)
+#   Batch 4 (1.5h): E3, E4            (Learning Rate)
 #
-# Total: ~1.5 hours (all parallel)
+# Total: ~6 hours (晚上11点开始 → 早上5点完成)
 ################################################################################
 
 set -e
@@ -70,9 +64,8 @@ wait_for_batch() {
 # Print header
 echo -e "${CYAN}╔════════════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${CYAN}║           🚀 4-GPU Experiment Runner (14 experiments)             ║${NC}"
-echo -e "${CYAN}║                   Estimated Time: ~1.5 hours                       ║${NC}"
+echo -e "${CYAN}║                    Estimated Time: ~6 hours                        ║${NC}"
 echo -e "${CYAN}║              Baseline: Alpha=0.3 (SRCC 0.9352)                     ║${NC}"
-echo -e "${CYAN}║         Config: batch=32, epochs=5, train_test_num=1               ║${NC}"
 echo -e "${CYAN}╚════════════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
@@ -91,11 +84,11 @@ echo -e "${GREEN}🎬 Starting experiments at $(date)${NC}"
 echo ""
 
 ################################################################################
-# BATCH 1: Core Ablations + Ranking Start (4 experiments, ~20 minutes)
+# BATCH 1: Core Ablations + Ranking Start (4 experiments, ~1.5 hours)
 ################################################################################
 
 echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
-echo -e "${CYAN}  BATCH 1/4: Core Ablations + Ranking Start (20 minutes)${NC}"
+echo -e "${CYAN}  BATCH 1/4: Core Ablations + Ranking Start (1.5 hours)${NC}"
 echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
 echo ""
 
@@ -106,12 +99,11 @@ tmux new-session -d -s "exp-a1" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dataset koniq-10k \
   --model_size base \
-  --batch_size 32 \
-  --epochs 5 \
+  --batch_size 4 \
+  --epochs 100 \
   --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --train_test_num 1 \
   --ranking_loss_alpha 0.3 \
   --lr 5e-6 \
   --weight_decay 2e-4 \
@@ -129,12 +121,11 @@ tmux new-session -d -s "exp-a2" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=1 python train_swin.py \
   --dataset koniq-10k \
   --model_size base \
-  --batch_size 32 \
-  --epochs 5 \
+  --batch_size 4 \
+  --epochs 100 \
   --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --train_test_num 1 \
   --attention_fusion \
   --ranking_loss_alpha 0 \
   --lr 5e-6 \
@@ -153,12 +144,11 @@ tmux new-session -d -s "exp-a3" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=2 python train_swin.py \
   --dataset koniq-10k \
   --model_size base \
-  --batch_size 32 \
-  --epochs 5 \
+  --batch_size 4 \
+  --epochs 100 \
   --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --train_test_num 1 \
   --no_multiscale \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
@@ -178,12 +168,11 @@ tmux new-session -d -s "exp-c1" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=3 python train_swin.py \
   --dataset koniq-10k \
   --model_size base \
-  --batch_size 32 \
-  --epochs 5 \
+  --batch_size 4 \
+  --epochs 100 \
   --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --train_test_num 1 \
   --attention_fusion \
   --ranking_loss_alpha 0.1 \
   --lr 5e-6 \
@@ -199,12 +188,12 @@ echo -e "${CYAN}🚀 Batch 1 started! Use 'tmux ls' to see sessions.${NC}"
 wait_for_batch "exp-a1" "exp-a2" "exp-a3" "exp-c1"
 
 ################################################################################
-# BATCH 2: Ranking + Model Size (4 experiments, ~20 minutes)
+# BATCH 2: Ranking + Model Size (4 experiments, ~1.5 hours)
 ################################################################################
 
 echo ""
 echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
-echo -e "${CYAN}  BATCH 2/4: Ranking + Model Size (20 minutes)${NC}"
+echo -e "${CYAN}  BATCH 2/4: Ranking + Model Size (1.5 hours)${NC}"
 echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
 echo ""
 
@@ -215,12 +204,11 @@ tmux new-session -d -s "exp-c2" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dataset koniq-10k \
   --model_size base \
-  --batch_size 32 \
-  --epochs 5 \
+  --batch_size 4 \
+  --epochs 100 \
   --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --train_test_num 1 \
   --attention_fusion \
   --ranking_loss_alpha 0.5 \
   --lr 5e-6 \
@@ -239,12 +227,11 @@ tmux new-session -d -s "exp-c3" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=1 python train_swin.py \
   --dataset koniq-10k \
   --model_size base \
-  --batch_size 32 \
-  --epochs 5 \
+  --batch_size 4 \
+  --epochs 100 \
   --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --train_test_num 1 \
   --attention_fusion \
   --ranking_loss_alpha 0.7 \
   --lr 5e-6 \
@@ -263,12 +250,11 @@ tmux new-session -d -s "exp-b1" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=2 python train_swin.py \
   --dataset koniq-10k \
   --model_size tiny \
-  --batch_size 32 \
-  --epochs 5 \
+  --batch_size 4 \
+  --epochs 100 \
   --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --train_test_num 1 \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --lr 5e-6 \
@@ -287,12 +273,11 @@ tmux new-session -d -s "exp-b2" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=3 python train_swin.py \
   --dataset koniq-10k \
   --model_size small \
-  --batch_size 32 \
-  --epochs 5 \
+  --batch_size 4 \
+  --epochs 100 \
   --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --train_test_num 1 \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --lr 5e-6 \
@@ -308,12 +293,12 @@ echo -e "${CYAN}🚀 Batch 2 started!${NC}"
 wait_for_batch "exp-c2" "exp-c3" "exp-b1" "exp-b2"
 
 ################################################################################
-# BATCH 3: Regularization + LR Start (4 experiments, ~20 minutes)
+# BATCH 3: Regularization + LR Start (4 experiments, ~1.5 hours)
 ################################################################################
 
 echo ""
 echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
-echo -e "${CYAN}  BATCH 3/4: Regularization + LR Start (20 minutes)${NC}"
+echo -e "${CYAN}  BATCH 3/4: Regularization + LR Start (1.5 hours)${NC}"
 echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
 echo ""
 
@@ -324,12 +309,11 @@ tmux new-session -d -s "exp-d1" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dataset koniq-10k \
   --model_size base \
-  --batch_size 32 \
-  --epochs 5 \
+  --batch_size 4 \
+  --epochs 100 \
   --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --train_test_num 1 \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --lr 5e-6 \
@@ -348,12 +332,11 @@ tmux new-session -d -s "exp-d2" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=1 python train_swin.py \
   --dataset koniq-10k \
   --model_size base \
-  --batch_size 32 \
-  --epochs 5 \
+  --batch_size 4 \
+  --epochs 100 \
   --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --train_test_num 1 \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --lr 5e-6 \
@@ -372,12 +355,11 @@ tmux new-session -d -s "exp-d4" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=2 python train_swin.py \
   --dataset koniq-10k \
   --model_size base \
-  --batch_size 32 \
-  --epochs 5 \
+  --batch_size 4 \
+  --epochs 100 \
   --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --train_test_num 1 \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --lr 5e-6 \
@@ -396,12 +378,11 @@ tmux new-session -d -s "exp-e1" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=3 python train_swin.py \
   --dataset koniq-10k \
   --model_size base \
-  --batch_size 32 \
-  --epochs 5 \
+  --batch_size 4 \
+  --epochs 100 \
   --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --train_test_num 1 \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --lr 2.5e-6 \
@@ -417,12 +398,12 @@ echo -e "${CYAN}🚀 Batch 3 started!${NC}"
 wait_for_batch "exp-d1" "exp-d2" "exp-d4" "exp-e1"
 
 ################################################################################
-# BATCH 4: Learning Rate (2 experiments, ~20 minutes)
+# BATCH 4: Learning Rate (2 experiments, ~1.5 hours)
 ################################################################################
 
 echo ""
 echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
-echo -e "${CYAN}  BATCH 4/4: Learning Rate (20 minutes)${NC}"
+echo -e "${CYAN}  BATCH 4/4: Learning Rate (1.5 hours)${NC}"
 echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
 echo ""
 
@@ -433,12 +414,11 @@ tmux new-session -d -s "exp-e3" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dataset koniq-10k \
   --model_size base \
-  --batch_size 32 \
-  --epochs 5 \
+  --batch_size 4 \
+  --epochs 100 \
   --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --train_test_num 1 \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --lr 7.5e-6 \
@@ -457,12 +437,11 @@ tmux new-session -d -s "exp-e4" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=1 python train_swin.py \
   --dataset koniq-10k \
   --model_size base \
-  --batch_size 32 \
-  --epochs 5 \
+  --batch_size 4 \
+  --epochs 100 \
   --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --train_test_num 1 \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --lr 1e-5 \
