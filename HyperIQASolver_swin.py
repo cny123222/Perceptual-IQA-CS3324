@@ -261,15 +261,6 @@ class HyperIQASolver(object):
                 # Gradient clipping to prevent exploding gradients and stabilize training
                 torch.nn.utils.clip_grad_norm_(self.model_hyper.parameters(), max_norm=1.0)
                 self.solver.step()
-                
-                # Update progress bar with current loss
-                if batch_idx % 10 == 0:
-                    avg_loss = sum(epoch_loss) / len(epoch_loss) if epoch_loss else 0.0
-                    postfix = {'loss': f'{avg_loss:.4f}'}
-                    if self.ranking_loss_alpha > 0 and epoch_rank_loss:
-                        avg_rank_loss = sum(epoch_rank_loss) / len(epoch_rank_loss)
-                        postfix['rank_loss'] = f'{avg_rank_loss:.4f}'
-                    train_loader_with_progress.set_postfix(postfix)
 
             train_srcc, _ = stats.spearmanr(pred_scores, gt_scores)
 
