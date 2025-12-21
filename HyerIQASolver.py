@@ -155,12 +155,16 @@ class HyperIQASolver(object):
             print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC\tSPAQ_SRCC\tSPAQ_PLCC')
         else:
             print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC')
+        
+        from tqdm import tqdm
+        
         for t in range(self.epochs):
             epoch_loss = []
             pred_scores = []
             gt_scores = []
 
-            for batch_idx, (img, label) in enumerate(self.train_data):
+            train_loader_with_progress = tqdm(self.train_data, desc=f'Epoch {t+1}/{self.epochs}', unit='batch')
+            for batch_idx, (img, label) in enumerate(train_loader_with_progress):
                 img = img.to(self.device)
                 label = label.float().to(self.device)
 
@@ -258,12 +262,13 @@ class HyperIQASolver(object):
 
     def test(self, data):
         """Testing"""
+        from tqdm import tqdm
         self.model_hyper.train(False)
         pred_scores = []
         gt_scores = []
 
         with torch.no_grad():  # Disable gradient computation for faster inference
-            for img, label in data:
+            for img, label in tqdm(data, desc='Testing', unit='batch', leave=False):
                 # DataLoader returns tensors, so use .to() directly to avoid warning
                 img = img.to(self.device)
                 label = label.float().to(self.device)  # MPS/CUDA 需要 float32
