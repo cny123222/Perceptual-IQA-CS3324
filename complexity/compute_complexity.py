@@ -11,6 +11,7 @@ import numpy as np
 from PIL import Image
 import sys
 import os
+import argparse
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -19,29 +20,40 @@ import models_swin as models
 from torchvision import transforms
 
 
-def load_model(checkpoint_path, model_size='base', device='cuda'):
+def load_model(checkpoint_path, model_size='base', device='cuda', use_attention=None):
     """加载训练好的模型"""
     print(f"Loading model from: {checkpoint_path}")
+    
+    # 加载权重以检测是否包含attention
+    checkpoint = torch.load(checkpoint_path, map_location=device)
+    if 'model_hyper' in checkpoint:
+        state_dict = checkpoint['model_hyper']
+    else:
+        state_dict = checkpoint
+    
+    # 自动检测是否包含attention
+    if use_attention is None:
+        has_attention = any('multiscale_attention' in key for key in state_dict.keys())
+        print(f"Auto-detected attention: {has_attention}")
+    else:
+        has_attention = use_attention
+        print(f"Using manual attention setting: {has_attention}")
     
     # 创建模型
     model = models.HyperNet(
         16, 112, 224, 112, 56, 28, 14, 7,
         use_multiscale=True,
-        use_attention=False,
+        use_attention=has_attention,
         drop_path_rate=0.3,
         dropout_rate=0.4,
         model_size=model_size
     ).to(device)
     
     # 加载权重
-    checkpoint = torch.load(checkpoint_path, map_location=device)
-    if 'model_hyper' in checkpoint:
-        model.load_state_dict(checkpoint['model_hyper'])
-    else:
-        model.load_state_dict(checkpoint)
+    model.load_state_dict(state_dict)
     
     model.eval()
-    print(f"Model loaded successfully (model_size={model_size})")
+    print(f"Model loaded successfully (model_size={model_size}, attention={has_attention})")
     return model
 
 
@@ -318,23 +330,54 @@ def save_results(output_file, model_name, model_size, total_params, trainable_pa
 
 
 def main():
+    # 解析命令行参数
+    parser = argparse.ArgumentParser(description='Model Complexity Analysis')
+    parser.add_argument('--checkpoint', type=str,
+                       default="/root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-swin-ranking-alpha0.5_20251221_155013/best_model_srcc_0.9343_plcc_0.9463.pkl",
+                       help='Path to model checkpoint')
+    parser.add_argument('--image', type=str,
+                       default="/root/Perceptual-IQA-CS3324/complexity/example.JPG",
+                       help='Path to example image')
+    parser.add_argument('--output', type=str,
+                       default="/root/Perceptual-IQA-CS3324/complexity/complexity_results.md",
+                       help='Output markdown file path')
+    parser.add_argument('--model_size', type=str, default='base',
+                       choices=['tiny', 'small', 'base'],
+                       help='Model size')
+    parser.add_argument('--use_attention', action='store_true',
+                       help='Use attention fusion (auto-detected if not specified)')
+    parser.add_argument('--no_attention', action='store_true',
+                       help='Disable attention fusion')
+    
+    args = parser.parse_args()
+    
     # 配置
-    checkpoint_path = "/root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-swin-ranking-alpha0.5_20251220_091014/best_model_srcc_0.9336_plcc_0.9464.pkl"
-    image_path = "/root/Perceptual-IQA-CS3324/complexity/example.JPG"
-    output_file = "/root/Perceptual-IQA-CS3324/complexity/complexity_results.md"
-    model_size = 'base'  # 'tiny', 'small', 'base'
+    checkpoint_path = args.checkpoint
+    image_path = args.image
+    output_file = args.output
+    model_size = args.model_size
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    
+    # 确定是否使用attention
+    if args.use_attention:
+        use_attention = True
+    elif args.no_attention:
+        use_attention = False
+    else:
+        use_attention = None  # Auto-detect
     
     print("="*80)
     print("MODEL COMPLEXITY ANALYSIS")
     print("="*80)
+    print(f"Checkpoint: {checkpoint_path}")
+    print(f"Model size: {model_size}")
     print(f"Device: {device}")
     if device == 'cuda':
         print(f"GPU: {torch.cuda.get_device_name(0)}")
         print(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.2f} GB")
     
     # 1. 加载模型
-    model = load_model(checkpoint_path, model_size=model_size, device=device)
+    model = load_model(checkpoint_path, model_size=model_size, device=device, use_attention=use_attention)
     
     # 2. 加载图片
     input_tensor, original_img = load_image(image_path, device=device)
