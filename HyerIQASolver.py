@@ -160,21 +160,7 @@ class HyperIQASolver(object):
             pred_scores = []
             gt_scores = []
 
-            # Use tqdm for progress bar with total length
-            total_batches = len(self.train_data)
-            print(f'  Total batches: {total_batches}')
-            print(f'  Loading first batch (this may take a moment)...')
-            train_loader_with_progress = tqdm(
-                self.train_data, 
-                desc=f'Epoch {t+1}/{self.epochs}',
-                total=total_batches,
-                unit='batch',
-                mininterval=0.5,
-                maxinterval=2.0,
-                smoothing=0.1,
-                initial=0
-            )
-            for batch_idx, (img, label) in enumerate(train_loader_with_progress):
+            for batch_idx, (img, label) in enumerate(self.train_data):
                 img = img.to(self.device)
                 label = label.float().to(self.device)
 
@@ -276,17 +262,8 @@ class HyperIQASolver(object):
         pred_scores = []
         gt_scores = []
 
-        # Use tqdm for progress bar during testing
-        total_test_batches = len(data)
-        test_loader_with_progress = tqdm(
-            data, 
-            desc='Testing',
-            total=total_test_batches,
-            unit='batch',
-            mininterval=1.0
-        )
-        with torch.no_grad():  # Disable gradient computation for faster inference (same as SPAQ test)
-            for img, label in test_loader_with_progress:
+        with torch.no_grad():  # Disable gradient computation for faster inference
+            for img, label in data:
                 # DataLoader returns tensors, so use .to() directly to avoid warning
                 img = img.to(self.device)
                 label = label.float().to(self.device)  # MPS/CUDA 需要 float32
@@ -406,18 +383,8 @@ class HyperIQASolver(object):
         
         print(f'  Testing on SPAQ dataset ({self.spaq_num_images} images)...')
         
-        # Use tqdm for progress bar (same as KonIQ test)
-        total_batches = len(self.spaq_loader)
-        spaq_loader_with_progress = tqdm(
-            self.spaq_loader,
-            desc='  SPAQ',
-            total=total_batches,
-            unit='batch',
-            mininterval=1.0
-        )
-        
         with torch.no_grad():  # Disable gradient computation for faster inference
-            for img, label in spaq_loader_with_progress:
+            for img, label in self.spaq_loader:
                 img = img.to(self.device)
                 label = label.float().to(self.device)
                 
