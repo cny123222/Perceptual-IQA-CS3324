@@ -1,0 +1,12 @@
+{
+  "checkpoint": "checkpoints/koniq-10k-swin-ranking-alpha0.5_20251220_091014/best_model_srcc_0.9336_plcc_0.9464.pkl",
+  "model_size": "base",
+  "test_patch_num": 20,
+  "test_random_crop": false,
+  "results": {
+    "KonIQ-10k Test Set": null,
+    "SPAQ": null,
+    "KADID-10K": null,
+    "AGIQA-3K": null
+  }
+}

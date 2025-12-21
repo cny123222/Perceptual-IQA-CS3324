@@ -43,11 +43,10 @@ def pil_loader(path):
 class JSONTestDataset(torch.utils.data.Dataset):
     """
     通用JSON格式测试数据集加载器
-    与训练时的测试方法完全一致
+    优化：预加载和缓存resize后的图像（与训练时的SPAQ测试完全一致）
     """
-    def __init__(self, root, json_file, transform, patch_num):
+    def __init__(self, root, json_file, patch_num, test_random_crop=True):
         self.root = root
-        self.transform = transform
         self.patch_num = patch_num
         
         # 加载JSON文件
@@ -63,21 +62,57 @@ class JSONTestDataset(torch.utils.data.Dataset):
         for item in data:
             img_path = os.path.join(root, os.path.basename(item['image']))
             if not os.path.exists(img_path):
-                print(f"  Warning: Image not found: {img_path}")
                 continue
             score = float(item['score'])
             for _ in range(patch_num):
                 self.samples.append((img_path, score))
         
         # 计算实际图像数量
-        unique_images = len(set([s[0] for s in self.samples]))
-        print(f"  Loaded {unique_images} images, {len(self.samples)} total patches")
+        unique_paths = list(set([s[0] for s in self.samples]))
+        print(f"  Found {len(unique_paths)} images, {len(self.samples)} total patches")
+        
+        # 关键优化：预加载和缓存所有resize后的图像（与训练时的SPAQDataset完全一致）
+        self.resize_transform = torchvision.transforms.Resize((512, 384))
+        
+        # 根据crop方法设置crop transform
+        if test_random_crop:
+            self.crop_transform = torchvision.transforms.Compose([
+                torchvision.transforms.RandomCrop(size=224),
+                torchvision.transforms.ToTensor(),
+                torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
+                                               std=(0.229, 0.224, 0.225))])
+        else:
+            self.crop_transform = torchvision.transforms.Compose([
+                torchvision.transforms.CenterCrop(size=224),
+                torchvision.transforms.ToTensor(),
+                torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
+                                               std=(0.229, 0.224, 0.225))])
+        
+        # 预加载和缓存所有resize后的图像
+        self._resized_cache = {}
+        print(f"  Pre-loading and caching {len(unique_paths)} images (this may take a moment)...")
+        for path in tqdm(unique_paths, desc='  Caching images', unit='img'):
+            if os.path.exists(path):
+                try:
+                    img = pil_loader(path)
+                    self._resized_cache[path] = self.resize_transform(img)
+                except Exception as e:
+                    print(f"  Warning: Failed to load {path}: {e}")
+                    continue
+        print(f"  ✓ Cached {len(self._resized_cache)} images in memory")
     
     def __getitem__(self, index):
         path, target = self.samples[index]
-        sample = pil_loader(path)
-        if self.transform is not None:
-            sample = self.transform(sample)
+        # 从缓存中获取预先resize的图像
+        resized_img = self._resized_cache.get(path)
+        if resized_img is None:
+            # Fallback：如果缓存中没有，重新加载
+            img = pil_loader(path)
+            resized_img = self.resize_transform(img)
+            self._resized_cache[path] = resized_img
+        
+        # 只需要做CenterCrop + ToTensor + Normalize（很快）
+        sample = self.crop_transform(resized_img)
         return sample, target
     
     def __len__(self):
@@ -85,7 +120,7 @@ class JSONTestDataset(torch.utils.data.Dataset):
 
 
 def test_on_dataset(dataset_name, dataset_path, json_file, device, model_hyper, 
-                   patch_num, dropout_rate, test_random_crop=False):
+                   patch_num, dropout_rate, test_random_crop=True):
     """
     在指定数据集上测试模型
     
@@ -110,28 +145,10 @@ def test_on_dataset(dataset_name, dataset_path, json_file, device, model_hyper,
     print(f'Patch number: {patch_num}')
     print(f'Crop method: {"RandomCrop" if test_random_crop else "CenterCrop"}')
     
-    # 构建transform（与训练时的测试transform完全一致）
-    # 参考 data_loader.py 中 koniq-10k 的测试transform
-    if test_random_crop:
-        # RandomCrop（原论文方法，但结果不可复现）
-        transforms = torchvision.transforms.Compose([
-            torchvision.transforms.Resize((512, 384)),
-            torchvision.transforms.RandomCrop(size=224),
-            torchvision.transforms.ToTensor(),
-            torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
-                                           std=(0.229, 0.224, 0.225))])
-    else:
-        # CenterCrop（推荐，结果可复现）
-        transforms = torchvision.transforms.Compose([
-            torchvision.transforms.Resize((512, 384)),
-            torchvision.transforms.CenterCrop(size=224),
-            torchvision.transforms.ToTensor(),
-            torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406),
-                                           std=(0.229, 0.224, 0.225))])
     
-    # 加载数据集
+    # 创建数据集（transform在Dataset内部处理，已经优化）
     try:
-        dataset = JSONTestDataset(dataset_path, json_file, transforms, patch_num)
+        dataset = JSONTestDataset(dataset_path, json_file, patch_num, test_random_crop)
     except FileNotFoundError as e:
         print(f"  ❌ Error: {e}")
         return None, None, 0
@@ -293,7 +310,7 @@ Examples:
     # 数据集配置
     datasets_config = {
         'koniq': {
-            'path': os.path.join(base_dir, 'koniq-10k') + '/',
+            'path': os.path.join(base_dir, 'koniq-test') + '/',
             'json': 'koniq_test.json',  # 使用KonIQ-10k的测试集
             'name': 'KonIQ-10k Test Set'
         },

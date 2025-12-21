@@ -1,0 +1,117 @@
+
+============================================================
+Cross-Dataset Testing Configuration
+============================================================
+Checkpoint: checkpoints/koniq-10k-swin-ranking-alpha0.5_20251220_091014/best_model_srcc_0.9336_plcc_0.9464.pkl
+Model size: base
+Test patch num: 20
+Crop method: CenterCrop
+Datasets: KONIQ, SPAQ, KADID, AGIQA
+============================================================
+Using device: cuda
+
+============================================================
+Loading Model
+============================================================
+Checkpoint: checkpoints/koniq-10k-swin-ranking-alpha0.5_20251220_091014/best_model_srcc_0.9336_plcc_0.9464.pkl
+Model size: base
+Device: cuda
+Loading Swin Transformer BASE (~88M parameters)
+HyperNet input channels: 1920 (multi_scale=True, model=base)
+  Loading checkpoint...
+  ✅ Model loaded successfully!
+
+============================================================
+Testing on KONIQ-10K TEST SET dataset
+============================================================
+Dataset path: /root/Perceptual-IQA-CS3324/koniq-10k/
+JSON file: koniq_test.json
+Patch number: 20
+Crop method: CenterCrop
+  Found 0 images, 0 total patches
+  Pre-loading and caching 0 images (this may take a moment)...
+  Caching images: 0img [00:00, ?img/s]  Caching images: 0img [00:00, ?img/s]
+  ✓ Cached 0 images in memory
+  Total batches: 0
+  Testing KONIQ-10K TEST SET: 0batch [00:00, ?batch/s]  Testing KONIQ-10K TEST SET: 0batch [00:00, ?batch/s]
+Traceback (most recent call last):
+  File "/root/Perceptual-IQA-CS3324/cross_dataset_test.py", line 381, in main
+    srcc, plcc, num_images = test_on_dataset(
+                             ^^^^^^^^^^^^^^^^
+  File "/root/Perceptual-IQA-CS3324/cross_dataset_test.py", line 169, in test_on_dataset
+    dataset = JSONTestDataset(dataset_path, json_file, transforms, patch_num)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/Perceptual-IQA-CS3324/cross_dataset_test.py", line 67, in __init__
+    for _ in range(patch_num):
+             ^^^^^^^^^^^^^^^^
+TypeError: 'Compose' object cannot be interpreted as an integer
+Traceback (most recent call last):
+  File "/root/Perceptual-IQA-CS3324/cross_dataset_test.py", line 381, in main
+    srcc, plcc, num_images = test_on_dataset(
+                             ^^^^^^^^^^^^^^^^
+  File "/root/Perceptual-IQA-CS3324/cross_dataset_test.py", line 169, in test_on_dataset
+    dataset = JSONTestDataset(dataset_path, json_file, transforms, patch_num)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/Perceptual-IQA-CS3324/cross_dataset_test.py", line 67, in __init__
+    for _ in range(patch_num):
+             ^^^^^^^^^^^^^^^^
+TypeError: 'Compose' object cannot be interpreted as an integer
+Traceback (most recent call last):
+  File "/root/Perceptual-IQA-CS3324/cross_dataset_test.py", line 381, in main
+    srcc, plcc, num_images = test_on_dataset(
+                             ^^^^^^^^^^^^^^^^
+  File "/root/Perceptual-IQA-CS3324/cross_dataset_test.py", line 169, in test_on_dataset
+    dataset = JSONTestDataset(dataset_path, json_file, transforms, patch_num)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/Perceptual-IQA-CS3324/cross_dataset_test.py", line 67, in __init__
+    for _ in range(patch_num):
+             ^^^^^^^^^^^^^^^^
+TypeError: 'Compose' object cannot be interpreted as an integer
+  ❌ Error: No predictions generated
+
+============================================================
+Testing on SPAQ dataset
+============================================================
+Dataset path: /root/Perceptual-IQA-CS3324/spaq-test/
+JSON file: spaq_test.json
+Patch number: 20
+Crop method: CenterCrop
+
+❌ Error testing on SPAQ: 'Compose' object cannot be interpreted as an integer
+
+============================================================
+Testing on KADID-10K dataset
+============================================================
+Dataset path: /root/Perceptual-IQA-CS3324/kadid-test/
+JSON file: kadid_test.json
+Patch number: 20
+Crop method: CenterCrop
+
+❌ Error testing on KADID-10K: 'Compose' object cannot be interpreted as an integer
+
+============================================================
+Testing on AGIQA-3K dataset
+============================================================
+Dataset path: /root/Perceptual-IQA-CS3324/agiqa-test/
+JSON file: agiqa_test.json
+Patch number: 20
+Crop method: CenterCrop
+
+❌ Error testing on AGIQA-3K: 'Compose' object cannot be interpreted as an integer
+
+============================================================
+FINAL RESULTS SUMMARY
+============================================================
+Model: Swin-Base
+Checkpoint: best_model_srcc_0.9336_plcc_0.9464.pkl
+Test patch num: 20
+------------------------------------------------------------
+Dataset              Images     SRCC       PLCC      
+------------------------------------------------------------
+KonIQ-10k Test Set   Failed     -          -         
+SPAQ                 Failed     -          -         
+KADID-10K            Failed     -          -         
+AGIQA-3K             Failed     -          -         
+============================================================
+
+✅ Results saved to: /root/Perceptual-IQA-CS3324/cross_dataset_results_base_best_model_srcc_0.9336_plcc_0.9464.json
