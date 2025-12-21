@@ -43,13 +43,15 @@
 
 **What's removed**: Attention-based feature fusion (用简单拼接代替)
 
-**Results**:
-- SRCC: **0.9336** (-0.07%)
-- PLCC: **0.9464** (+0.01%)
+**Results** (Round 1, fair comparison):
+- SRCC: **0.9316** (-0.27%)
+- PLCC: **0.9450** (-0.13%)
 - Log: `logs/swin_multiscale_ranking_alpha0.5_20251221_003537.log`
-- Status: ✅ **Already Done** (30 epochs, Round 1 result)
+- Status: ✅ **Already Done** (Round 1 of 10 rounds)
 
-**Conclusion**: Attention provides **+0.07% SRCC** but marginal benefit
+**Note**: This experiment ran for 3 rounds total, achieving best SRCC 0.9336 in Round 3. However, for fair comparison with other experiments (which ran 1 round), we use Round 1 result: 0.9316.
+
+**Conclusion**: Attention provides **+0.27% SRCC** contribution (0.9316 → 0.9343)
 
 ---
 
@@ -80,7 +82,7 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
   --no_spaq
 ```
 
-**Expected Result**: SRCC ≈ 0.9300-0.9310 (-0.3-0.4%)
+**Expected Result**: SRCC ≈ 0.9310-0.9320 (-0.2-0.3%)
 
 **Status**: ⏰ **TODO** (~1.5 hours)
 
@@ -464,10 +466,10 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 
 ## 📈 Expected Results Table (To be filled)
 
-| Experiment | Configuration | SRCC | PLCC | SRCC Δ | Component Contribution |
-|-----------|---------------|------|------|--------|------------------------|
+| Experiment | Configuration | SRCC (Round 1) | PLCC (Round 1) | SRCC Δ | Component Contribution |
+|-----------|---------------|----------------|----------------|--------|------------------------|
 | **A0: Full Model** | Base + Att + Rank | **0.9343** | **0.9463** | - | Baseline |
-| **A1: - Attention** | Base + Rank | **0.9336** | **0.9464** | -0.0007 | Attention: +0.07% |
+| **A1: - Attention** | Base + Rank | **0.9316** | **0.9450** | **-0.0027** | **Attention: +0.27%** |
 | **A2: - Ranking** | Base + Att | ? | ? | ? | Ranking: ? |
 | **A3: - Both** | Base only | ? | ? | ? | Both: ? |
 | **B1: Tiny** | Tiny + Rank | **0.9236** | **0.9361** | -0.0107 | Size effect: Base vs Tiny |
@@ -475,6 +477,8 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 | **C1: Alpha=0.3** | Base + Att + α=0.3 | **0.9303** | **0.9435** | -0.0040 | α too low |
 | **D1: Weak Reg** | Weak regularization | ? | ? | ? | Reg sensitivity |
 | **D3: Lower LR** | LR=2.5e-6 | ? | ? | ? | LR sensitivity |
+
+**Note**: All results are from Round 1 for fair comparison. Some experiments ran multiple rounds, but only Round 1 is used here.
 
 ---
 
