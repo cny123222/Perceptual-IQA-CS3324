@@ -11,6 +11,7 @@ Usage:
 """
 
 import os
+import sys
 import argparse
 import torch
 import torchvision
@@ -19,6 +20,7 @@ from scipy import stats
 import numpy as np
 import json
 from PIL import Image
+from datetime import datetime
 from tqdm import tqdm
 import glob
 
@@ -308,6 +310,37 @@ Examples:
     
     config = parser.parse_args()
     
+    # 设置日志文件（带时间戳）
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs')
+    os.makedirs(log_dir, exist_ok=True)
+    
+    # 从checkpoint路径提取信息
+    checkpoint_name = os.path.basename(config.checkpoint).replace('.pkl', '')
+    log_filename = f'cross_dataset_test_{config.model_size}_{timestamp}.log'
+    log_path = os.path.join(log_dir, log_filename)
+    
+    # 创建Tee类来同时输出到控制台和文件
+    class Tee:
+        def __init__(self, *files):
+            self.files = files
+        
+        def write(self, data):
+            for f in self.files:
+                f.write(data)
+                f.flush()
+        
+        def flush(self):
+            for f in self.files:
+                f.flush()
+    
+    # 重定向stdout和stderr到日志文件
+    log_file = open(log_path, 'w', buffering=1)
+    sys.stdout = Tee(sys.stdout, log_file)
+    sys.stderr = Tee(sys.stderr, log_file)
+    
+    print(f'\n📝 Log file: {log_path}\n')
+    
     # 设置基础目录
     if config.base_dir is None:
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -441,6 +474,12 @@ Examples:
         json.dump(output_data, f, indent=2)
     
     print(f'\n✅ Results saved to: {output_path}')
+    print(f'\n📝 Log file saved to: {log_path}')
+    
+    # 恢复标准输出并关闭日志文件
+    sys.stdout = sys.__stdout__
+    sys.stderr = sys.__stderr__
+    log_file.close()
 
 
 if __name__ == '__main__':
