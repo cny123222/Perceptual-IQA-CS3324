@@ -1,0 +1,83 @@
+Training log will be saved to: /root/Perceptual-IQA-CS3324/logs/resnet50_baseline_20251221_130922.log
+================================================================================
+
+================================================================================
+BASELINE EXPERIMENT CONFIGURATION (Original HyperIQA - ResNet-50)
+================================================================================
+Dataset:                    koniq-10k
+Model:                      ResNet-50
+Epochs:                     10
+Batch Size:                 96
+Learning Rate:              2e-05
+LR Ratio (backbone):        10
+Weight Decay:               0.0005
+Train Patch Num:            20
+Test Patch Num:             20
+Patch Size:                 224
+Train-Test Rounds:          10
+--------------------------------------------------------------------------------
+Testing:
+  SPAQ Cross-Dataset Test:  False
+--------------------------------------------------------------------------------
+Reproducibility:
+  Random Seed:              42
+  CuDNN Deterministic:      True
+  CuDNN Benchmark:          False
+================================================================================
+
+Training and testing on koniq-10k dataset for 10 rounds...
+KonIQ-10k: 7046 train images, 2010 test images
+Round 1
+  Train: 7046 images, Test: 2010 images
+Using device: cuda
+Model checkpoints will be saved to: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_130922
+Loading Koniq-10k dataset from /root/Perceptual-IQA-CS3324/koniq-10k/...
+Building sample list from 7046 images...
+  Total samples created: 140920
+Pre-loading 7046 unique images into cache...
+  Cached 7046 images successfully
+Dataset loaded. Total samples: 140920
+Loading Koniq-10k dataset from /root/Perceptual-IQA-CS3324/koniq-10k/...
+Building sample list from 2010 images...
+  Total samples created: 40200
+Pre-loading 2010 unique images into cache...
+  Cached 2010 images successfully
+Dataset loaded. Total samples: 40200
+SPAQ cross-dataset testing: DISABLED (use --test_spaq to enable)
+
+================================================================================
+TRAINING CONFIGURATION SUMMARY (ResNet-50 Baseline)
+================================================================================
+Model Architecture:
+  Backbone:                 ResNet-50
+  Parameters:               ~27.4M
+--------------------------------------------------------------------------------
+Loss Function:
+  Type:                     L1 Loss Only
+--------------------------------------------------------------------------------
+Regularization:
+  Weight Decay:             0.0005
+  Early Stopping:           ENABLED
+  Patience:                 5 epochs
+--------------------------------------------------------------------------------
+Optimization:
+  Learning Rate (HyperNet): 0.0002
+  Learning Rate (Backbone): 2e-05
+  LR Scheduler:             step
+  Optimizer:                Adam
+--------------------------------------------------------------------------------
+Data:
+  Test Crop Method:         CenterCrop
+  Test Patch Num:           20
+  Cross-Dataset Test:       None
+--------------------------------------------------------------------------------
+Training:
+  Epochs:                   10
+  Checkpoint Directory:     /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_130922
+================================================================================
+
+Learning rate scheduler: Step decay (original, divide by 10 every 6 epochs)
+Early stopping enabled with patience=5
+Epoch	Train_Loss	Train_SRCC	Test_SRCC	Test_PLCC
+  Total batches: 1468
+  Loading first batch (this may take a moment)...

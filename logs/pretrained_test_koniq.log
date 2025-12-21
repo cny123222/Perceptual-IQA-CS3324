@@ -1,0 +1,12 @@
+Using device: cuda
+Loading pretrained model from: /root/Perceptual-IQA-CS3324/pretrained/koniq_pretrained.pkl
+Model loaded successfully
+
+Testing on koniq-10k dataset...
+Traceback (most recent call last):
+  File "/root/Perceptual-IQA-CS3324/test_pretrained.py", line 171, in <module>
+    test_model(args.model_path, args.dataset)
+  File "/root/Perceptual-IQA-CS3324/test_pretrained.py", line 55, in test_model
+    train_images = set([item['image_name'] for item in train_data])
+                        ~~~~^^^^^^^^^^^^^^
+KeyError: 'image_name'
