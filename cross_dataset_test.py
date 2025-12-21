@@ -240,21 +240,28 @@ def load_model(checkpoint_path, model_size, device):
     
     # 从checkpoint文件名中提取dropout_rate（如果有的话）
     # 例如: best_model_srcc_0.9236_plcc_0.9406.pkl
-    dropout_rate = 0.3  # 默认值
+    dropout_rate = 0.4  # 默认值（Base模型使用0.4）
+    
+    # 加载权重以检查是否包含attention
+    print(f'  Loading checkpoint...')
+    checkpoint = torch.load(checkpoint_path, map_location=device)
+    
+    # 检查checkpoint中是否包含attention权重
+    has_attention = any('multiscale_attention' in key for key in checkpoint.keys())
+    print(f'  Checkpoint contains attention: {has_attention}')
     
     # 创建模型（与训练时的HyperNet一致）
     # 参考 HyperIQASolver_swin.py 的 __init__ 方法
     model_hyper = models.HyperNet(
         16, 112, 224, 112, 56, 28, 14, 7,
         use_multiscale=True,  # 默认启用多尺度特征融合
-        drop_path_rate=0.2,   # 默认值（训练时的值）
+        use_attention=has_attention,  # 根据checkpoint自动检测
+        drop_path_rate=0.3,   # Base模型使用0.3
         dropout_rate=dropout_rate,
         model_size=model_size
     ).to(device)
     
     # 加载权重
-    print(f'  Loading checkpoint...')
-    checkpoint = torch.load(checkpoint_path, map_location=device)
     model_hyper.load_state_dict(checkpoint)
     model_hyper.train(False)  # 设置为评估模式
     
