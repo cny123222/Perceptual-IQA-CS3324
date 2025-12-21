@@ -258,12 +258,12 @@ class HyperIQASolver(object):
             elif self.use_lr_scheduler and self.lr_scheduler_type == 'step':
                 # Original step decay: recreate optimizer each epoch
                 hypernet_lr = self.lr * self.lrratio / pow(10, (t // 6))
-                backbone_lr = self.lr  # Backbone LR stays constant
+                backbone_lr = self.lr / pow(10, (t // 6))  # Backbone LR also decays (fixed bug)
                 
                 self.paras = [{'params': self.hypernet_params, 'lr': hypernet_lr},
                               {'params': self.model_hyper.res.parameters(), 'lr': backbone_lr}]
                 self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay)
-                print(f'  Learning rates: HyperNet={hypernet_lr:.6f}, Backbone={hypernet_lr:.6f}')
+                print(f'  Learning rates: HyperNet={hypernet_lr:.6f}, Backbone={backbone_lr:.6f}')
             # else: constant LR, no update needed
 
         print('Best test SRCC %f, PLCC %f' % (best_srcc, best_plcc))

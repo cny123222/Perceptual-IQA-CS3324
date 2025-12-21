@@ -1,0 +1,416 @@
+Training log will be saved to: /root/Perceptual-IQA-CS3324/logs/resnet50_baseline_20251221_004809.log
+================================================================================
+
+================================================================================
+BASELINE EXPERIMENT CONFIGURATION (Original HyperIQA - ResNet-50)
+================================================================================
+Dataset:                    koniq-10k
+Model:                      ResNet-50
+Epochs:                     10
+Batch Size:                 96
+Learning Rate:              2e-05
+LR Ratio (backbone):        10
+Weight Decay:               0.0005
+Train Patch Num:            20
+Test Patch Num:             20
+Patch Size:                 224
+Train-Test Rounds:          10
+--------------------------------------------------------------------------------
+Testing:
+  SPAQ Cross-Dataset Test:  False
+--------------------------------------------------------------------------------
+Reproducibility:
+  Random Seed:              42
+  CuDNN Deterministic:      True
+  CuDNN Benchmark:          False
+================================================================================
+
+Training and testing on koniq-10k dataset for 10 rounds...
+KonIQ-10k: 7046 train images, 2010 test images
+Round 1
+  Train: 7046 images, Test: 2010 images
+Using device: cuda
+Model checkpoints will be saved to: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_004809
+Loading Koniq-10k dataset from /root/Perceptual-IQA-CS3324/koniq-10k/...
+Building sample list from 7046 images...
+  Total samples created: 140920
+Pre-loading 7046 unique images into cache...
+  Cached 7046 images successfully
+Dataset loaded. Total samples: 140920
+Loading Koniq-10k dataset from /root/Perceptual-IQA-CS3324/koniq-10k/...
+Building sample list from 2010 images...
+  Total samples created: 40200
+Pre-loading 2010 unique images into cache...
+  Cached 2010 images successfully
+Dataset loaded. Total samples: 40200
+SPAQ cross-dataset testing: DISABLED (use --test_spaq to enable)
+
+================================================================================
+TRAINING CONFIGURATION SUMMARY (ResNet-50 Baseline)
+================================================================================
+Model Architecture:
+  Backbone:                 ResNet-50
+  Parameters:               ~27.4M
+--------------------------------------------------------------------------------
+Loss Function:
+  Type:                     L1 Loss Only
+--------------------------------------------------------------------------------
+Regularization:
+  Weight Decay:             0.0005
+  Early Stopping:           ENABLED
+  Patience:                 5 epochs
+--------------------------------------------------------------------------------
+Optimization:
+  Learning Rate (HyperNet): 0.0002
+  Learning Rate (Backbone): 2e-05
+  LR Scheduler:             step
+  Optimizer:                Adam
+--------------------------------------------------------------------------------
+Data:
+  Test Crop Method:         CenterCrop
+  Test Patch Num:           20
+  Cross-Dataset Test:       None
+--------------------------------------------------------------------------------
+Training:
+  Epochs:                   10
+  Checkpoint Directory:     /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_004809
+================================================================================
+
+Learning rate scheduler: Step decay (original, divide by 10 every 6 epochs)
+Early stopping enabled with patience=5
+Epoch	Train_Loss	Train_SRCC	Test_SRCC	Test_PLCC
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+1	5.642		0.8541		0.8817		0.9047
+  ⭐ New best model saved! SRCC: 0.8817, PLCC: 0.9047
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_004809/best_model_srcc_0.8817_plcc_0.9047.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+2	3.579		0.9416		0.8833		0.9068
+  ⭐ New best model saved! SRCC: 0.8833, PLCC: 0.9068
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_004809/best_model_srcc_0.8833_plcc_0.9068.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+3	3.034		0.9582		0.8814		0.9014
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+4	2.737		0.9660		0.8853		0.9047
+  ⭐ New best model saved! SRCC: 0.8853, PLCC: 0.9047
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_004809/best_model_srcc_0.8853_plcc_0.9047.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+5	2.517		0.9711		0.8866		0.9061
+  ⭐ New best model saved! SRCC: 0.8866, PLCC: 0.9061
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_004809/best_model_srcc_0.8866_plcc_0.9061.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+6	2.360		0.9744		0.8879		0.9034
+  ⭐ New best model saved! SRCC: 0.8879, PLCC: 0.9034
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_004809/best_model_srcc_0.8879_plcc_0.9034.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+7	2.260		0.9768		0.8846		0.9037
+  Learning rates: HyperNet=0.000020, Backbone=0.000020
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+8	2.143		0.9790		0.8857		0.9036
+  Learning rates: HyperNet=0.000020, Backbone=0.000020
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+9	2.052		0.9807		0.8831		0.9029
+  Learning rates: HyperNet=0.000020, Backbone=0.000020
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+10	1.985		0.9820		0.8880		0.9075
+  ⭐ New best model saved! SRCC: 0.8880, PLCC: 0.9075
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_004809/best_model_srcc_0.8880_plcc_0.9075.pkl
+  Learning rates: HyperNet=0.000020, Backbone=0.000020
+Best test SRCC 0.887959, PLCC 0.907496
+Round 2
+  Train: 7046 images, Test: 2010 images
+Using device: cuda
+Model checkpoints will be saved to: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_042551
+Loading Koniq-10k dataset from /root/Perceptual-IQA-CS3324/koniq-10k/...
+Building sample list from 7046 images...
+  Total samples created: 140920
+Pre-loading 7046 unique images into cache...
+  Cached 7046 images successfully
+Dataset loaded. Total samples: 140920
+Loading Koniq-10k dataset from /root/Perceptual-IQA-CS3324/koniq-10k/...
+Building sample list from 2010 images...
+  Total samples created: 40200
+Pre-loading 2010 unique images into cache...
+  Cached 2010 images successfully
+Dataset loaded. Total samples: 40200
+SPAQ cross-dataset testing: DISABLED (use --test_spaq to enable)
+
+================================================================================
+TRAINING CONFIGURATION SUMMARY (ResNet-50 Baseline)
+================================================================================
+Model Architecture:
+  Backbone:                 ResNet-50
+  Parameters:               ~27.4M
+--------------------------------------------------------------------------------
+Loss Function:
+  Type:                     L1 Loss Only
+--------------------------------------------------------------------------------
+Regularization:
+  Weight Decay:             0.0005
+  Early Stopping:           ENABLED
+  Patience:                 5 epochs
+--------------------------------------------------------------------------------
+Optimization:
+  Learning Rate (HyperNet): 0.0002
+  Learning Rate (Backbone): 2e-05
+  LR Scheduler:             step
+  Optimizer:                Adam
+--------------------------------------------------------------------------------
+Data:
+  Test Crop Method:         CenterCrop
+  Test Patch Num:           20
+  Cross-Dataset Test:       None
+--------------------------------------------------------------------------------
+Training:
+  Epochs:                   10
+  Checkpoint Directory:     /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_042551
+================================================================================
+
+Learning rate scheduler: Step decay (original, divide by 10 every 6 epochs)
+Early stopping enabled with patience=5
+Epoch	Train_Loss	Train_SRCC	Test_SRCC	Test_PLCC
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+1	5.566		0.8562		0.8786		0.9004
+  ⭐ New best model saved! SRCC: 0.8786, PLCC: 0.9004
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_042551/best_model_srcc_0.8786_plcc_0.9004.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+2	3.585		0.9411		0.8839		0.9067
+  ⭐ New best model saved! SRCC: 0.8839, PLCC: 0.9067
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_042551/best_model_srcc_0.8839_plcc_0.9067.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+3	3.038		0.9579		0.8839		0.9037
+  ⭐ New best model saved! SRCC: 0.8839, PLCC: 0.9037
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_042551/best_model_srcc_0.8839_plcc_0.9037.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+4	2.710		0.9665		0.8842		0.9028
+  ⭐ New best model saved! SRCC: 0.8842, PLCC: 0.9028
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_042551/best_model_srcc_0.8842_plcc_0.9028.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+5	2.518		0.9711		0.8826		0.9042
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+6	2.355		0.9745		0.8885		0.9039
+  ⭐ New best model saved! SRCC: 0.8885, PLCC: 0.9039
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_042551/best_model_srcc_0.8885_plcc_0.9039.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+7	2.229		0.9773		0.8830		0.9010
+  Learning rates: HyperNet=0.000020, Backbone=0.000020
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+8	2.138		0.9789		0.8817		0.9015
+  Learning rates: HyperNet=0.000020, Backbone=0.000020
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+9	2.062		0.9805		0.8840		0.9035
+  Learning rates: HyperNet=0.000020, Backbone=0.000020
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+10	1.989		0.9817		0.8847		0.9013
+  Learning rates: HyperNet=0.000020, Backbone=0.000020
+Best test SRCC 0.888548, PLCC 0.903936
+Round 3
+  Train: 7046 images, Test: 2010 images
+Using device: cuda
+Model checkpoints will be saved to: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_075712
+Loading Koniq-10k dataset from /root/Perceptual-IQA-CS3324/koniq-10k/...
+Building sample list from 7046 images...
+  Total samples created: 140920
+Pre-loading 7046 unique images into cache...
+  Cached 7046 images successfully
+Dataset loaded. Total samples: 140920
+Loading Koniq-10k dataset from /root/Perceptual-IQA-CS3324/koniq-10k/...
+Building sample list from 2010 images...
+  Total samples created: 40200
+Pre-loading 2010 unique images into cache...
+  Cached 2010 images successfully
+Dataset loaded. Total samples: 40200
+SPAQ cross-dataset testing: DISABLED (use --test_spaq to enable)
+
+================================================================================
+TRAINING CONFIGURATION SUMMARY (ResNet-50 Baseline)
+================================================================================
+Model Architecture:
+  Backbone:                 ResNet-50
+  Parameters:               ~27.4M
+--------------------------------------------------------------------------------
+Loss Function:
+  Type:                     L1 Loss Only
+--------------------------------------------------------------------------------
+Regularization:
+  Weight Decay:             0.0005
+  Early Stopping:           ENABLED
+  Patience:                 5 epochs
+--------------------------------------------------------------------------------
+Optimization:
+  Learning Rate (HyperNet): 0.0002
+  Learning Rate (Backbone): 2e-05
+  LR Scheduler:             step
+  Optimizer:                Adam
+--------------------------------------------------------------------------------
+Data:
+  Test Crop Method:         CenterCrop
+  Test Patch Num:           20
+  Cross-Dataset Test:       None
+--------------------------------------------------------------------------------
+Training:
+  Epochs:                   10
+  Checkpoint Directory:     /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_075712
+================================================================================
+
+Learning rate scheduler: Step decay (original, divide by 10 every 6 epochs)
+Early stopping enabled with patience=5
+Epoch	Train_Loss	Train_SRCC	Test_SRCC	Test_PLCC
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+1	5.597		0.8562		0.8772		0.9010
+  ⭐ New best model saved! SRCC: 0.8772, PLCC: 0.9010
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_075712/best_model_srcc_0.8772_plcc_0.9010.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+2	3.581		0.9417		0.8786		0.8996
+  ⭐ New best model saved! SRCC: 0.8786, PLCC: 0.8996
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_075712/best_model_srcc_0.8786_plcc_0.8996.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+3	3.033		0.9582		0.8780		0.9005
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+4	2.715		0.9662		0.8813		0.8993
+  ⭐ New best model saved! SRCC: 0.8813, PLCC: 0.8993
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_075712/best_model_srcc_0.8813_plcc_0.8993.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+5	2.519		0.9711		0.8830		0.9004
+  ⭐ New best model saved! SRCC: 0.8830, PLCC: 0.9004
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_075712/best_model_srcc_0.8830_plcc_0.9004.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+6	2.355		0.9746		0.8871		0.9051
+  ⭐ New best model saved! SRCC: 0.8871, PLCC: 0.9051
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_075712/best_model_srcc_0.8871_plcc_0.9051.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+7	2.231		0.9772		0.8867		0.9044
+  Learning rates: HyperNet=0.000020, Backbone=0.000020
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+8	2.147		0.9791		0.8871		0.9054
+  Learning rates: HyperNet=0.000020, Backbone=0.000020
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+9	2.051		0.9806		0.8841		0.9039
+  Learning rates: HyperNet=0.000020, Backbone=0.000020
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+10	1.991		0.9818		0.8863		0.9051
+  Learning rates: HyperNet=0.000020, Backbone=0.000020
+Best test SRCC 0.887114, PLCC 0.905146
+Round 4
+  Train: 7046 images, Test: 2010 images
+Using device: cuda
+Model checkpoints will be saved to: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_112739
+Loading Koniq-10k dataset from /root/Perceptual-IQA-CS3324/koniq-10k/...
+Building sample list from 7046 images...
+  Total samples created: 140920
+Pre-loading 7046 unique images into cache...
+  Cached 7046 images successfully
+Dataset loaded. Total samples: 140920
+Loading Koniq-10k dataset from /root/Perceptual-IQA-CS3324/koniq-10k/...
+Building sample list from 2010 images...
+  Total samples created: 40200
+Pre-loading 2010 unique images into cache...
+  Cached 2010 images successfully
+Dataset loaded. Total samples: 40200
+SPAQ cross-dataset testing: DISABLED (use --test_spaq to enable)
+
+================================================================================
+TRAINING CONFIGURATION SUMMARY (ResNet-50 Baseline)
+================================================================================
+Model Architecture:
+  Backbone:                 ResNet-50
+  Parameters:               ~27.4M
+--------------------------------------------------------------------------------
+Loss Function:
+  Type:                     L1 Loss Only
+--------------------------------------------------------------------------------
+Regularization:
+  Weight Decay:             0.0005
+  Early Stopping:           ENABLED
+  Patience:                 5 epochs
+--------------------------------------------------------------------------------
+Optimization:
+  Learning Rate (HyperNet): 0.0002
+  Learning Rate (Backbone): 2e-05
+  LR Scheduler:             step
+  Optimizer:                Adam
+--------------------------------------------------------------------------------
+Data:
+  Test Crop Method:         CenterCrop
+  Test Patch Num:           20
+  Cross-Dataset Test:       None
+--------------------------------------------------------------------------------
+Training:
+  Epochs:                   10
+  Checkpoint Directory:     /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_112739
+================================================================================
+
+Learning rate scheduler: Step decay (original, divide by 10 every 6 epochs)
+Early stopping enabled with patience=5
+Epoch	Train_Loss	Train_SRCC	Test_SRCC	Test_PLCC
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+1	5.596		0.8573		0.8798		0.9022
+  ⭐ New best model saved! SRCC: 0.8798, PLCC: 0.9022
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_112739/best_model_srcc_0.8798_plcc_0.9022.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+2	3.562		0.9421		0.8828		0.9023
+  ⭐ New best model saved! SRCC: 0.8828, PLCC: 0.9023
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_112739/best_model_srcc_0.8828_plcc_0.9023.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+3	3.031		0.9581		0.8815		0.9022
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
+4	2.739		0.9659		0.8829		0.9025
+  ⭐ New best model saved! SRCC: 0.8829, PLCC: 0.9025
+     Path: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-resnet_20251221_112739/best_model_srcc_0.8829_plcc_0.9025.pkl
+  Learning rates: HyperNet=0.000200, Backbone=0.000200
+  Total batches: 1468
+  Loading first batch (this may take a moment)...
