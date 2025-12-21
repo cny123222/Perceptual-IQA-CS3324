@@ -54,34 +54,18 @@
 
 ---
 
-### Experiment A2: Remove Ranking Loss ⏰ **TODO**
+### Experiment A2: Remove Ranking Loss ✅ **DONE**
 
-**What's removed**: Ranking Loss → L1 loss only
+**What's removed**: Ranking Loss → L1 loss only (alpha=0)
 
-**Command**:
-```bash
-cd /root/Perceptual-IQA-CS3324 && python train_swin.py \
-  --dataset koniq-10k \
-  --model_size base \
-  --batch_size 32 \
-  --epochs 5 \
-  --patience 5 \
-  --train_patch_num 20 \
-  --test_patch_num 20 \
-  --ranking_loss_alpha 0 \
-  --attention_fusion \
-  --lr 5e-6 \
-  --weight_decay 2e-4 \
-  --drop_path_rate 0.3 \
-  --dropout_rate 0.4 \
-  --lr_scheduler cosine \
-  --test_random_crop \
-  --no_spaq
-```
+**Results** (Epoch 1):
+- SRCC: **0.9338** (-0.05%)
+- PLCC: **0.9465** (+0.02%)
+- Log: `logs/swin_multiscale_ranking_alpha0_20251221_203437.log`
 
-**Expected**: SRCC ≈ 0.9310-0.9320 (-0.2-0.3%)
+**Contribution**: Ranking Loss provides **+0.05% SRCC, +0.02% PLCC**
 
-**Time**: ~1.5 hours
+**Note**: Contribution is much smaller than expected! PLCC actually improved slightly without ranking loss.
 
 ---
 
@@ -671,7 +655,7 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 |-----------|------|-------------|------------------------|
 | Full Model | 0.9343 | - | Baseline |
 | - Attention | 0.9316 | -0.27% | **Attention: +0.27%** |
-| - Ranking Loss | ~0.9315 | ~-0.28% | **Ranking: +0.28%** |
+| - Ranking Loss | 0.9338 ✅ | -0.05% ✅ | **Ranking: +0.05%** ⚠️ |
 | - Multi-scale | ~0.9260 | ~-0.83% | **Multi-scale: +0.83%** |
 
 ### Ranking Loss Sensitivity
@@ -752,8 +736,9 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 |----|-----------|------|--------|-------|
 | A0 | Full Model (Base + Att + Rank0.5) | 0.9343 | ✅ Done | Baseline |
 | A1 | Remove Attention | 0.9316 | ✅ Done | Patience=7 (acceptable) |
+| A2 | Remove Ranking Loss (Alpha=0) | 0.9338 | ✅ Done | +0.05% contribution only! ⚠️ |
 
-**Total Completed**: 2 experiments
+**Total Completed**: 3 experiments
 
 ---
 
@@ -769,14 +754,14 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 
 ---
 
-### 🔥 Priority 1: Core Ablations (Must Do - 2 experiments)
+### 🔥 Priority 1: Core Ablations (Must Do - 1 experiment)
 
-| ID | Experiment | Command | Time |
-|----|-----------|---------|------|
-| **A2** | **Remove Ranking Loss** | See Section "Experiment A2" | 1.5h |
-| **A3** | **Remove Multi-scale** | See Section "Experiment A3" | 1.5h |
+| ID | Experiment | Command | Time | Status |
+|----|-----------|---------|------|--------|
+| ~~**A2**~~ | ~~**Remove Ranking Loss**~~ | - | - | ✅ Done |
+| **A3** | **Remove Multi-scale** | See Section "Experiment A3" | 1.5h | ⏰ TODO |
 
-**Can run in parallel**: 1.5 hours total
+**Remaining**: 1 experiment (1.5 hours)
 
 ---
 
@@ -839,11 +824,14 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 
 ### Stage 1: Core Ablations (Essential) 🔥
 
-**Parallel Execution** (1.5 hours):
-- Terminal 1: **A2** (Remove Ranking Loss)
-- Terminal 2: **A3** (Remove Multi-scale)
+**Status**: 
+- ✅ **A2 (Remove Ranking Loss)**: DONE - Contribution only +0.05% ⚠️
+- ⏰ **A3 (Remove Multi-scale)**: TODO - Expected large contribution (+0.8%)
 
-**Why**: These measure the contribution of NEW components we added to the baseline.
+**Single Execution** (1.5 hours):
+- Terminal 1: **A3** (Remove Multi-scale)
+
+**Why**: Measure the contribution of multi-scale feature extraction (expected to be significant).
 
 ---
 
@@ -909,28 +897,27 @@ cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --mod
 
 ## 🚀 Quick Start Commands
 
-### Stage 1 Commands (Start Here!)
+### Stage 1 Command (Next Experiment!)
 
-**Terminal 1 - A2 (Remove Ranking Loss):**
-```bash
-cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --model_size base --batch_size 32 --epochs 5 --patience 5 --train_patch_num 20 --test_patch_num 20 --ranking_loss_alpha 0 --attention_fusion --lr 5e-6 --weight_decay 2e-4 --drop_path_rate 0.3 --dropout_rate 0.4 --lr_scheduler cosine --test_random_crop --no_spaq
-```
-
-**Terminal 2 - A3 (Remove Multi-scale):**
+**A3 (Remove Multi-scale) - IMPORTANT:**
 ```bash
 cd /root/Perceptual-IQA-CS3324 && python train_swin.py --dataset koniq-10k --model_size base --batch_size 32 --epochs 5 --patience 5 --train_patch_num 20 --test_patch_num 20 --ranking_loss_alpha 0.5 --attention_fusion --no_multiscale --lr 5e-6 --weight_decay 2e-4 --drop_path_rate 0.3 --dropout_rate 0.4 --lr_scheduler cosine --test_random_crop --no_spaq
 ```
 
+**Expected**: Significant SRCC drop (~0.8%), as multi-scale features are crucial for IQA.
+
 ---
 
 **Summary**: 
-- **2 experiments ✅ done** (A0, A1)
+- **3 experiments ✅ done** (A0, A1, A2)
 - **3 experiments ⚠️ need redo** (B1, B2, C1 - for fair comparison and correct config)
-- **10+ experiments ⏰ TODO** 
-  - Core ablations: A2, A3 (2)
+- **9+ experiments ⏰ TODO** 
+  - Core ablations: A3 (1) ← **Only 1 left!**
   - Ranking sensitivity: C3, C4 (2, plus C1 redo)
   - Model sizes: B1, B2 (2, redo)
   - Regularization: D1-D3 core (3), D4-D6 optional (3)
   - LR sensitivity: E1, E2 (2)
-- **Total new work**: 13-16 experiments (7.5-9 hours with parallel execution)
+- **Total new work**: 12-15 experiments (6-7.5 hours with parallel execution)
+
+**⚠️ Surprising Finding**: Ranking Loss contribution is only **+0.05% SRCC** (much smaller than expected!)
 
