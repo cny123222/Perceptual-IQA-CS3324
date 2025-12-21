@@ -230,10 +230,6 @@ class Koniq_10kFolder(data.Dataset):
         if self.transform is not None:
             sample = self.transform(sample)
         return sample, target
-        except Exception as e:
-            print(f'Error loading image at index {index}: {path}')
-            print(f'Error: {e}')
-            raise
 
     def __len__(self):
         length = len(self.samples)
