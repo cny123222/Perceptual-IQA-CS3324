@@ -93,18 +93,15 @@ echo -e "${BLUE}[1/4]${NC} Starting A1 (Remove Attention) on GPU 0..."
 kill_tmux_session "exp-a1"
 tmux new-session -d -s "exp-a1" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
-  --koniq_set /root/autodl-tmp/koniq-10k \
+  --dataset koniq-10k \
   --patch_size 32 \
   --batch_size 4 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --num_workers 8 \
   --lr 5e-6 \
   --weight_decay 2e-4 \
   --epochs 100 \
   --model_size base \
-  --multiscale \
-  --multiscale_stages 1 2 3 \
   --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
   --dropout_rate 0.4 \
@@ -116,18 +113,15 @@ echo -e "${BLUE}[2/4]${NC} Starting A2 (Remove Ranking Loss) on GPU 1..."
 kill_tmux_session "exp-a2"
 tmux new-session -d -s "exp-a2" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=1 python train_swin.py \
-  --koniq_set /root/autodl-tmp/koniq-10k \
+  --dataset koniq-10k \
   --patch_size 32 \
   --batch_size 4 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --num_workers 8 \
   --lr 5e-6 \
   --weight_decay 2e-4 \
   --epochs 100 \
   --model_size base \
-  --multiscale \
-  --multiscale_stages 1 2 3 \
   --attention_fusion \
   --ranking_loss_alpha 0 \
   --drop_path_rate 0.3 \
@@ -140,16 +134,16 @@ echo -e "${BLUE}[3/4]${NC} Starting A3 (Remove Multi-scale) on GPU 2..."
 kill_tmux_session "exp-a3"
 tmux new-session -d -s "exp-a3" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=2 python train_swin.py \
-  --koniq_set /root/autodl-tmp/koniq-10k \
+  --dataset koniq-10k \
   --patch_size 32 \
   --batch_size 4 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --num_workers 8 \
   --lr 5e-6 \
   --weight_decay 2e-4 \
   --epochs 100 \
   --model_size base \
+  --no_multiscale \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
@@ -162,18 +156,15 @@ echo -e "${BLUE}[4/4]${NC} Starting C1 (Alpha=0.1) on GPU 3..."
 kill_tmux_session "exp-c1"
 tmux new-session -d -s "exp-c1" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=3 python train_swin.py \
-  --koniq_set /root/autodl-tmp/koniq-10k \
+  --dataset koniq-10k \
   --patch_size 32 \
   --batch_size 4 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --num_workers 8 \
   --lr 5e-6 \
   --weight_decay 2e-4 \
   --epochs 100 \
   --model_size base \
-  --multiscale \
-  --multiscale_stages 1 2 3 \
   --attention_fusion \
   --ranking_loss_alpha 0.1 \
   --drop_path_rate 0.3 \
@@ -199,18 +190,15 @@ echo -e "${BLUE}[1/4]${NC} Starting C2 (Alpha=0.5) on GPU 0..."
 kill_tmux_session "exp-c2"
 tmux new-session -d -s "exp-c2" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
-  --koniq_set /root/autodl-tmp/koniq-10k \
+  --dataset koniq-10k \
   --patch_size 32 \
   --batch_size 4 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --num_workers 8 \
   --lr 5e-6 \
   --weight_decay 2e-4 \
   --epochs 100 \
   --model_size base \
-  --multiscale \
-  --multiscale_stages 1 2 3 \
   --attention_fusion \
   --ranking_loss_alpha 0.5 \
   --drop_path_rate 0.3 \
@@ -223,18 +211,15 @@ echo -e "${BLUE}[2/4]${NC} Starting C3 (Alpha=0.7) on GPU 1..."
 kill_tmux_session "exp-c3"
 tmux new-session -d -s "exp-c3" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=1 python train_swin.py \
-  --koniq_set /root/autodl-tmp/koniq-10k \
+  --dataset koniq-10k \
   --patch_size 32 \
   --batch_size 4 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --num_workers 8 \
   --lr 5e-6 \
   --weight_decay 2e-4 \
   --epochs 100 \
   --model_size base \
-  --multiscale \
-  --multiscale_stages 1 2 3 \
   --attention_fusion \
   --ranking_loss_alpha 0.7 \
   --drop_path_rate 0.3 \
@@ -247,18 +232,15 @@ echo -e "${BLUE}[3/4]${NC} Starting B1 (Swin-Tiny) on GPU 2..."
 kill_tmux_session "exp-b1"
 tmux new-session -d -s "exp-b1" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=2 python train_swin.py \
-  --koniq_set /root/autodl-tmp/koniq-10k \
+  --dataset koniq-10k \
   --patch_size 32 \
   --batch_size 4 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --num_workers 8 \
   --lr 5e-6 \
   --weight_decay 2e-4 \
   --epochs 100 \
   --model_size tiny \
-  --multiscale \
-  --multiscale_stages 1 2 3 \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
@@ -271,18 +253,15 @@ echo -e "${BLUE}[4/4]${NC} Starting B2 (Swin-Small) on GPU 3..."
 kill_tmux_session "exp-b2"
 tmux new-session -d -s "exp-b2" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=3 python train_swin.py \
-  --koniq_set /root/autodl-tmp/koniq-10k \
+  --dataset koniq-10k \
   --patch_size 32 \
   --batch_size 4 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --num_workers 8 \
   --lr 5e-6 \
   --weight_decay 2e-4 \
   --epochs 100 \
   --model_size small \
-  --multiscale \
-  --multiscale_stages 1 2 3 \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
@@ -308,18 +287,15 @@ echo -e "${BLUE}[1/4]${NC} Starting D1 (WD=5e-5) on GPU 0..."
 kill_tmux_session "exp-d1"
 tmux new-session -d -s "exp-d1" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
-  --koniq_set /root/autodl-tmp/koniq-10k \
+  --dataset koniq-10k \
   --patch_size 32 \
   --batch_size 4 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --num_workers 8 \
   --lr 5e-6 \
   --weight_decay 5e-5 \
   --epochs 100 \
   --model_size base \
-  --multiscale \
-  --multiscale_stages 1 2 3 \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
@@ -332,18 +308,15 @@ echo -e "${BLUE}[2/4]${NC} Starting D2 (WD=1e-4) on GPU 1..."
 kill_tmux_session "exp-d2"
 tmux new-session -d -s "exp-d2" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=1 python train_swin.py \
-  --koniq_set /root/autodl-tmp/koniq-10k \
+  --dataset koniq-10k \
   --patch_size 32 \
   --batch_size 4 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --num_workers 8 \
   --lr 5e-6 \
   --weight_decay 1e-4 \
   --epochs 100 \
   --model_size base \
-  --multiscale \
-  --multiscale_stages 1 2 3 \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
@@ -356,18 +329,15 @@ echo -e "${BLUE}[3/4]${NC} Starting D4 (WD=4e-4) on GPU 2..."
 kill_tmux_session "exp-d4"
 tmux new-session -d -s "exp-d4" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=2 python train_swin.py \
-  --koniq_set /root/autodl-tmp/koniq-10k \
+  --dataset koniq-10k \
   --patch_size 32 \
   --batch_size 4 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --num_workers 8 \
   --lr 5e-6 \
   --weight_decay 4e-4 \
   --epochs 100 \
   --model_size base \
-  --multiscale \
-  --multiscale_stages 1 2 3 \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
@@ -380,18 +350,15 @@ echo -e "${BLUE}[4/4]${NC} Starting E1 (LR=2.5e-6) on GPU 3..."
 kill_tmux_session "exp-e1"
 tmux new-session -d -s "exp-e1" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=3 python train_swin.py \
-  --koniq_set /root/autodl-tmp/koniq-10k \
+  --dataset koniq-10k \
   --patch_size 32 \
   --batch_size 4 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --num_workers 8 \
   --lr 2.5e-6 \
   --weight_decay 2e-4 \
   --epochs 100 \
   --model_size base \
-  --multiscale \
-  --multiscale_stages 1 2 3 \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
@@ -417,18 +384,15 @@ echo -e "${BLUE}[1/2]${NC} Starting E3 (LR=7.5e-6) on GPU 0..."
 kill_tmux_session "exp-e3"
 tmux new-session -d -s "exp-e3" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
-  --koniq_set /root/autodl-tmp/koniq-10k \
+  --dataset koniq-10k \
   --patch_size 32 \
   --batch_size 4 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --num_workers 8 \
   --lr 7.5e-6 \
   --weight_decay 2e-4 \
   --epochs 100 \
   --model_size base \
-  --multiscale \
-  --multiscale_stages 1 2 3 \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
@@ -441,18 +405,15 @@ echo -e "${BLUE}[2/2]${NC} Starting E4 (LR=1e-5) on GPU 1..."
 kill_tmux_session "exp-e4"
 tmux new-session -d -s "exp-e4" \
   "cd $BASE_DIR && CUDA_VISIBLE_DEVICES=1 python train_swin.py \
-  --koniq_set /root/autodl-tmp/koniq-10k \
+  --dataset koniq-10k \
   --patch_size 32 \
   --batch_size 4 \
   --train_patch_num 20 \
   --test_patch_num 20 \
-  --num_workers 8 \
   --lr 1e-5 \
   --weight_decay 2e-4 \
   --epochs 100 \
   --model_size base \
-  --multiscale \
-  --multiscale_stages 1 2 3 \
   --attention_fusion \
   --ranking_loss_alpha 0.3 \
   --drop_path_rate 0.3 \
