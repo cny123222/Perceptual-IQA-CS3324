@@ -156,8 +156,6 @@ class HyperIQASolver(object):
         else:
             print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC')
         
-        from tqdm import tqdm
-        
         for t in range(self.epochs):
             epoch_loss = []
             pred_scores = []
@@ -262,7 +260,6 @@ class HyperIQASolver(object):
 
     def test(self, data):
         """Testing"""
-        from tqdm import tqdm
         self.model_hyper.train(False)
         pred_scores = []
         gt_scores = []

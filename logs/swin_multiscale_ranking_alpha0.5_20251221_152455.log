@@ -1,0 +1,118 @@
+Training log will be saved to: /root/Perceptual-IQA-CS3324/logs/swin_multiscale_ranking_alpha0.5_20251221_152455.log
+================================================================================
+Random seed set to 42 for reproducibility
+
+================================================================================
+EXPERIMENT CONFIGURATION
+================================================================================
+Dataset:                    koniq-10k
+Model Size:                 base
+Epochs:                     30
+Batch Size:                 32
+Learning Rate:              5e-06
+LR Ratio (backbone):        10
+Weight Decay:               0.0002
+Train Patch Num:            20
+Test Patch Num:             20
+--------------------------------------------------------------------------------
+Loss Function:
+  Ranking Loss Alpha:       0.5
+  Ranking Loss Margin:      0.1
+--------------------------------------------------------------------------------
+Regularization:
+  Drop Path Rate:           0.3
+  Dropout Rate:             0.4
+  Early Stopping:           True
+  Patience:                 5
+--------------------------------------------------------------------------------
+Training Strategy:
+  LR Scheduler:             cosine
+  Multi-Scale Fusion:       True
+  Attention Fusion:         True
+  Test Random Crop:         True
+  SPAQ Cross-Dataset Test:  False
+--------------------------------------------------------------------------------
+Reproducibility:
+  Random Seed:              42
+  CuDNN Deterministic:      True
+  CuDNN Benchmark:          False
+================================================================================
+
+Training and testing on koniq-10k dataset for 1 rounds...
+Using Swin Transformer backbone
+KonIQ-10k: 7046 train images, 2010 test images
+Round 1
+  Train: 7046 images, Test: 2010 images
+Using device: cuda
+Backbone: Swin Transformer Tiny
+Model checkpoints will be saved to: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-swin-ranking-alpha0.5_20251221_152455
+Multi-scale feature fusion: ENABLED
+  → Using ATTENTION-based fusion
+Regularization: drop_path_rate=0.30, dropout_rate=0.40
+Loading Swin Transformer BASE (~88M parameters)
+Using attention-based multi-scale feature fusion for BASE
+HyperNet input channels: 1920 (multi_scale=True, model=base)
+Loading Koniq-10k dataset from /root/Perceptual-IQA-CS3324/koniq-10k/...
+Building sample list from 7046 images...
+  Preparing samples:   0%|          | 0/7046 [00:00<?, ?img/s]  Preparing samples: 100%|##########| 7046/7046 [00:00<00:00, 154700.56img/s]
+  Total samples created: 140920
+Dataset loaded. Total samples: 140920
+Loading Koniq-10k dataset from /root/Perceptual-IQA-CS3324/koniq-10k/...
+Building sample list from 2010 images...
+  Preparing samples:   0%|          | 0/2010 [00:00<?, ?img/s]  Preparing samples: 100%|##########| 2010/2010 [00:00<00:00, 152003.16img/s]
+  Total samples created: 40200
+Dataset loaded. Total samples: 40200
+Test augmentation: RandomCrop (original paper, less reproducible)
+SPAQ cross-dataset testing: DISABLED (use --test_spaq to enable)
+Ranking loss enabled: alpha=0.5, margin=0.1
+
+================================================================================
+TRAINING CONFIGURATION SUMMARY
+================================================================================
+Model Architecture:
+  Backbone:                 Swin Transformer BASE
+  Multi-Scale Fusion:       ENABLED
+  Fusion Method:            Attention
+  Parameters:               ~89.1M
+--------------------------------------------------------------------------------
+Loss Function:
+  Type:                     L1 + Ranking Loss
+  Ranking Alpha:            0.5
+  Ranking Margin:           0.1
+--------------------------------------------------------------------------------
+Regularization:
+  Drop Path Rate:           0.3
+  Dropout Rate:             0.4
+  Weight Decay:             0.0002
+  Early Stopping:           ENABLED
+  Patience:                 5 epochs
+--------------------------------------------------------------------------------
+Optimization:
+  Learning Rate (HyperNet): 5e-05
+  Learning Rate (Backbone): 5e-06
+  LR Scheduler:             cosine
+  Optimizer:                Adam
+--------------------------------------------------------------------------------
+Data:
+  Test Crop Method:         RandomCrop
+  Test Patch Num:           20
+  Cross-Dataset Test:       None
+--------------------------------------------------------------------------------
+Training:
+  Epochs:                   30
+  Checkpoint Directory:     /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-swin-ranking-alpha0.5_20251221_152455
+================================================================================
+
+Learning rate scheduler: CosineAnnealingLR (T_max=30, eta_min=1e-6)
+Early stopping enabled with patience=5
+Epoch	Train_Loss	Train_SRCC	Test_SRCC	Test_PLCC
+Traceback (most recent call last):
+  File "/root/Perceptual-IQA-CS3324/train_swin.py", line 251, in <module>
+    main(config)
+  File "/root/Perceptual-IQA-CS3324/train_swin.py", line 191, in main
+    srcc_all[i], plcc_all[i] = solver.train()
+                               ^^^^^^^^^^^^^^
+  File "/root/Perceptual-IQA-CS3324/HyperIQASolver_swin.py", line 272, in train
+    train_loader_with_progress.set_postfix(postfix)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+NameError: name 'train_loader_with_progress' is not defined

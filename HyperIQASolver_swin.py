@@ -213,8 +213,6 @@ class HyperIQASolver(object):
         else:
             print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC')
         
-        from tqdm import tqdm
-        
         for t in range(self.epochs):
             epoch_loss = []
             epoch_l1_loss = []
@@ -400,7 +398,6 @@ class HyperIQASolver(object):
 
     def test(self, data):
         """Testing"""
-        from tqdm import tqdm
         self.model_hyper.train(False)
         pred_scores = []
         gt_scores = []
@@ -525,7 +522,6 @@ class HyperIQASolver(object):
         
         print(f'  Testing on SPAQ dataset ({self.spaq_num_images} images)...')
         
-        from tqdm import tqdm
         with torch.no_grad():  # Disable gradient computation for faster inference
             for img, label in tqdm(self.spaq_loader, desc='Testing SPAQ', unit='batch', leave=False):
                 img = img.to(self.device)
