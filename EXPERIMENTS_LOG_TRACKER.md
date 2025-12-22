@@ -19,13 +19,13 @@
 ## Progress Overview
 
 **Completed**: 1/11 (NEW Baseline - No Ranking Loss, No ColorJitter ✅)  
-**Running**: 0/11  
-**Remaining**: 10/11
+**Running**: 2/11 (A1, A2 in progress 🔄)  
+**Remaining**: 8/11
 
 **Core Experiments** (11 total):
-- [x] **NEW Baseline** - No Ranking Loss, No ColorJitter - **SRCC 0.9354** ✅
-- [ ] A1 - Remove Attention
-- [ ] A3 - Remove Multi-scale
+- [x] **Baseline** - No Ranking Loss, No ColorJitter - **SRCC 0.9354** ✅
+- [ ] A1 - Remove Attention 🔄 (Running on GPU 1)
+- [ ] A2 - Remove Multi-scale 🔄 (Running on GPU 3)
 - [ ] B1 - Model Tiny
 - [ ] B2 - Model Large
 - [ ] D1 - Weight Decay 1e-4
@@ -66,10 +66,11 @@
 
 **Results**:
 - **SRCC**: **0.9354** 🏆 (Best so far!)
-- **PLCC**: **0.9465**
+- **PLCC**: **0.9448**
 - **Time**: ~1.7 hours
-- **Checkpoint**: `checkpoints/koniq-10k-swin_20251222_161625/best_model_srcc_0.9354_plcc_0.9465.pkl`
+- **Checkpoint**: `checkpoints/koniq-10k-swin_20251222_161625/best_model_srcc_0.9354_plcc_0.9448.pkl`
 - **Status**: ✅ COMPLETE
+- **Training Log**: Complete with 5 epochs, best at epoch 3
 
 **Key Discovery**: 
 - ✅ **Ranking Loss is harmful!** Removing it improves SRCC by +0.0022 (0.9354 vs 0.9332)
@@ -82,18 +83,20 @@
 
 ### A1 - Remove Attention Fusion
 
-**Status**: ⏳ NOT STARTED
+**Status**: 🔄 RUNNING (GPU 1, started 18:42)
 
 **Configuration**: Same as baseline except:
 - Attention Fusion: ❌ **False** (removed)
 
 **Results**:
-- **SRCC**: -
-- **PLCC**: -
-- **Time**: -
-- **Log File**: -
+- **SRCC**: - (in progress)
+- **PLCC**: - (in progress)
+- **Time**: ~27 minutes elapsed
+- **Log File**: `/root/Perceptual-IQA-CS3324/logs/swin_multiscale_ranking_alpha0_20251222_184235.log`
 
 **Purpose**: Quantify the contribution of attention-based multi-scale feature fusion.
+
+**Expected**: SRCC drop, showing attention is important for fusing multi-scale features.
 
 ---
 
@@ -103,29 +106,33 @@
 
 **Results**:
 - **SRCC**: **0.9354** (better than with ranking loss!)
-- **PLCC**: **0.9465**
+- **PLCC**: **0.9448**
 - **Time**: ~1.7 hours
 - **Log File**: `/root/Perceptual-IQA-CS3324/logs/swin_multiscale_ranking_alpha0_20251222_161625.log`
 
 **Conclusion**: Ranking Loss Alpha=0 (no ranking loss) is **better** than Alpha=0.3. This experiment became our new baseline!
 
+**Note**: This is the same as the baseline experiment - we discovered ranking loss is harmful, so removing it became our best configuration.
+
 ---
 
-### A3 - Remove Multi-scale Features
+### A2 - Remove Multi-scale Features
 
-**Status**: ⏳ NOT STARTED
+**Status**: 🔄 RUNNING (GPU 3, started 18:43)
 
 **Configuration**: Same as baseline except:
 - Multi-scale: ❌ **False** (removed, using only last layer)
-- Attention Fusion: N/A (no fusion needed for single scale)
+- Attention Fusion: ✅ True (but only one scale to process)
 
 **Results**:
-- **SRCC**: -
-- **PLCC**: -
-- **Time**: -
-- **Log File**: -
+- **SRCC**: - (in progress)
+- **PLCC**: - (in progress)
+- **Time**: ~3 minutes elapsed
+- **Log File**: `/root/Perceptual-IQA-CS3324/logs/swin_ranking_alpha0_20251222_184358.log`
 
 **Purpose**: Quantify the contribution of multi-scale feature extraction.
+
+**Expected**: SRCC drop, showing multi-scale features are crucial.
 
 ---
 
@@ -388,12 +395,84 @@ Example:
 
 ---
 
-## 🎯 Next Steps
+## 🎯 Next Steps & Recommended Priority
 
-1. Run experiments from `ALL_EXPERIMENTS_COMMANDS.md`
-2. Monitor progress with `watch -n 30 nvidia-smi`
-3. Use `tail -f logs/*.log` to check training progress
-4. Update this file after each experiment completes
+### Priority 1: Core Ablations (Critical for Paper) ⭐⭐⭐
+- [x] **Baseline** - SRCC 0.9354 ✅ COMPLETE
+- [ ] **A1** - Remove Attention 🔄 RUNNING
+- [ ] **A2** - Remove Multi-scale 🔄 RUNNING
+
+**Why**: These quantify the contribution of our key architectural components.
+
+---
+
+### Priority 2: Model Size Comparison (Important) ⭐⭐
+- [ ] **B1** - Swin-Tiny (~28M params)
+- [ ] **B2** - Swin-Large (~197M params)
+
+**Why**: Shows whether our approach works across different model scales and helps understand capacity requirements.
+
+**Expected Findings**:
+- Tiny: Likely ~0.925-0.930 SRCC (reduced capacity)
+- Large: Likely ~0.935-0.937 SRCC (diminishing returns)
+
+**Recommendation**: Run B1 and B2 after A1/A2 complete (can use 2 GPUs in parallel).
+
+---
+
+### Priority 3: Regularization Sensitivity (Optional but Valuable) ⭐
+- [ ] **D1** - Weight Decay = 1e-4
+- [ ] **D2** - Weight Decay = 5e-4
+- [ ] **D3** - Drop Path = 0.1
+- [ ] **D4** - Drop Path = 0.5
+
+**Why**: Helps understand robustness to hyperparameters and optimal regularization.
+
+**Recommendation**: Pick 2-3 most interesting ones if time limited.
+
+---
+
+### Priority 4: Learning Rate Sensitivity (Optional) ⭐
+- [ ] **E1** - LR = 1e-6
+- [ ] **E2** - LR = 3e-6
+- [ ] **E3** - LR = 7e-6
+- [ ] **E4** - LR = 1e-5
+
+**Why**: Shows training stability and convergence properties.
+
+**Recommendation**: Can be supplementary material if short on time.
+
+---
+
+## 📊 Suggested Execution Plan
+
+### Phase 1: Core (Now) - A1, A2
+**Time**: ~1.7h  
+**Status**: 🔄 In Progress
+
+### Phase 2: Model Size (Next) - B1, B2
+**Time**: ~1.7h (parallel on 2 GPUs)  
+**Commands**:
+```bash
+# GPU 0
+cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py --dataset koniq-10k --model_size tiny --batch_size 32 --epochs 5 --patience 5 --train_patch_num 20 --test_patch_num 20 --train_test_num 1 --attention_fusion --ranking_loss_alpha 0 --lr 5e-6 --weight_decay 2e-4 --drop_path_rate 0.3 --dropout_rate 0.4 --lr_scheduler cosine --test_random_crop --no_spaq --no_color_jitter
+
+# GPU 1
+cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=1 python train_swin.py --dataset koniq-10k --model_size large --batch_size 32 --epochs 5 --patience 5 --train_patch_num 20 --test_patch_num 20 --train_test_num 1 --attention_fusion --ranking_loss_alpha 0 --lr 5e-6 --weight_decay 2e-4 --drop_path_rate 0.3 --dropout_rate 0.4 --lr_scheduler cosine --test_random_crop --no_spaq --no_color_jitter
+```
+
+### Phase 3: Optional - D and E groups
+**Time**: Depends on how many selected  
+**Recommendation**: Can be done later or as supplementary experiments
+
+---
+
+## 📝 How to Update
+
+1. Monitor progress with `watch -n 30 nvidia-smi`
+2. Check logs with `tail -f logs/*.log`
+3. After each experiment completes, extract results and update above
+4. Update progress checkboxes
 
 ---
 
