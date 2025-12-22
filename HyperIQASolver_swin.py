@@ -50,6 +50,9 @@ class HyperIQASolver(object):
         # ColorJitter data augmentation
         self.use_color_jitter = getattr(config, 'use_color_jitter', True)  # Default: enabled
         
+        # Loss function type
+        self.loss_type = getattr(config, 'loss_type', 'l1')  # Options: 'l1', 'l2', 'srcc', 'rank', 'pairwise'
+        
         # 创建模型保存目录（带时间戳防止覆盖）
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         save_dir_suffix = '-swin'
@@ -90,7 +93,9 @@ class HyperIQASolver(object):
         ).to(self.device)
         self.model_hyper.train(True)
 
+        # Initialize loss functions
         self.l1_loss = torch.nn.L1Loss().to(self.device)
+        self.l2_loss = torch.nn.MSELoss().to(self.device)
 
         backbone_params = list(map(id, self.model_hyper.swin.parameters()))
         self.hypernet_params = filter(lambda p: id(p) not in backbone_params, self.model_hyper.parameters())
@@ -160,12 +165,18 @@ class HyperIQASolver(object):
         print(f"  Parameters:               ~{self._count_parameters():.1f}M")
         print("-" * 80)
         print(f"Loss Function:")
+        loss_type_names = {
+            'l1': 'L1 (MAE)',
+            'l2': 'L2 (MSE)', 
+            'srcc': 'SRCC (Spearman Correlation)',
+            'rank': 'Rank (Pairwise Ranking)',
+            'pairwise': 'Pairwise Fidelity'
+        }
+        print(f"  Primary Loss Type:        {loss_type_names.get(self.loss_type, self.loss_type)}")
         if self.ranking_loss_alpha > 0:
-            print(f"  Type:                     L1 + Ranking Loss")
+            print(f"  Additional Loss:          Ranking Loss (legacy)")
             print(f"  Ranking Alpha:            {self.ranking_loss_alpha}")
             print(f"  Ranking Margin:           {self.ranking_loss_margin}")
-        else:
-            print(f"  Type:                     L1 Only")
         print("-" * 80)
         print(f"Regularization:")
         print(f"  Drop Path Rate:           {self.drop_path_rate}")
@@ -249,11 +260,11 @@ class HyperIQASolver(object):
                 pred_scores = pred_scores + pred.cpu().tolist()
                 gt_scores = gt_scores + label.cpu().tolist()
 
-                # Compute L1 loss
-                l1_loss = self.l1_loss(pred.squeeze(), label.float().detach())
-                epoch_l1_loss.append(l1_loss.item())
+                # Compute primary loss using the specified loss type
+                primary_loss = self.compute_loss(pred, label.float().detach())
+                epoch_l1_loss.append(primary_loss.item())  # Track primary loss (named l1 for compatibility)
                 
-                # Compute ranking loss if enabled
+                # Compute ranking loss if enabled (additional regularization)
                 if self.ranking_loss_alpha > 0:
                     rank_loss = self.pairwise_ranking_loss(
                         pred.squeeze(), 
@@ -262,9 +273,9 @@ class HyperIQASolver(object):
                     )
                     epoch_rank_loss.append(rank_loss.item())
                     # Combine losses
-                    total_loss = l1_loss + self.ranking_loss_alpha * rank_loss
+                    total_loss = primary_loss + self.ranking_loss_alpha * rank_loss
                 else:
-                    total_loss = l1_loss
+                    total_loss = primary_loss
                     rank_loss = None
                 
                 epoch_loss.append(total_loss.item())
@@ -404,6 +415,177 @@ class HyperIQASolver(object):
             loss = torch.tensor(0.0, device=preds.device, requires_grad=True)
         
         return loss
+    
+    def srcc_loss_fn(self, pred, target):
+        """
+        SRCC Loss (Spearman Rank Correlation Coefficient Loss)
+        L_SRCC = 1 - SRCC(pred, target)
+        
+        Formula:
+        L_SRCC = 1 - Σ(v_n - v̄)(p_n - p̄) / √[Σ(v_n - v̄)² · Σ(p_n - p̄)²]
+        
+        where v_n is the true value, p_n is the predicted value
+        """
+        pred = pred.squeeze()
+        target = target.squeeze()
+        
+        # Calculate means
+        pred_mean = pred.mean()
+        target_mean = target.mean()
+        
+        # Calculate centered values
+        pred_centered = pred - pred_mean
+        target_centered = target - target_mean
+        
+        # Calculate numerator
+        numerator = (pred_centered * target_centered).sum()
+        
+        # Calculate denominator
+        pred_var = (pred_centered ** 2).sum()
+        target_var = (target_centered ** 2).sum()
+        denominator = torch.sqrt(pred_var * target_var)
+        
+        # Avoid division by zero
+        epsilon = 1e-8
+        srcc = numerator / (denominator + epsilon)
+        
+        # Loss is 1 - SRCC (minimize this to maximize SRCC)
+        loss = 1.0 - srcc
+        
+        return loss
+    
+    def rank_loss_fn(self, pred, target):
+        """
+        Rank Loss (Pairwise Ranking Hinge Loss)
+        
+        Formula:
+        L_rank^ij = max(0, |Q̂_i - Q̂_j| - e(Q̂_i, Q̂_j) · (Q_i - Q_j))
+        
+        where e(Q̂_i, Q̂_j) = { 1  if Q̂_i ≥ Q̂_j
+                               -1 if Q̂_i < Q̂_j }
+        """
+        pred = pred.squeeze()
+        target = target.squeeze()
+        
+        # Create pairwise difference matrices
+        # pred_diff[i,j] = pred[i] - pred[j]
+        pred_diff = pred.unsqueeze(1) - pred.unsqueeze(0)
+        # target_diff[i,j] = target[i] - target[j]
+        target_diff = target.unsqueeze(1) - target.unsqueeze(0)
+        
+        # Calculate e(Q̂_i, Q̂_j): sign function
+        # e = 1 if pred[i] >= pred[j], else -1
+        e = torch.sign(pred_diff)
+        e = torch.where(e == 0, torch.ones_like(e), e)  # Handle equal case as 1
+        
+        # Calculate |pred_diff|
+        pred_diff_abs = torch.abs(pred_diff)
+        
+        # Calculate loss: max(0, |pred_diff| - e * target_diff)
+        loss_matrix = F.relu(pred_diff_abs - e * target_diff)
+        
+        # Only consider valid pairs (where targets are different)
+        # Mask out diagonal and pairs with same target
+        mask = (torch.abs(target_diff) > 1e-6).float()
+        mask = mask * (1 - torch.eye(len(pred), device=pred.device))  # Remove diagonal
+        
+        # Average over valid pairs
+        valid_pairs = mask.sum()
+        if valid_pairs > 0:
+            loss = (loss_matrix * mask).sum() / valid_pairs
+        else:
+            loss = torch.tensor(0.0, device=pred.device, requires_grad=True)
+        
+        return loss
+    
+    def pairwise_fidelity_loss_fn(self, pred, target):
+        """
+        Pairwise Fidelity Loss (requires distribution information)
+        
+        Formula:
+        p^pred(A>B) = Φ((μ_A^pred - μ_B^pred) / √((σ_A^pred)² + (σ_B^pred)²))
+        L_fd = 1 - √[p(A>B) · p^pred(A>B)] - √[(1-p(A>B)) · (1-p^pred(A>B))]
+        
+        Note: This is a simplified implementation assuming uniform uncertainty.
+        For full implementation, we would need opinion distribution data from the dataset.
+        """
+        pred = pred.squeeze()
+        target = target.squeeze()
+        
+        # Simplified version: estimate p(A>B) from target differences
+        # Create pairwise comparison matrix
+        target_diff = target.unsqueeze(1) - target.unsqueeze(0)
+        pred_diff = pred.unsqueeze(1) - pred.unsqueeze(0)
+        
+        # Ground truth probability p(A>B)
+        # Use sigmoid to convert difference to probability
+        # Larger differences = higher confidence
+        p_gt = torch.sigmoid(target_diff)
+        
+        # Predicted probability p^pred(A>B)
+        # Assume constant uncertainty (simplified)
+        # For real implementation, model should output uncertainty
+        sigma_assumed = 0.1  # Assumed constant standard deviation
+        pred_diff_normalized = pred_diff / (np.sqrt(2) * sigma_assumed)
+        
+        # Approximate Φ (cumulative normal) with sigmoid
+        # This is a common approximation: Φ(x) ≈ sigmoid(1.702·x)
+        p_pred = torch.sigmoid(1.702 * pred_diff_normalized)
+        
+        # Calculate fidelity loss
+        # L_fd = 1 - √[p·p^pred] - √[(1-p)·(1-p^pred)]
+        epsilon = 1e-8
+        term1 = torch.sqrt(p_gt * p_pred + epsilon)
+        term2 = torch.sqrt((1 - p_gt) * (1 - p_pred) + epsilon)
+        loss_matrix = 1.0 - term1 - term2
+        
+        # Only consider valid pairs
+        mask = (torch.abs(target_diff) > 1e-6).float()
+        mask = mask * (1 - torch.eye(len(pred), device=pred.device))
+        
+        # Average over valid pairs
+        valid_pairs = mask.sum()
+        if valid_pairs > 0:
+            loss = (loss_matrix * mask).sum() / valid_pairs
+        else:
+            loss = torch.tensor(0.0, device=pred.device, requires_grad=True)
+        
+        return loss
+    
+    def compute_loss(self, pred, target):
+        """
+        Compute loss based on the specified loss type.
+        
+        Args:
+            pred: predicted quality scores
+            target: ground truth quality scores
+            
+        Returns:
+            loss: computed loss value
+        """
+        if self.loss_type == 'l1':
+            # L1 Loss (MAE): L_MAE = (1/N) Σ |Q_i - Q̂_i|
+            return self.l1_loss(pred.squeeze(), target.float())
+        
+        elif self.loss_type == 'l2':
+            # L2 Loss (MSE): L_MSE = (1/N) Σ ||y_n - ŷ_n||²
+            return self.l2_loss(pred.squeeze(), target.float())
+        
+        elif self.loss_type == 'srcc':
+            # SRCC Loss: Direct optimization of Spearman correlation
+            return self.srcc_loss_fn(pred, target.float())
+        
+        elif self.loss_type == 'rank':
+            # Rank Loss: Pairwise ranking hinge loss
+            return self.rank_loss_fn(pred, target.float())
+        
+        elif self.loss_type == 'pairwise':
+            # Pairwise Fidelity Loss: Considers opinion distribution
+            return self.pairwise_fidelity_loss_fn(pred, target.float())
+        
+        else:
+            raise ValueError(f"Unknown loss type: {self.loss_type}. "
+                           f"Choose from: 'l1', 'l2', 'srcc', 'rank', 'pairwise'")
 
     def test(self, data):
         """Testing"""
