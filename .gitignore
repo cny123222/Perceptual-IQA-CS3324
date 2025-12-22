@@ -71,3 +71,9 @@ csiq_label.txt
 csiq_label.txt
 
 # datasets
+
+# Logs directory (symbolic link to data disk)
+logs/
+
+# Checkpoints directory (symbolic link to data disk)
+checkpoints/
