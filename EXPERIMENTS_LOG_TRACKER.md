@@ -1,33 +1,31 @@
-# Experiments Log Tracker - Round 2 (No ColorJitter) 🚀
+# Experiments Log Tracker - Round 2 (Simplified Model) 🚀
 
 **Purpose**: Track all ablation and sensitivity experiments with their log files and results.  
-**Baseline**: Alpha=0.3, **NO ColorJitter** (SRCC 0.9350, PLCC 0.9460)  
-**Configuration**: batch_size=32, epochs=5, train_test_num=1, **--no_color_jitter**  
+**Baseline**: Alpha=0 (NO Ranking Loss), **NO ColorJitter** (SRCC **0.9354**, PLCC 0.9465)  
+**Configuration**: batch_size=32, epochs=5, train_test_num=1, **--no_color_jitter**, **--ranking_loss_alpha 0**  
 **Started**: 2025-12-22  
 
-## 🔥 Round 2 Changes
-- ✅ All experiments use `--no_color_jitter`
-- ✅ New baseline: SRCC 0.9350 (vs 0.9352 with ColorJitter, drop only -0.0002)
-- ✅ Training time: ~1.7h per experiment (vs ~3.2h with ColorJitter)
+## 🔥 Round 2 Changes - IMPORTANT DISCOVERY! 
+- ✅ **Ranking Loss is HARMFUL!** Removing it improves SRCC: 0.9354 vs 0.9332 (+0.0022)
+- ✅ All experiments use `--ranking_loss_alpha 0` (no ranking loss)
+- ✅ All experiments use `--no_color_jitter` (3x faster training)
+- ✅ New baseline: SRCC 0.9354 (best so far!)
+- ✅ Training time: ~1.7h per experiment
 - ✅ Fair comparison across all experiments
-- ✅ Total 14 experiments to run
+- ✅ Total 11 core experiments (C1-C3 moved to supplementary)
 
 ---
 
 ## Progress Overview
 
-**Completed**: 1/14 (A4 - Baseline without ColorJitter ✅)  
-**Running**: 0/14  
-**Remaining**: 13/14
+**Completed**: 1/11 (NEW Baseline - No Ranking Loss, No ColorJitter ✅)  
+**Running**: 0/11  
+**Remaining**: 10/11
 
-**Experiments List**:
-- [x] A4 - Baseline (No ColorJitter) - **0.9350** ✅
+**Core Experiments** (11 total):
+- [x] **NEW Baseline** - No Ranking Loss, No ColorJitter - **SRCC 0.9354** ✅
 - [ ] A1 - Remove Attention
-- [ ] A2 - Remove Ranking Loss  
 - [ ] A3 - Remove Multi-scale
-- [ ] C1 - Alpha=0.1
-- [ ] C2 - Alpha=0.5
-- [ ] C3 - Alpha=0.7
 - [ ] B1 - Model Tiny
 - [ ] B2 - Model Large
 - [ ] D1 - Weight Decay 1e-4
@@ -39,20 +37,26 @@
 - [ ] E3 - LR 7e-6
 - [ ] E4 - LR 1e-5
 
+**Supplementary Experiments** (Ranking Loss Sensitivity - Optional):
+- [ ] C1 - Alpha=0.1
+- [ ] C2 - Alpha=0.3
+- [ ] C3 - Alpha=0.5
+- [ ] C4 - Alpha=0.7
+
 ---
 
 ## 📊 Baseline (Best Model)
 
-### ⭐ NEW Baseline - Full Model WITHOUT ColorJitter (Alpha=0.3)
+### ⭐ NEW Baseline - Simplified Model (No Ranking Loss, No ColorJitter)
 
-**Log File**: `/root/Perceptual-IQA-CS3324/logs/swin_multiscale_ranking_alpha0.3_20251222_135111.log`
+**Log File**: `/root/Perceptual-IQA-CS3324/logs/swin_multiscale_ranking_alpha0_20251222_161625.log`
 
 **Configuration**:
 - Model Size: base
 - Multi-scale: ✅ True
 - Attention Fusion: ✅ True
-- **ColorJitter**: ❌ **Disabled**
-- Ranking Loss Alpha: **0.3**
+- **ColorJitter**: ❌ **Disabled** (3x faster training)
+- **Ranking Loss Alpha**: **0** (NO ranking loss - simpler and better!)
 - Learning Rate: 5e-6
 - Weight Decay: 2e-4
 - Drop Path: 0.3
@@ -61,13 +65,16 @@
 - Test Random Crop: ✅ True
 
 **Results**:
-- **SRCC**: **0.9350**
-- **PLCC**: **0.9460**
+- **SRCC**: **0.9354** 🏆 (Best so far!)
+- **PLCC**: **0.9465**
 - **Time**: ~1.7 hours
-- **Checkpoint**: `checkpoints/koniq-10k-swin-ranking-alpha0.3_20251222_135111/best_model_srcc_0.9350_plcc_0.9460.pkl`
+- **Checkpoint**: `checkpoints/koniq-10k-swin_20251222_161625/best_model_srcc_0.9354_plcc_0.9465.pkl`
 - **Status**: ✅ COMPLETE
 
-**Notes**: This is the new baseline for all Round 2 experiments. Performance drop from ColorJitter removal is negligible (-0.0002 SRCC).
+**Key Discovery**: 
+- ✅ **Ranking Loss is harmful!** Removing it improves SRCC by +0.0022 (0.9354 vs 0.9332)
+- ✅ Simpler model (L1 loss only) performs better than complex ranking loss
+- ✅ This is our new baseline for all experiments
 
 ---
 
@@ -90,20 +97,17 @@
 
 ---
 
-### A2 - Remove Ranking Loss
+### ~~A2 - Remove Ranking Loss~~ → **Now the Baseline!**
 
-**Status**: ⏳ NOT STARTED
-
-**Configuration**: Same as baseline except:
-- Ranking Loss Alpha: **0.0** (ranking loss disabled)
+**Status**: ✅ **COMPLETE - This is now our baseline!**
 
 **Results**:
-- **SRCC**: -
-- **PLCC**: -
-- **Time**: -
-- **Log File**: -
+- **SRCC**: **0.9354** (better than with ranking loss!)
+- **PLCC**: **0.9465**
+- **Time**: ~1.7 hours
+- **Log File**: `/root/Perceptual-IQA-CS3324/logs/swin_multiscale_ranking_alpha0_20251222_161625.log`
 
-**Purpose**: Quantify the contribution of ranking loss in addition to L1 loss.
+**Conclusion**: Ranking Loss Alpha=0 (no ranking loss) is **better** than Alpha=0.3. This experiment became our new baseline!
 
 ---
 
@@ -125,60 +129,49 @@
 
 ---
 
-## 📈 Part C: Ranking Loss Sensitivity Analysis
+## 📈 Part C: Ranking Loss Sensitivity Analysis (SUPPLEMENTARY - Optional)
 
-**Purpose**: Understand how ranking_loss_alpha affects model performance.
+**Status**: **MOVED TO SUPPLEMENTARY**  
+**Reason**: Discovered that ranking loss is harmful (Alpha=0 is best)
 
----
+**Known Results**:
+- Alpha=0.0: SRCC 0.9354 ✅ (Best - now baseline)
+- Alpha=0.3: SRCC 0.9332 (worse by -0.0022)
 
-### C1 - Alpha=0.1
-
-**Status**: ⏳ NOT STARTED
-
-**Configuration**: Same as baseline except:
-- Ranking Loss Alpha: **0.1** (vs 0.3 baseline)
-
-**Results**:
-- **SRCC**: -
-- **PLCC**: -
-- **Time**: -
-- **Log File**: -
-
-**Purpose**: Test lower ranking loss weight.
+**Conclusion**: Ranking loss consistently hurts performance. Not running C1-C3 in core experiments.
 
 ---
 
-### C2 - Alpha=0.5
+### C1 - Alpha=0.1 (Supplementary)
 
-**Status**: ⏳ NOT STARTED
+**Status**: ⏳ SUPPLEMENTARY - Not needed for core paper
 
 **Configuration**: Same as baseline except:
-- Ranking Loss Alpha: **0.5** (vs 0.3 baseline)
-
-**Results**:
-- **SRCC**: -
-- **PLCC**: -
-- **Time**: -
-- **Log File**: -
-
-**Purpose**: Test higher ranking loss weight.
+- Ranking Loss Alpha: **0.1**
 
 ---
 
-### C3 - Alpha=0.7
+### C2 - Alpha=0.3 (Supplementary)
 
-**Status**: ⏳ NOT STARTED
+**Status**: ✅ Already have data - SRCC 0.9332 (worse than baseline)
+
+---
+
+### C3 - Alpha=0.5 (Supplementary)
+
+**Status**: ⏳ SUPPLEMENTARY - Not needed for core paper
 
 **Configuration**: Same as baseline except:
-- Ranking Loss Alpha: **0.7** (vs 0.3 baseline)
+- Ranking Loss Alpha: **0.5**
 
-**Results**:
-- **SRCC**: -
-- **PLCC**: -
-- **Time**: -
-- **Log File**: -
+---
 
-**Purpose**: Test even higher ranking loss weight.
+### C4 - Alpha=0.7 (Supplementary)
+
+**Status**: ⏳ SUPPLEMENTARY - Not needed for core paper
+
+**Configuration**: Same as baseline except:
+- Ranking Loss Alpha: **0.7**
 
 ---
 
@@ -407,8 +400,9 @@ Example:
 ## ⏱️ Time Estimates
 
 - **Per Experiment**: ~1.7 hours
-- **Sequential (1 GPU)**: ~23.8 hours (14 experiments)
-- **Parallel (2 GPUs)**: ~11.9 hours (7 experiments each)
-- **Parallel (4 GPUs)**: ~6.8 hours (optimal scheduling)
+- **Core Experiments**: 10 remaining (1 already done)
+- **Sequential (1 GPU)**: ~17 hours (10 experiments)
+- **Parallel (2 GPUs)**: ~8.5 hours (5 experiments each)
+- **Parallel (4 GPUs)**: ~4.25 hours (optimal scheduling)
 
-**Recommendation**: Run 1-2 experiments at a time on separate GPUs to avoid resource contention.
+**Recommendation**: Run 2-4 experiments simultaneously on separate GPUs. With no ColorJitter and GPU-bound training, resource contention should be minimal.
