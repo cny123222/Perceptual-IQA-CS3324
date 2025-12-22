@@ -18,15 +18,15 @@
 
 ## Progress Overview
 
-**Completed**: 3/11 (Baseline + A1 + A2 ✅)  
+**Completed**: 4/11 (Baseline + A1 + A2 + B1 ✅)  
 **Running**: 0/11  
-**Remaining**: 8/11
+**Remaining**: 7/11
 
 **Core Experiments** (11 total):
-- [x] **Baseline** - Full Model - **SRCC 0.9354** ✅
+- [x] **Baseline** - Full Model (Base) - **SRCC 0.9354** ✅
 - [x] **A1** - Remove Attention - **SRCC 0.9323** (Δ -0.0031) ✅
 - [x] **A2** - Remove Multi-scale - **SRCC 0.9296** (Δ -0.0058) ✅
-- [ ] B1 - Model Tiny
+- [x] **B1** - Model Tiny - **SRCC 0.9212** (Δ -0.0142) ✅
 - [ ] B2 - Model Large
 - [ ] D1 - Weight Decay 1e-4
 - [ ] D2 - Weight Decay 5e-4
@@ -79,19 +79,21 @@
 
 ---
 
-## 📊 Core Ablation Results Summary
+## 📊 Experiment Results Summary
 
-| Experiment | SRCC | PLCC | Δ SRCC | Δ PLCC | Contribution |
-|------------|------|------|--------|--------|--------------|
-| **Baseline (Full)** | **0.9354** | **0.9448** | - | - | - |
+| Experiment | SRCC | PLCC | Δ SRCC | Δ PLCC | Key Finding |
+|------------|------|------|--------|--------|-------------|
+| **Baseline (Full)** | **0.9354** | **0.9448** | - | - | Best model |
 | A1 (No Attention) | 0.9323 | 0.9453 | -0.0031 | +0.0005 | Attention: **+0.31%** |
 | A2 (No Multi-scale) | 0.9296 | 0.9411 | -0.0058 | -0.0037 | Multi-scale: **+0.62%** |
+| B1 (Tiny Model) | 0.9212 | 0.9334 | -0.0142 | -0.0114 | Capacity: **+1.42%** |
 
 ### Key Findings:
-1. ✅ **Multi-scale features** are the **most important component** (Δ -0.0058)
-2. ✅ **Attention fusion** provides additional benefit (Δ -0.0031)
-3. ✅ Combined effect: Multi-scale + Attention = **+0.93% SRCC improvement**
-4. ✅ Even single-scale baseline achieves strong 0.9296 SRCC
+1. ✅ **Multi-scale features** are the **most important architectural component** (Δ -0.0058, +0.62%)
+2. ✅ **Model capacity (Base vs Tiny)** has the **largest impact** (Δ -0.0142, +1.42%)
+3. ✅ **Attention fusion** provides moderate benefit (Δ -0.0031, +0.31%)
+4. ✅ Combined architectural improvements: **+0.93% SRCC** (Multi-scale + Attention)
+5. ✅ Tiny model still achieves strong **0.9212 SRCC** with 3x fewer parameters
 
 ---
 
@@ -215,18 +217,25 @@
 
 ### B1 - Tiny Model
 
-**Status**: ⏳ NOT STARTED
+**Status**: ✅ COMPLETE
 
 **Configuration**: Same as baseline except:
-- Model Size: **tiny** (vs base)
+- Model Size: **tiny** (~28M params vs ~88M base)
 
 **Results**:
-- **SRCC**: -
-- **PLCC**: -
-- **Time**: -
-- **Log File**: -
+- **SRCC**: **0.9212** (Baseline: 0.9354, **Δ -0.0142**)
+- **PLCC**: **0.9334** (Baseline: 0.9448, Δ -0.0114)
+- **Time**: ~1.5 hours
+- **Log File**: `/root/Perceptual-IQA-CS3324/logs/swin_multiscale_ranking_alpha0_20251222_193417.log`
+- **Checkpoint**: `checkpoints/koniq-10k-swin_20251222_193418/best_model_srcc_0.9212_plcc_0.9334.pkl`
 
-**Purpose**: Test smaller, faster model.
+**Purpose**: Test smaller, faster model with reduced capacity.
+
+**Findings**:
+- ✅ Tiny model achieves **92.12% of base performance** (0.9212 vs 0.9354)
+- ✅ Significant performance drop of **-1.42% SRCC** shows model capacity matters
+- ✅ Still achieves strong 0.9212 SRCC with ~3x fewer parameters
+- ✅ Good trade-off for resource-constrained applications
 
 ---
 
