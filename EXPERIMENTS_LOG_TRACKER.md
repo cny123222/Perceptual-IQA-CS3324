@@ -18,16 +18,16 @@
 
 ## Progress Overview
 
-**Completed**: 4/11 (Baseline + A1 + A2 + B1 ✅)  
+**Completed**: 5/11 (Baseline + A1 + A2 + B1 + B2 ✅)  
 **Running**: 0/11  
-**Remaining**: 7/11
+**Remaining**: 6/11
 
 **Core Experiments** (11 total):
 - [x] **Baseline** - Full Model (Base) - **SRCC 0.9354** ✅
 - [x] **A1** - Remove Attention - **SRCC 0.9323** (Δ -0.0031) ✅
 - [x] **A2** - Remove Multi-scale - **SRCC 0.9296** (Δ -0.0058) ✅
 - [x] **B1** - Model Tiny - **SRCC 0.9212** (Δ -0.0142) ✅
-- [ ] B2 - Model Large
+- [x] **B2** - Model Small - **SRCC 0.9332** (Δ -0.0022) ✅
 - [ ] D1 - Weight Decay 1e-4
 - [ ] D2 - Weight Decay 5e-4
 - [ ] D3 - Drop Path 0.1
@@ -83,17 +83,19 @@
 
 | Experiment | SRCC | PLCC | Δ SRCC | Δ PLCC | Key Finding |
 |------------|------|------|--------|--------|-------------|
-| **Baseline (Full)** | **0.9354** | **0.9448** | - | - | Best model |
+| **Baseline (Base)** | **0.9354** | **0.9448** | - | - | Best model |
 | A1 (No Attention) | 0.9323 | 0.9453 | -0.0031 | +0.0005 | Attention: **+0.31%** |
 | A2 (No Multi-scale) | 0.9296 | 0.9411 | -0.0058 | -0.0037 | Multi-scale: **+0.62%** |
-| B1 (Tiny Model) | 0.9212 | 0.9334 | -0.0142 | -0.0114 | Capacity: **+1.42%** |
+| B1 (Tiny Model) | 0.9212 | 0.9334 | -0.0142 | -0.0114 | Capacity (Tiny): **-1.42%** |
+| B2 (Small Model) | 0.9332 | 0.9448 | -0.0022 | 0.0000 | Capacity (Small): **-0.22%** |
 
 ### Key Findings:
 1. ✅ **Multi-scale features** are the **most important architectural component** (Δ -0.0058, +0.62%)
-2. ✅ **Model capacity (Base vs Tiny)** has the **largest impact** (Δ -0.0142, +1.42%)
-3. ✅ **Attention fusion** provides moderate benefit (Δ -0.0031, +0.31%)
-4. ✅ Combined architectural improvements: **+0.93% SRCC** (Multi-scale + Attention)
-5. ✅ Tiny model still achieves strong **0.9212 SRCC** with 3x fewer parameters
+2. ✅ **Model capacity matters**: Tiny (-1.42%) < Small (-0.22%) < Base (best)
+3. ✅ **Small model is competitive** with Base (0.9332 vs 0.9354, only -0.22%)
+4. ✅ **Attention fusion** provides moderate benefit (Δ -0.0031, +0.31%)
+5. ✅ Combined architectural improvements: **+0.93% SRCC** (Multi-scale + Attention)
+6. ✅ **Capacity-performance trade-off**: Small model (~50M params) nearly matches Base (~88M params)
 
 ---
 
@@ -239,20 +241,28 @@
 
 ---
 
-### B2 - Large Model
+### B2 - Small Model
 
-**Status**: ⏳ NOT STARTED
+**Status**: ✅ COMPLETE
 
 **Configuration**: Same as baseline except:
-- Model Size: **large** (vs base)
+- Model Size: **small** (~50M params vs ~88M base)
 
 **Results**:
-- **SRCC**: -
-- **PLCC**: -
-- **Time**: -
-- **Log File**: -
+- **SRCC**: **0.9332** (Baseline: 0.9354, **Δ -0.0022**)
+- **PLCC**: **0.9448** (Baseline: 0.9448, Δ 0.0000)
+- **Time**: ~1.5 hours
+- **Log File**: `/root/Perceptual-IQA-CS3324/logs/swin_multiscale_ranking_alpha0_20251222_194409.log`
+- **Checkpoint**: `checkpoints/koniq-10k-swin_20251222_194409/best_model_srcc_0.9332_plcc_0.9448.pkl`
 
-**Purpose**: Test larger, potentially more powerful model.
+**Purpose**: Test smaller model for efficiency vs performance trade-off.
+
+**Findings**:
+- ✅ Small model achieves **99.76% of base performance** (0.9332 vs 0.9354)
+- ✅ Only **-0.22% SRCC drop** with ~40% fewer parameters  
+- ✅ PLCC identical to baseline (0.9448)
+- ✅ Excellent efficiency-performance trade-off
+- ✅ **Recommended for deployment**: Nearly matches base with much better efficiency
 
 ---
 
