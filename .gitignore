@@ -57,6 +57,8 @@ Thumbs.db
 
 # Pretrained models
 pretrained/
+benchmarks/StairIQA/pretrained/
+benchmarks/DBCNN/dbcnn/models/
 
 # Datasets (large files, should not be tracked)
 koniq-10k/
