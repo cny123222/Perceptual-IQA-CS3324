@@ -153,6 +153,7 @@ def load_koniq_train_images(koniq_path):
                 img_name = os.path.basename(item['image'])
                 # Try different possible locations
                 possible_paths = [
+                    os.path.join(koniq_path, 'train', img_name),  # Actual structure: train/xxx.jpg
                     os.path.join(koniq_path, '512x384', img_name),
                     os.path.join(koniq_path, 'images', img_name),
                     os.path.join(koniq_path, img_name)
