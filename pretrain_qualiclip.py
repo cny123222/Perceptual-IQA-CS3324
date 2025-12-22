@@ -124,8 +124,8 @@ def extract_text_features(clip_model, device, clip_type='openai'):
     text_neg = tokenize_fn(["Bad photo"]).to(device)
     
     with torch.no_grad():
-        text_features_pos = clip_model.encode_text(text_pos).squeeze(0)  # [D]
-        text_features_neg = clip_model.encode_text(text_neg).squeeze(0)  # [D]
+        text_features_pos = clip_model.encode_text(text_pos).squeeze(0).float()  # [D], convert to float32
+        text_features_neg = clip_model.encode_text(text_neg).squeeze(0).float()  # [D], convert to float32
     
     print(f"✓ Text features extracted: {text_features_pos.shape}")
     return text_features_pos, text_features_neg
