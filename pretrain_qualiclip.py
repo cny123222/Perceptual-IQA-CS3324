@@ -241,7 +241,10 @@ def pretrain_epoch(encoder, dataloader, criterion, optimizer, device,
     encoder.train()
     
     total_loss = 0.0
-    total_losses = {'total': 0.0, 'cons': 0.0, 'pos': 0.0, 'neg': 0.0}
+    # Initialize total_losses dictionary based on loss type
+    # SimplifiedQualiCLIPLoss uses: total, cons, rank
+    # QualiCLIPLoss uses: total, cons, pos, neg
+    total_losses = {'total': 0.0, 'cons': 0.0, 'rank': 0.0}
     num_batches = 0
     
     pbar = tqdm(dataloader, desc='Pretraining')
@@ -325,7 +328,7 @@ def pretrain_epoch(encoder, dataloader, criterion, optimizer, device,
         pbar.set_postfix({
             'loss': f"{loss.item():.4f}",
             'cons': f"{loss_dict.get('cons', 0):.4f}",
-            'rank': f"{loss_dict.get('pos', 0) + loss_dict.get('neg', 0):.4f}"
+            'rank': f"{loss_dict.get('rank', 0):.4f}"
         })
     
     # Compute averages
