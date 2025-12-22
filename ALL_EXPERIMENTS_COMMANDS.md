@@ -1,12 +1,19 @@
-# All 14 Experiment Commands (Individual)
+# All 14 Experiment Commands (Individual) - Updated
 
-**Date**: 2025-12-22  
-**Configuration**: batch_size=32, epochs=5, train_test_num=1  
-**Baseline**: Alpha=0.3 (SRCC 0.9352)
+**Date**: 2025-12-22 (Updated)  
+**Configuration**: batch_size=32, epochs=5, train_test_num=1, **--no_color_jitter**  
+**Baseline**: Alpha=0.3 (SRCC **0.9350**, no ColorJitter)  
+**Time per Experiment**: ~1.7 hours (~20min/epoch)
+
+**🔥 重要更新**:
+- ✅ **所有实验都加上 `--no_color_jitter`**
+- ✅ A4消融实验显示ColorJitter性能损失可忽略(-0.0002)
+- ✅ 训练速度提升1.9倍 (3.2h → 1.7h)
+- ✅ 新baseline: SRCC 0.9350 (无ColorJitter)
 
 **建议运行方式**：
-- **一次跑1个实验**：最快，无资源竞争
-- **一次跑2个实验**：可接受，注意分配不同GPU
+- **一次跑1个实验**：最快，无资源竞争 (~1.7h/实验)
+- **一次跑2个实验**：可接受，注意分配不同GPU (~2h/实验)
 - ❌ 不建议4个同时跑：会很慢！
 
 ---
@@ -15,7 +22,8 @@
 
 ### A1: 移除Attention Fusion
 
-**目的**: 验证Attention Fusion的贡献
+**目的**: 验证Attention Fusion的贡献  
+**预计时间**: ~1.7小时
 
 ```bash
 cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
@@ -34,14 +42,16 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dropout_rate 0.4 \
   --lr_scheduler cosine \
   --test_random_crop \
-  --no_spaq
+  --no_spaq \
+  --no_color_jitter
 ```
 
 ---
 
 ### A2: 移除Ranking Loss (Alpha=0)
 
-**目的**: 验证Ranking Loss的贡献
+**目的**: 验证Ranking Loss的贡献  
+**预计时间**: ~1.7小时
 
 ```bash
 cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
@@ -61,14 +71,16 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dropout_rate 0.4 \
   --lr_scheduler cosine \
   --test_random_crop \
-  --no_spaq
+  --no_spaq \
+  --no_color_jitter
 ```
 
 ---
 
 ### A3: 移除Multi-scale Feature Fusion
 
-**目的**: 验证Multi-scale的贡献
+**目的**: 验证Multi-scale的贡献  
+**预计时间**: ~1.7小时
 
 ```bash
 cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
@@ -89,7 +101,8 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dropout_rate 0.4 \
   --lr_scheduler cosine \
   --test_random_crop \
-  --no_spaq
+  --no_spaq \
+  --no_color_jitter
 ```
 
 ---
@@ -98,7 +111,8 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
 
 ### C1: Alpha=0.1 (Lower)
 
-**目的**: 测试较低的ranking loss权重
+**目的**: 测试较低的ranking loss权重  
+**预计时间**: ~1.7小时
 
 ```bash
 cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
@@ -118,14 +132,16 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dropout_rate 0.4 \
   --lr_scheduler cosine \
   --test_random_crop \
-  --no_spaq
+  --no_spaq \
+  --no_color_jitter
 ```
 
 ---
 
 ### C2: Alpha=0.5 (Higher)
 
-**目的**: 测试较高的ranking loss权重（原best配置）
+**目的**: 测试较高的ranking loss权重（原best配置）  
+**预计时间**: ~1.7小时
 
 ```bash
 cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
@@ -145,14 +161,16 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dropout_rate 0.4 \
   --lr_scheduler cosine \
   --test_random_crop \
-  --no_spaq
+  --no_spaq \
+  --no_color_jitter
 ```
 
 ---
 
 ### C3: Alpha=0.7 (Much Higher)
 
-**目的**: 测试更高的ranking loss权重
+**目的**: 测试更高的ranking loss权重  
+**预计时间**: ~1.7小时
 
 ```bash
 cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
@@ -172,7 +190,8 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dropout_rate 0.4 \
   --lr_scheduler cosine \
   --test_random_crop \
-  --no_spaq
+  --no_spaq \
+  --no_color_jitter
 ```
 
 ---
@@ -181,7 +200,8 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
 
 ### B1: Swin-Tiny (~28M params)
 
-**目的**: 测试更小的模型
+**目的**: 测试更小的模型  
+**预计时间**: ~1.5小时 (tiny更快)
 
 ```bash
 cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
@@ -201,14 +221,16 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dropout_rate 0.4 \
   --lr_scheduler cosine \
   --test_random_crop \
-  --no_spaq
+  --no_spaq \
+  --no_color_jitter
 ```
 
 ---
 
 ### B2: Swin-Small (~50M params)
 
-**目的**: 测试中等大小的模型
+**目的**: 测试中等大小的模型  
+**预计时间**: ~1.8小时 (small稍慢)
 
 ```bash
 cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
@@ -228,7 +250,8 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dropout_rate 0.4 \
   --lr_scheduler cosine \
   --test_random_crop \
-  --no_spaq
+  --no_spaq \
+  --no_color_jitter
 ```
 
 ---
@@ -237,7 +260,8 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
 
 ### D1: Weight Decay=5e-5 (Very Weak, 0.25×)
 
-**目的**: 测试非常弱的正则化
+**目的**: 测试非常弱的正则化  
+**预计时间**: ~1.7小时
 
 ```bash
 cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
@@ -257,14 +281,16 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dropout_rate 0.4 \
   --lr_scheduler cosine \
   --test_random_crop \
-  --no_spaq
+  --no_spaq \
+  --no_color_jitter
 ```
 
 ---
 
 ### D2: Weight Decay=1e-4 (Weak, 0.5×)
 
-**目的**: 测试较弱的正则化
+**目的**: 测试较弱的正则化  
+**预计时间**: ~1.7小时
 
 ```bash
 cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
@@ -284,14 +310,16 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dropout_rate 0.4 \
   --lr_scheduler cosine \
   --test_random_crop \
-  --no_spaq
+  --no_spaq \
+  --no_color_jitter
 ```
 
 ---
 
 ### D4: Weight Decay=4e-4 (Strong, 2×)
 
-**目的**: 测试较强的正则化
+**目的**: 测试较强的正则化  
+**预计时间**: ~1.7小时
 
 ```bash
 cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
@@ -311,7 +339,8 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dropout_rate 0.4 \
   --lr_scheduler cosine \
   --test_random_crop \
-  --no_spaq
+  --no_spaq \
+  --no_color_jitter
 ```
 
 ---
@@ -320,7 +349,8 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
 
 ### E1: LR=2.5e-6 (Conservative, 0.5×)
 
-**目的**: 测试更保守的学习率
+**目的**: 测试更保守的学习率  
+**预计时间**: ~1.7小时
 
 ```bash
 cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
@@ -340,14 +370,16 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dropout_rate 0.4 \
   --lr_scheduler cosine \
   --test_random_crop \
-  --no_spaq
+  --no_spaq \
+  --no_color_jitter
 ```
 
 ---
 
 ### E3: LR=7.5e-6 (Faster, 1.5×)
 
-**目的**: 测试更快的学习率
+**目的**: 测试更快的学习率  
+**预计时间**: ~1.7小时
 
 ```bash
 cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
@@ -367,14 +399,16 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dropout_rate 0.4 \
   --lr_scheduler cosine \
   --test_random_crop \
-  --no_spaq
+  --no_spaq \
+  --no_color_jitter
 ```
 
 ---
 
 ### E4: LR=1e-5 (Aggressive, 2×)
 
-**目的**: 测试激进的学习率
+**目的**: 测试激进的学习率  
+**预计时间**: ~1.7小时
 
 ```bash
 cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
@@ -394,7 +428,8 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dropout_rate 0.4 \
   --lr_scheduler cosine \
   --test_random_crop \
-  --no_spaq
+  --no_spaq \
+  --no_color_jitter
 ```
 
 ---
@@ -413,7 +448,7 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
 
 **优点**: 速度最快，无GPU竞争  
 **缺点**: 需要手动监控  
-**预计时间**: 每个5-10分钟，总共1.5-2小时
+**预计时间**: 每个~1.7小时，总共~24小时
 
 ---
 
@@ -431,7 +466,7 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=1 python train_swin.py ..
 
 **优点**: 速度较快，可接受的资源竞争  
 **缺点**: 需要开两个terminal  
-**预计时间**: 每对8-12分钟，总共1-1.5小时
+**预计时间**: 每对~2小时，总共~12小时
 
 ---
 
@@ -494,6 +529,7 @@ tmux attach-session -s exp1
 - ✅ `--lr_scheduler cosine`
 - ✅ `--test_random_crop`
 - ✅ `--no_spaq`
+- ✅ **`--no_color_jitter`** (新增！所有实验统一)
 
 每个实验只改变一个目标参数！
 
