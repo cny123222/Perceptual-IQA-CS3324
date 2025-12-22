@@ -429,11 +429,20 @@ def main():
     # Load dataset
     print("\n[3/6] Loading dataset...")
     image_paths = load_koniq_train_images(args.data_root)
+    
+    # Define transforms for crops
+    crop_transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+                           std=[0.229, 0.224, 0.225])
+    ])
+    
     dataset = QualityAwarePretrainDataset(
         image_paths,
         crop_size=args.crop_size,
         base_size=args.base_size,
-        overlap_ratio=args.overlap_ratio
+        overlap_ratio=args.overlap_ratio,
+        transform=crop_transform
     )
     dataloader = DataLoader(
         dataset,
