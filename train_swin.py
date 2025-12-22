@@ -140,6 +140,7 @@ def main(config):
     print(f"  LR Scheduler:             {config.lr_scheduler_type}")
     print(f"  Multi-Scale Fusion:       {config.use_multiscale}")
     print(f"  Attention Fusion:         {config.use_attention}")
+    print(f"  ColorJitter Augmentation: {config.use_color_jitter}")
     print(f"  Test Random Crop:         {config.test_random_crop}")
     print(f"  SPAQ Cross-Dataset Test:  {config.test_spaq}")
     print("-" * 80)
@@ -246,6 +247,7 @@ if __name__ == '__main__':
     parser.add_argument('--no_lr_scheduler', dest='use_lr_scheduler', action='store_false', help='Disable learning rate scheduler')
     parser.add_argument('--test_random_crop', dest='test_random_crop', action='store_true', help='Use RandomCrop for testing (original paper setup, less reproducible)')
     parser.add_argument('--no_spaq', dest='test_spaq', action='store_false', help='Disable SPAQ cross-dataset testing (saves time and memory)')
+    parser.add_argument('--no_color_jitter', dest='use_color_jitter', action='store_false', help='Disable ColorJitter data augmentation (3x faster training, may slightly reduce performance)')
 
     config = parser.parse_args()
     main(config)

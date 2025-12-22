@@ -47,6 +47,9 @@ class HyperIQASolver(object):
         # SPAQ cross-dataset testing
         self.test_spaq = getattr(config, 'test_spaq', True)  # Default: enable SPAQ testing
         
+        # ColorJitter data augmentation
+        self.use_color_jitter = getattr(config, 'use_color_jitter', True)  # Default: enabled
+        
         # 创建模型保存目录（带时间戳防止覆盖）
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         save_dir_suffix = '-swin'
@@ -100,10 +103,16 @@ class HyperIQASolver(object):
         # Use AdamW for better weight decay handling (decouples weight decay from gradient update)
         self.solver = torch.optim.AdamW(paras, weight_decay=self.weight_decay)
 
-        train_loader = data_loader.DataLoader(config.dataset, path, train_idx, config.patch_size, config.train_patch_num, batch_size=config.batch_size, istrain=True)
+        train_loader = data_loader.DataLoader(config.dataset, path, train_idx, config.patch_size, config.train_patch_num, batch_size=config.batch_size, istrain=True, use_color_jitter=self.use_color_jitter)
         test_loader = data_loader.DataLoader(config.dataset, path, test_idx, config.patch_size, config.test_patch_num, istrain=False, test_random_crop=self.test_random_crop)
         self.train_data = train_loader.get_data()
         self.test_data = test_loader.get_data()
+        
+        # Print ColorJitter status
+        if self.use_color_jitter:
+            print('ColorJitter: ENABLED (training will be slower but may improve performance)')
+        else:
+            print('ColorJitter: DISABLED (3x faster training)')
         
         # Print test crop method
         if self.test_random_crop:
