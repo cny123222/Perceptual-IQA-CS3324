@@ -129,16 +129,16 @@ print('✅ All imports successful!')
 
 | 实验 | 描述 | 预计时间 |
 |------|------|---------|
-| A1 | Remove Attention | 5-10 min |
-| A2 | Remove Ranking | 5-10 min |
-| A3 | Remove Multi-scale | 5-10 min |
-| C1 | Alpha=0.1 | 5-10 min |
-| C2 | Alpha=0.5 | 5-10 min |
-| C3 | Alpha=0.7 | 5-10 min |
-| B1 | Swin-Tiny | 5-10 min |
-| B2 | Swin-Small | 5-10 min |
+| A1 | Remove Attention | ~2h |
+| A2 | Remove Ranking | ~2h |
+| A3 | Remove Multi-scale | ~2h |
+| C1 | Alpha=0.1 | ~2h |
+| C2 | Alpha=0.5 | ~2h |
+| C3 | Alpha=0.7 | ~2h |
+| B1 | Swin-Tiny | ~1.5h |
+| B2 | Swin-Small | ~2.5h |
 
-**总计**: 40-80分钟
+**总计**: ~16小时 (每个实验~2小时，5 epochs × 26min/epoch)
 
 ### 机器B (新机器) - 运行6个实验
 
@@ -146,14 +146,14 @@ print('✅ All imports successful!')
 
 | 实验 | 描述 | 预计时间 |
 |------|------|---------|
-| D1 | WD=5e-5 | 5-10 min |
-| D2 | WD=1e-4 | 5-10 min |
-| D4 | WD=4e-4 | 5-10 min |
-| E1 | LR=2.5e-6 | 5-10 min |
-| E3 | LR=7.5e-6 | 5-10 min |
-| E4 | LR=1e-5 | 5-10 min |
+| D1 | WD=5e-5 | ~2h |
+| D2 | WD=1e-4 | ~2h |
+| D4 | WD=4e-4 | ~2h |
+| E1 | LR=2.5e-6 | ~2h |
+| E3 | LR=7.5e-6 | ~2h |
+| E4 | LR=1e-5 | ~2h |
 
-**总计**: 30-60分钟
+**总计**: ~12小时 (每个实验~2小时，5 epochs × 26min/epoch)
 
 ---
 

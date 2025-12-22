@@ -51,9 +51,9 @@
 
 **Results**:
 - **SRCC**: - (in progress or interrupted)
-- **PLCC**: -
-- **RMSE**: -
-- **Status**: ⏸️ INCOMPLETE
+- **PLCC**: - 
+- **RMSE**: - 
+- **Status**: 
 
 **Purpose**: Quantify the contribution of attention-based multi-scale feature fusion.
 
@@ -74,10 +74,11 @@
 - Dropout: 0.4
 
 **Results**:
-- **SRCC**: - (in progress or interrupted)
-- **PLCC**: -
-- **RMSE**: -
-- **Status**: ⏸️ INCOMPLETE
+- **SRCC**: - 0.9345
+- **PLCC**: - 0.9453
+- **RMSE**: - 
+- **Checkpoint**: `checkpoints/koniq-10k-swin_20251222_104715/best_model_srcc_0.9345_plcc_0.9453.pkl`
+- **Status**: ✅ COMPLETE
 
 **Purpose**: Quantify the contribution of ranking loss in addition to L1 loss.
 
@@ -104,6 +105,86 @@
 - **Status**: ⏳ NOT STARTED
 
 **Purpose**: Quantify the contribution of multi-scale feature fusion.
+
+**Command**:
+```bash
+cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
+  --dataset koniq-10k \
+  --model_size base \
+  --batch_size 32 \
+  --epochs 5 \
+  --patience 5 \
+  --train_patch_num 20 \
+  --test_patch_num 20 \
+  --train_test_num 1 \
+  --no_multiscale \
+  --attention_fusion \
+  --ranking_loss_alpha 0.3 \
+  --lr 5e-6 \
+  --weight_decay 2e-4 \
+  --drop_path_rate 0.3 \
+  --dropout_rate 0.4 \
+  --lr_scheduler cosine \
+  --test_random_crop \
+  --no_spaq
+```
+
+---
+
+### A4 - Remove ColorJitter (Data Augmentation)
+
+**Log File**: (not started)
+
+**Configuration**: Same as baseline except:
+- **ColorJitter**: ❌ **Disabled** (comment out in data_loader.py line 49)
+
+**Results**:
+- **SRCC**: -
+- **PLCC**: -
+- **RMSE**: -
+- **Status**: ⏳ NOT STARTED
+
+**Purpose**: Quantify the contribution of ColorJitter data augmentation. ColorJitter causes 3x training slowdown (2h → 40min per experiment). Need to verify if the performance gain justifies the time cost.
+
+**How to run**:
+1. Comment out line 49 in `data_loader.py`:
+   ```python
+   # torchvision.transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.05),
+   ```
+2. Run the same command as baseline
+3. Restore the line after experiment
+
+**Command**:
+```bash
+# Step 1: Comment out ColorJitter in data_loader.py
+# Step 2: Run experiment
+cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
+  --dataset koniq-10k \
+  --model_size base \
+  --batch_size 32 \
+  --epochs 5 \
+  --patience 5 \
+  --train_patch_num 20 \
+  --test_patch_num 20 \
+  --train_test_num 1 \
+  --attention_fusion \
+  --ranking_loss_alpha 0.3 \
+  --lr 5e-6 \
+  --weight_decay 2e-4 \
+  --drop_path_rate 0.3 \
+  --dropout_rate 0.4 \
+  --lr_scheduler cosine \
+  --test_random_crop \
+  --no_spaq
+# Step 3: Restore ColorJitter line
+```
+
+**Expected Time**: ~40 minutes (vs 2 hours with ColorJitter)
+
+**Decision Point**: 
+- If SRCC drop < 0.002: Remove ColorJitter, save 67% time on all experiments
+- If SRCC drop > 0.005: Keep ColorJitter, accept slower training
+- If 0.002 < drop < 0.005: Discuss trade-off in paper
 
 **Command**:
 ```bash
@@ -327,23 +408,24 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
 
 ## 📋 Summary Table
 
-| Exp | Description | Log File | SRCC | PLCC | RMSE | Status |
+| Exp | Description | Log File | SRCC | PLCC | Time | Status |
 |-----|-------------|----------|------|------|------|--------|
-| **Best** | **Baseline (Alpha=0.3)** | `...alpha0.3_20251221_215123.log` | **0.9352** | **0.9460** | - | ✅ |
-| A1 | Remove Attention | `...alpha0.3_20251222_123450.log` | - | - | - | ⏸️ |
-| A2 | Remove Ranking | `...alpha0_20251222_104715.log` | - | - | - | ⏸️ |
-| A3 | Remove Multi-scale | - | - | - | - | ⏳ |
-| C1 | Alpha=0.1 | - | - | - | - | ⏳ |
-| C2 | Alpha=0.5 | - | - | - | - | ⏳ |
-| C3 | Alpha=0.7 | - | - | - | - | ⏳ |
-| B1 | Swin-Tiny | - | - | - | - | ⏳ |
-| B2 | Swin-Small | - | - | - | - | ⏳ |
-| D1 | WD=5e-5 | - | - | - | - | ⏳ |
-| D2 | WD=1e-4 | - | - | - | - | ⏳ |
-| D4 | WD=4e-4 | - | - | - | - | ⏳ |
-| E1 | LR=2.5e-6 | - | - | - | - | ⏳ |
-| E3 | LR=7.5e-6 | - | - | - | - | ⏳ |
-| E4 | LR=1e-5 | - | - | - | - | ⏳ |
+| **Best** | **Baseline (Alpha=0.3)** | `...alpha0.3_20251221_215123.log` | **0.9352** | **0.9460** | 2h | ✅ |
+| **A4** | **Remove ColorJitter** | - | - | - | **40min** | **⏳ PRIORITY!** |
+| A1 | Remove Attention | `...alpha0.3_20251222_123450.log` | - | - | 2h | ⏸️ |
+| A2 | Remove Ranking | `...alpha0_20251222_104715.log` | - | - | 2h | ⏸️ |
+| A3 | Remove Multi-scale | - | - | - | 2h | ⏳ |
+| C1 | Alpha=0.1 | - | - | - | 2h | ⏳ |
+| C2 | Alpha=0.5 | - | - | - | 2h | ⏳ |
+| C3 | Alpha=0.7 | - | - | - | 2h | ⏳ |
+| B1 | Swin-Tiny | - | - | - | 1.5h | ⏳ |
+| B2 | Swin-Small | - | - | - | 2.5h | ⏳ |
+| D1 | WD=5e-5 | - | - | - | 2h | ⏳ |
+| D2 | WD=1e-4 | - | - | - | 2h | ⏳ |
+| D4 | WD=4e-4 | - | - | - | 2h | ⏳ |
+| E1 | LR=2.5e-6 | - | - | - | 2h | ⏳ |
+| E3 | LR=7.5e-6 | - | - | - | 2h | ⏳ |
+| E4 | LR=1e-5 | - | - | - | 2h | ⏳ |
 
 **Legend**:
 - ✅ Complete
@@ -385,29 +467,36 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
 
 ## 🎯 Next Steps
 
+### ⚡ PRIORITY 0 (CRITICAL - Do First!):
+1. **A4 (Remove ColorJitter)** - 40 minutes
+   - **WHY FIRST**: If ColorJitter is not important, all subsequent experiments will be 3x faster!
+   - **Impact**: Could save 18.7 hours (67% time) on remaining 14 experiments
+   - **Decision point**: Based on A4 results, decide whether to keep or remove ColorJitter
+   - See `COLORJITTER_ANALYSIS.md` for details
+
 ### Priority 1 (Core Ablations - Most Important):
-1. **A1** - Complete or re-run (Remove Attention)
-2. **A2** - Complete or re-run (Remove Ranking)
-3. **A3** - Run (Remove Multi-scale)
+2. **A1** - Complete or re-run (Remove Attention)
+3. **A2** - Complete or re-run (Remove Ranking)
+4. **A3** - Run (Remove Multi-scale)
 
 ### Priority 2 (Ranking Sensitivity):
-4. **C1** - Run (Alpha=0.1)
-5. **C2** - Run (Alpha=0.5)
-6. **C3** - Run (Alpha=0.7)
+5. **C1** - Run (Alpha=0.1)
+6. **C2** - Run (Alpha=0.5)
+7. **C3** - Run (Alpha=0.7)
 
 ### Priority 3 (Model Size):
-7. **B1** - Run (Swin-Tiny)
-8. **B2** - Run (Swin-Small)
+8. **B1** - Run (Swin-Tiny)
+9. **B2** - Run (Swin-Small)
 
 ### Priority 4 (Weight Decay):
-9. **D1** - Run (WD=5e-5)
-10. **D2** - Run (WD=1e-4)
-11. **D4** - Run (WD=4e-4)
+10. **D1** - Run (WD=5e-5)
+11. **D2** - Run (WD=1e-4)
+12. **D4** - Run (WD=4e-4)
 
 ### Priority 5 (Learning Rate):
-12. **E1** - Run (LR=2.5e-6)
-13. **E3** - Run (LR=7.5e-6)
-14. **E4** - Run (LR=1e-5)
+13. **E1** - Run (LR=2.5e-6)
+14. **E3** - Run (LR=7.5e-6)
+15. **E4** - Run (LR=1e-5)
 
 ---
 
@@ -415,9 +504,14 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
 
 - **Completed**: 1/15 (6.7%)
 - **In Progress/Incomplete**: 2/15 (13.3%)
-- **Not Started**: 12/15 (80.0%)
+- **Not Started**: 13/15 (86.7%) - including A4 (ColorJitter)
 
-**Estimated Time Remaining**: ~12 experiments × 5-10 minutes = 60-120 minutes
+**Estimated Time**:
+- **With ColorJitter**: ~14 experiments × 2h = 28 hours
+- **Without ColorJitter** (if A4 shows it's not important): ~14 experiments × 40min = 9.3 hours
+- **Time Savings Potential**: 18.7 hours (67%)
+
+**⚡ CRITICAL**: Run A4 (Remove ColorJitter) first to determine optimal strategy!
 
 ---
 
