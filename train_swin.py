@@ -251,6 +251,12 @@ if __name__ == '__main__':
     parser.add_argument('--test_random_crop', dest='test_random_crop', action='store_true', help='Use RandomCrop for testing (original paper setup, less reproducible)')
     parser.add_argument('--no_spaq', dest='test_spaq', action='store_false', help='Disable SPAQ cross-dataset testing (saves time and memory)')
     parser.add_argument('--no_color_jitter', dest='use_color_jitter', action='store_false', help='Disable ColorJitter data augmentation (3x faster training, may slightly reduce performance)')
+    
+    # QualiCLIP pretraining arguments
+    parser.add_argument('--pretrained_encoder', dest='pretrained_encoder', type=str, default=None,
+                       help='Path to pretrained image encoder weights (from QualiCLIP pretraining)')
+    parser.add_argument('--lr_encoder_pretrained', dest='lr_encoder_pretrained', type=float, default=1e-6,
+                       help='Learning rate for pretrained encoder (should be smaller than lr)')
 
     config = parser.parse_args()
     main(config)

@@ -92,6 +92,21 @@ class HyperIQASolver(object):
             model_size=self.model_size
         ).to(self.device)
         self.model_hyper.train(True)
+        
+        # Load pretrained encoder weights if provided (from QualiCLIP pretraining)
+        pretrained_encoder = getattr(config, 'pretrained_encoder', None)
+        if pretrained_encoder is not None and os.path.exists(pretrained_encoder):
+            print(f'\n{"="*80}')
+            print(f'Loading pretrained encoder from: {pretrained_encoder}')
+            try:
+                pretrained_weights = torch.load(pretrained_encoder, map_location=self.device)
+                self.model_hyper.swin.load_state_dict(pretrained_weights, strict=False)
+                print('✓ Successfully loaded pretrained image encoder weights')
+                print(f'{"="*80}\n')
+            except Exception as e:
+                print(f'⚠ Warning: Failed to load pretrained weights: {e}')
+                print('Continuing with randomly initialized encoder')
+                print(f'{"="*80}\n')
 
         # Initialize loss functions
         self.l1_loss = torch.nn.L1Loss().to(self.device)
@@ -102,9 +117,21 @@ class HyperIQASolver(object):
         self.lr = config.lr
         self.lrratio = config.lr_ratio
         self.weight_decay = config.weight_decay
-        paras = [{'params': self.hypernet_params, 'lr': self.lr * self.lrratio},
-                 {'params': self.model_hyper.swin.parameters(), 'lr': self.lr}
-                 ]
+        
+        # Use different learning rates for pretrained encoder vs rest of the network
+        if pretrained_encoder is not None and os.path.exists(pretrained_encoder):
+            lr_encoder = getattr(config, 'lr_encoder_pretrained', 1e-6)
+            print(f'Using differential learning rates:')
+            print(f'  Pretrained Encoder: {lr_encoder:.6f}')
+            print(f'  HyperNet (rest):    {self.lr * self.lrratio:.6f}')
+            paras = [{'params': self.model_hyper.swin.parameters(), 'lr': lr_encoder},
+                     {'params': self.hypernet_params, 'lr': self.lr * self.lrratio}
+                     ]
+        else:
+            paras = [{'params': self.hypernet_params, 'lr': self.lr * self.lrratio},
+                     {'params': self.model_hyper.swin.parameters(), 'lr': self.lr}
+                     ]
+        
         # Use AdamW for better weight decay handling (decouples weight decay from gradient update)
         self.solver = torch.optim.AdamW(paras, weight_decay=self.weight_decay)
 
