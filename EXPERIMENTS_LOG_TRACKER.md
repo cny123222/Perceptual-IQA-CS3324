@@ -8,7 +8,7 @@
 
 ## 📊 Baseline (Best Model)
 
-### Best - Full Model (Alpha=0.3)
+### Best (OLD) - Full Model with ColorJitter (Alpha=0.3)
 
 **Log File**: `/root/Perceptual-IQA-CS3324/logs/swin_multiscale_ranking_alpha0.3_20251221_215123.log`
 
@@ -16,6 +16,7 @@
 - Model Size: base
 - Multi-scale: ✅ True
 - Attention Fusion: ✅ True
+- **ColorJitter**: ✅ **Enabled**
 - Ranking Loss Alpha: **0.3**
 - Learning Rate: 5e-6
 - Weight Decay: 2e-4
@@ -23,13 +24,43 @@
 - Dropout: 0.4
 
 **Results**:
-- **SRCC**: 0.9352 ⭐
+- **SRCC**: 0.9352
 - **PLCC**: 0.9460
-- **RMSE**: -
+- **Time**: ~3.2 hours
 - **Checkpoint**: `checkpoints/koniq-10k-swin-ranking-alpha0.3_20251221_215124/best_model_srcc_0.9352_plcc_0.9460.pkl`
+- **Status**: ✅ COMPLETE (superseded by new baseline)
+
+**Notes**: Original baseline with ColorJitter. Superseded by new baseline without ColorJitter.
+
+---
+
+### Best (NEW) - Full Model WITHOUT ColorJitter (Alpha=0.3) ⭐
+
+**Log File**: `/root/Perceptual-IQA-CS3324/logs/swin_multiscale_ranking_alpha0.3_20251222_135111.log`
+
+**Configuration**:
+- Model Size: base
+- Multi-scale: ✅ True
+- Attention Fusion: ✅ True
+- **ColorJitter**: ❌ **Disabled** (A4 ablation result)
+- Ranking Loss Alpha: **0.3**
+- Learning Rate: 5e-6
+- Weight Decay: 2e-4
+- Drop Path: 0.3
+- Dropout: 0.4
+
+**Results**:
+- **SRCC**: 0.9350 ⭐ (only -0.0002 vs with ColorJitter)
+- **PLCC**: 0.9460 (same as with ColorJitter)
+- **Time**: ~1.7 hours (47% faster!)
+- **Checkpoint**: TBD
 - **Status**: ✅ COMPLETE
 
-**Notes**: This is the current best model and baseline for all comparisons.
+**Notes**: 
+- **This is the NEW baseline for all subsequent experiments!**
+- ColorJitter removed after A4 ablation showed negligible performance impact (-0.0002 SRCC)
+- All future experiments should use `--no_color_jitter` for fair comparison
+- Significantly faster training (~1.9x speedup)
 
 ---
 
@@ -131,20 +162,27 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
 
 ---
 
-### A4 - Remove ColorJitter (Data Augmentation)
+### A4 - Remove ColorJitter (Data Augmentation) ⭐
 
-**Log File**: (not started)
+**Log File**: `/root/Perceptual-IQA-CS3324/logs/swin_multiscale_ranking_alpha0.3_20251222_135111.log`
 
-**Configuration**: Same as baseline except:
-- **ColorJitter**: ❌ **Disabled** (comment out in data_loader.py line 49)
+**Configuration**: Same as OLD baseline except:
+- **ColorJitter**: ❌ **Disabled** (via --no_color_jitter flag)
 
 **Results**:
-- **SRCC**: -
-- **PLCC**: -
+- **SRCC**: 0.9350 (baseline: 0.9352, drop: **-0.0002 only!**)
+- **PLCC**: 0.9460 (same as baseline)
 - **RMSE**: -
-- **Status**: ⏳ NOT STARTED
+- **Time**: ~1.7 hours (vs 3.2 hours with ColorJitter)
+- **Status**: ✅ COMPLETE
 
-**Purpose**: Quantify the contribution of ColorJitter data augmentation. ColorJitter causes 3x training slowdown (2h → 40min per experiment). Need to verify if the performance gain justifies the time cost.
+**Purpose**: Quantify the contribution of ColorJitter data augmentation. ColorJitter causes ~2x training slowdown.
+
+**Conclusion**: 
+- ✅ **ColorJitter can be safely removed!**
+- Performance loss is negligible (0.0002 SRCC ≈ 0.02%)
+- Training speed improves by ~1.9x
+- **Decision**: Remove ColorJitter from all subsequent experiments
 
 **How to run**:
 1. Comment out line 49 in `data_loader.py`:
