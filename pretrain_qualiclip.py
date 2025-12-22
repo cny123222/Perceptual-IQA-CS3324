@@ -46,11 +46,12 @@ def get_device():
 def load_clip_text_encoder(device):
     """
     Load CLIP text encoder for extracting text embeddings.
-    We use the official OpenAI CLIP model.
+    We use the local QualiCLIP CLIP implementation.
     """
     try:
+        # Try OpenAI CLIP first
         import clip
-        print("Loading CLIP text encoder...")
+        print("Loading CLIP text encoder (OpenAI)...")
         model, _ = clip.load("RN50", device=device)
         model.eval()
         
@@ -58,17 +59,42 @@ def load_clip_text_encoder(device):
         for param in model.parameters():
             param.requires_grad = False
         
-        print("✓ CLIP text encoder loaded successfully")
-        return model
+        print("✓ CLIP text encoder loaded successfully (OpenAI)")
+        return model, 'openai'
     except ImportError:
-        print("Error: CLIP not installed. Install with: pip install git+https://github.com/openai/CLIP.git")
-        raise
+        # Fallback to QualiCLIP's CLIP implementation
+        print("OpenAI CLIP not found, using QualiCLIP's CLIP implementation...")
+        import sys
+        import os
+        qualiclip_path = os.path.join(os.path.dirname(__file__), 'benchmarks', 'QualiCLIP')
+        sys.path.insert(0, qualiclip_path)
+        
+        try:
+            from clip import clip as qualiclip
+            print("Loading CLIP text encoder (QualiCLIP)...")
+            model, _ = qualiclip.load("RN50", device=device)
+            model.eval()
+            
+            # Freeze all parameters
+            for param in model.parameters():
+                param.requires_grad = False
+            
+            print("✓ CLIP text encoder loaded successfully (QualiCLIP)")
+            return model, 'qualiclip'
+        except Exception as e:
+            print(f"Error: Failed to load CLIP from either source")
+            print(f"  OpenAI CLIP: Not installed")
+            print(f"  QualiCLIP CLIP: {e}")
+            print("\nPlease install CLIP using one of these methods:")
+            print("  1. pip install git+https://github.com/openai/CLIP.git")
+            print("  2. Or via SSH: git clone git@github.com:openai/CLIP.git && cd CLIP && pip install -e .")
+            raise
     except Exception as e:
         print(f"Error loading CLIP: {e}")
         raise
 
 
-def extract_text_features(clip_model, device):
+def extract_text_features(clip_model, device, clip_type='openai'):
     """
     Extract and cache text features for quality-related prompts.
     
@@ -76,15 +102,25 @@ def extract_text_features(clip_model, device):
         text_features_pos: Features for "Good photo" prompt
         text_features_neg: Features for "Bad photo" prompt
     """
-    import clip
+    if clip_type == 'openai':
+        import clip
+        tokenize_fn = clip.tokenize
+    else:
+        # Use QualiCLIP's tokenizer
+        import sys
+        import os
+        qualiclip_path = os.path.join(os.path.dirname(__file__), 'benchmarks', 'QualiCLIP')
+        sys.path.insert(0, qualiclip_path)
+        from clip import clip as qualiclip
+        tokenize_fn = qualiclip.tokenize
     
     # Quality-related text prompts
     prompts_positive = ["Good photo", "High quality image", "Clear image"]
     prompts_negative = ["Bad photo", "Low quality image", "Blurry image"]
     
     # Use the simplest prompts (as in QualiCLIP paper)
-    text_pos = clip.tokenize(["Good photo"]).to(device)
-    text_neg = clip.tokenize(["Bad photo"]).to(device)
+    text_pos = tokenize_fn(["Good photo"]).to(device)
+    text_neg = tokenize_fn(["Bad photo"]).to(device)
     
     with torch.no_grad():
         text_features_pos = clip_model.encode_text(text_pos).squeeze(0)  # [D]
@@ -374,8 +410,8 @@ def main():
     
     # Load CLIP text encoder
     print("\n[1/6] Loading CLIP text encoder...")
-    clip_model = load_clip_text_encoder(device)
-    text_features_pos, text_features_neg = extract_text_features(clip_model, device)
+    clip_model, clip_type = load_clip_text_encoder(device)
+    text_features_pos, text_features_neg = extract_text_features(clip_model, device, clip_type)
     
     # Create image encoder
     print("\n[2/6] Creating Swin image encoder...")
