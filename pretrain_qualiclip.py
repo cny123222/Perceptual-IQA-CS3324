@@ -16,6 +16,7 @@ from tqdm import tqdm
 import random
 import numpy as np
 from datetime import datetime
+import torchvision.transforms as transforms
 
 # Import our modules
 from qualiclip_pretrain.degradation_generator import SyntheticDegradation, RandomDegradation
