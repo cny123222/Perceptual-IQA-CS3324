@@ -131,9 +131,9 @@ class DataLoader(object):
         if self.istrain:
             dataloader = torch.utils.data.DataLoader(
                 self.data, batch_size=self.batch_size, shuffle=True,
-                num_workers=0, pin_memory=False)  # num_workers=0 for macOS compatibility
+                num_workers=4, pin_memory=True)  # Parallel data loading for faster training
         else:
             dataloader = torch.utils.data.DataLoader(
                 self.data, batch_size=1, shuffle=False,
-                num_workers=0, pin_memory=False)  # num_workers=0 for macOS compatibility
+                num_workers=2, pin_memory=True)  # Parallel data loading for testing
         return dataloader
