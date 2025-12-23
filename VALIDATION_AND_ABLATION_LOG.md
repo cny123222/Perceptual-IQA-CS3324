@@ -11,12 +11,28 @@
 
 ## 📊 Cross-Dataset Testing Results
 
+### Test 1: Old Model (with ColorJitter + Ranking Loss)
+
 | Dataset | Domain | # Images | SRCC | PLCC | Status | Log File | Notes |
 |---------|--------|----------|------|------|--------|----------|-------|
-| **KonIQ-10k Test** | In-domain | 2,010 | **0.9347** | **0.9466** | ✅ Done | `logs/cross_dataset_test_base_20251221_193204.log` | Test set (RandomCrop) |
-| **SPAQ** | Cross-domain | 2,224 | **0.8788** | **0.8751** | ✅ Done | `logs/cross_dataset_test_base_20251221_193204.log` | Smartphone photos |
-| **KADID-10K** | Cross-domain | 2,000 | **0.5208** | **0.5456** | ✅ Done | `logs/cross_dataset_test_base_20251221_193204.log` | Synthetic distortions |
+| **KonIQ-10k Test** | In-domain | 2,010 | 0.9347 | 0.9466 | ✅ Done | `logs/cross_dataset_test_base_20251221_193204.log` | With ColorJitter, Ranking α=0.5 |
+| **SPAQ** | Cross-domain | 2,224 | **0.8788** | 0.8751 | ✅ Done | `logs/cross_dataset_test_base_20251221_193204.log` | Smartphone photos |
+| **KADID-10K** | Cross-domain | 2,000 | 0.5208 | 0.5456 | ✅ Done | `logs/cross_dataset_test_base_20251221_193204.log` | Synthetic distortions |
 | **AGIQA-3K** | Cross-domain | 2,982 | **0.6704** | **0.7190** | ✅ Done | `logs/cross_dataset_test_base_20251221_193204.log` | AI-generated images |
+
+### Test 2: Best Model (NO ColorJitter, NO Ranking Loss, LR 5e-7) ⭐
+
+| Dataset | Domain | # Images | SRCC | PLCC | Status | Log File | Notes |
+|---------|--------|----------|------|------|--------|----------|-------|
+| **KonIQ-10k** | In-domain | 2,010 | **0.9378** | **0.9485** | ✅ Done | Best model checkpoint | LR=5e-7, NO ColorJitter |
+| **SPAQ** | Cross-domain | 2,224 | 0.8698 | 0.8709 | ✅ Done | `logs/cross_dataset_test_base_20251223_153750.log` | Δ -0.90% SRCC |
+| **KADID-10K** | Cross-domain | 2,000 | **0.5412** | **0.5591** | ✅ Done | `logs/cross_dataset_test_base_20251223_153750.log` | Δ **+3.92%** SRCC ✅ |
+| **AGIQA-3K** | Cross-domain | 2,982 | 0.6484 | 0.6830 | ✅ Done | `logs/cross_dataset_test_base_20251223_153750.log` | Δ **-3.28%** SRCC ⚠️ |
+
+**Average Generalization (3 cross-domain datasets)**:
+- Test 1: SRCC 0.6900, PLCC 0.7132
+- Test 2: SRCC 0.6865, PLCC 0.7044
+- **Change**: -0.51% SRCC, -1.23% PLCC
 
 **Started**: Dec 21, 2025 19:32  
 **Completed**: Dec 21, 2025 ~20:35  
