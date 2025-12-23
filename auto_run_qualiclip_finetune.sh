@@ -104,16 +104,16 @@ echo -e "${YELLOW}[Step 3] Starting fine-tuning with QualiCLIP pre-trained encod
 echo ""
 
 # 训练参数（基于用户经验优化）
-DATABASE="koniq10k"
-MODEL_NAME="swin_base_qualiclip_pretrained"
+DATASET="koniq-10k"
+MODEL_SIZE="base"
 BATCH_SIZE=8
 EPOCHS=50
 LR_MAIN=1e-6              # HyperNet学习率（用户说1e-6效果好）
 LR_ENCODER=5e-7           # Encoder学习率（更小，保护预训练特征）
 
 echo "Training Configuration:"
-echo "  Dataset: $DATABASE"
-echo "  Model Name: $MODEL_NAME"
+echo "  Dataset: $DATASET"
+echo "  Model Size: $MODEL_SIZE"
 echo "  Batch Size: $BATCH_SIZE"
 echo "  Total Epochs: $EPOCHS"
 echo "  HyperNet LR: $LR_MAIN"
@@ -134,8 +134,8 @@ echo -e "${GREEN}========================================${NC}"
 echo ""
 
 python train_swin.py \
-    --database "$DATABASE" \
-    --model_name "$MODEL_NAME" \
+    --dataset "$DATASET" \
+    --model_size "$MODEL_SIZE" \
     --batch_size $BATCH_SIZE \
     --epochs $EPOCHS \
     --lr $LR_MAIN \
@@ -150,7 +150,7 @@ if [ ${PIPESTATUS[0]} -eq 0 ]; then
     echo -e "${GREEN}✓ Fine-tuning completed successfully!${NC}"
     echo -e "${GREEN}========================================${NC}"
     echo ""
-    echo "Model saved to: checkpoints/$MODEL_NAME/"
+    echo "Model saved to: checkpoints/"
     echo "Training log: $FINETUNE_LOG"
 else
     echo ""
@@ -175,7 +175,8 @@ if [ "$RUN_TESTS" = "yes" ]; then
     echo ""
     echo -e "${BLUE}Running cross-dataset evaluation...${NC}"
     
-    BEST_MODEL="checkpoints/$MODEL_NAME/best_model.pkl"
+    # Find the most recent checkpoint directory
+    BEST_MODEL=$(find checkpoints/ -name "best_model.pkl" -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" ")
     
     if [ -f "$BEST_MODEL" ]; then
         python test_swin.py \
@@ -185,7 +186,7 @@ if [ "$RUN_TESTS" = "yes" ]; then
         
         echo -e "${GREEN}✓ Cross-dataset evaluation completed!${NC}"
     else
-        echo -e "${RED}✗ Best model not found: $BEST_MODEL${NC}"
+        echo -e "${RED}✗ Best model not found in checkpoints/${NC}"
     fi
 else
     echo "Skipping cross-dataset evaluation."
@@ -202,7 +203,7 @@ echo -e "${GREEN}========================================${NC}"
 echo ""
 echo "Summary:"
 echo "  Pre-trained weights: $PRETRAIN_WEIGHTS"
-echo "  Fine-tuned model: checkpoints/$MODEL_NAME/"
+echo "  Fine-tuned model: checkpoints/"
 echo "  Training log: $FINETUNE_LOG"
 echo ""
 echo "Next steps:"
