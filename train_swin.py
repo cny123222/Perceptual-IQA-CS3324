@@ -127,6 +127,14 @@ def main(config):
     print(f"Test Patch Num:             {config.test_patch_num}")
     print("-" * 80)
     print("Loss Function:")
+    loss_type_names = {
+        'l1': 'L1 (MAE)',
+        'l2': 'L2 (MSE)',
+        'srcc': 'SRCC (Spearman)',
+        'rank': 'Rank (Pairwise Ranking)',
+        'pairwise': 'Pairwise Fidelity'
+    }
+    print(f"  Primary Loss Type:        {loss_type_names.get(config.loss_type, config.loss_type)}")
     print(f"  Ranking Loss Alpha:       {config.ranking_loss_alpha}")
     print(f"  Ranking Loss Margin:      {config.ranking_loss_margin}")
     print("-" * 80)
