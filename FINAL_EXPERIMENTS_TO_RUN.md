@@ -50,9 +50,9 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --test_random_crop --no_spaq --no_color_jitter
 ```
 
-### A3: Remove Multi-scale Features
+### A2: Remove Multi-scale Features
 ```bash
-cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
+cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=1 python train_swin.py \
   --dataset koniq-10k --model_size base --batch_size 32 --epochs 5 --patience 5 \
   --train_patch_num 20 --test_patch_num 20 --train_test_num 1 \
   --no_multiscale --attention_fusion --ranking_loss_alpha 0 --lr 5e-6 --weight_decay 2e-4 \
@@ -70,10 +70,10 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --test_random_crop --no_spaq --no_color_jitter
 ```
 
-### B2: Swin-Large Model
+### B2: Swin-Small Model
 ```bash
 cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
-  --dataset koniq-10k --model_size large --batch_size 32 --epochs 5 --patience 5 \
+  --dataset koniq-10k --model_size small --batch_size 32 --epochs 5 --patience 5 \
   --train_patch_num 20 --test_patch_num 20 --train_test_num 1 \
   --attention_fusion --ranking_loss_alpha 0 --lr 5e-6 --weight_decay 2e-4 \
   --drop_path_rate 0.3 --dropout_rate 0.4 --lr_scheduler cosine \
@@ -92,7 +92,7 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
 
 ### D2: Weight Decay = 5e-4
 ```bash
-cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
+cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=1 python train_swin.py \
   --dataset koniq-10k --model_size base --batch_size 32 --epochs 5 --patience 5 \
   --train_patch_num 20 --test_patch_num 20 --train_test_num 1 \
   --attention_fusion --ranking_loss_alpha 0 --lr 5e-6 --weight_decay 5e-4 \

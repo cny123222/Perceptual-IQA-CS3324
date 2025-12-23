@@ -302,7 +302,7 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dataset koniq-10k \
   --model_size base \
   --batch_size 32 \
-  --epochs 5 \
+  --epochs 10 \
   --patience 5 \
   --train_patch_num 20 \
   --test_patch_num 20 \
@@ -362,7 +362,7 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=1 python train_swin.py \
 **GPU**: 2
 
 ```bash
-cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=2 python train_swin.py \
+cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=0 python train_swin.py \
   --dataset koniq-10k \
   --model_size base \
   --batch_size 32 \
@@ -394,7 +394,7 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=2 python train_swin.py \
 **GPU**: 3
 
 ```bash
-cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=3 python train_swin.py \
+cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=1 python train_swin.py \
   --dataset koniq-10k \
   --model_size base \
   --batch_size 32 \

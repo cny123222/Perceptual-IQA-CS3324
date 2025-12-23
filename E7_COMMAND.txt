@@ -1,0 +1,85 @@
+╔══════════════════════════════════════════════════════════════╗
+║          E7 实验 - LR=1e-7 单独命令                           ║
+╚══════════════════════════════════════════════════════════════╝
+
+在另一台机器上运行这条命令：
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+完整命令 (复制整个):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CUDA_VISIBLE_DEVICES=0 python train_swin.py \
+  --dataset koniq-10k \
+  --model_size base \
+  --batch_size 32 \
+  --epochs 15 \
+  --patience 5 \
+  --train_patch_num 20 \
+  --test_patch_num 20 \
+  --train_test_num 1 \
+  --lr 1e-7 \
+  --weight_decay 2e-4 \
+  --drop_path_rate 0.3 \
+  --dropout_rate 0.4 \
+  --lr_scheduler cosine \
+  --attention_fusion \
+  --ranking_loss_alpha 0 \
+  --test_random_crop \
+  --no_spaq \
+  --no_color_jitter \
+  2>&1 | tee logs/E7_lr1e7_$(date +%Y%m%d_%H%M%S).log
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+或者使用nohup后台运行:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+nohup python train_swin.py \
+  --dataset koniq-10k \
+  --model_size base \
+  --batch_size 32 \
+  --epochs 15 \
+  --patience 5 \
+  --train_patch_num 20 \
+  --test_patch_num 20 \
+  --train_test_num 1 \
+  --lr 1e-7 \
+  --weight_decay 2e-4 \
+  --drop_path_rate 0.3 \
+  --dropout_rate 0.4 \
+  --lr_scheduler cosine \
+  --attention_fusion \
+  --ranking_loss_alpha 0 \
+  --test_random_crop \
+  --no_spaq \
+  --no_color_jitter \
+  > logs/E7_lr1e7.out 2>&1 &
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+实验配置:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+• Learning Rate: 1e-7 (探索更低LR)
+• Epochs: 15 (更多epoch让它充分收敛)
+• Patience: 5 (更大patience)
+• Model: Base (完整模型)
+• Multi-scale: ✅ True
+• Attention: ✅ True
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+预期结果:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SRCC: ~0.938-0.940 (?)
+PLCC: ~0.948-0.950
+时间: ~25-30分钟
+
+对比E6 (5e-7): SRCC 0.9378
+期望提升: 0-0.002
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+监控:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+tail -f logs/E7_lr1e7*.log
+nvidia-smi
+

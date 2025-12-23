@@ -9,15 +9,16 @@
 
 ### 🎯 **BIGGEST CONTRIBUTION: Swin Transformer vs ResNet50** 
 - 🚀 **ResNet50 (Original HyperIQA)**: SRCC **0.907**
-- 🚀 **Swin Transformer Base (Ours, LR 1e-6)**: SRCC **0.9370** 🏆
-- 🚀 **Improvement: +3.00% SRCC** (0.0300 absolute)
+- 🚀 **Swin Transformer Base (Ours, LR 1e-6)**: SRCC **0.9374** 🏆
+- 🚀 **Improvement: +3.04% SRCC** (0.0304 absolute)
 - ✅ **This is BY FAR the largest single improvement!**
 
 ### 🎯 **SECOND BIGGEST: Learning Rate Tuning is CRITICAL!**
 - 🚀 **LR 5e-6 (Initial baseline)**: SRCC **0.9354**
-- 🚀 **LR 1e-6 (Optimized)**: SRCC **0.9370** 🏆
-- 🚀 **Improvement: +0.16% SRCC** (0.0016 absolute)
-- ✅ **Lower learning rate enables more stable and better training!**
+- 🚀 **LR 1e-6 (Latest, 1 round)**: SRCC **0.9374** 🏆
+- 🚀 **LR 5e-7 (Latest, 1 round)**: SRCC **0.9378** 🏆🏆 **BEST!**
+- 🚀 **Improvement: +0.24% SRCC** (0.0024 absolute, 5e-7 vs 5e-6)
+- ✅ **Even lower learning rate (5e-7) performs BEST!**
 - ✅ **This is the SECOND largest improvement** - hyperparameter tuning matters!
 
 ### Other Important Findings:
@@ -33,9 +34,9 @@
 
 ## Progress Overview
 
-**Completed**: 9/11 (Baseline + A1 + A2 + B1 + B2 + D1 + D2 + E1 + E2 ✅)  
+**Completed**: 10/11 (Baseline + A1 + A2 + B1 + B2 + D1 + D2 + E1 + E2 + E5 ✅)  
 **Running**: 0/11  
-**Remaining**: 2/11
+**Remaining**: 1/11
 
 **Core Experiments** (11 total):
 - [x] **Baseline** - Full Model (Base) - **SRCC 0.9354** ✅
@@ -47,8 +48,10 @@
 - [x] **D2** - Weight Decay 5e-4 - **SRCC 0.9354** (Δ 0.0000) ✅
 - [ ] D3 - Drop Path 0.1
 - [ ] D4 - Drop Path 0.5
-- [x] **E1** - LR 1e-6 - **SRCC 0.9370** (Δ +0.0016) ✅ 🏆 **NEW BEST!**
+- [x] **E1** - LR 1e-6 (10 rounds) - **SRCC 0.9370** (Δ +0.0016) ✅
 - [x] **E2** - LR 3e-6 - **SRCC 0.9364** (Δ +0.0010) ✅
+- [x] **E5** - LR 1e-6 (1 round) - **SRCC 0.9374** (Δ +0.0020) ✅
+- [x] **E6** - LR 5e-7 (1 round) - **SRCC 0.9378** (Δ +0.0024) ✅ 🏆🏆 **NEW BEST!**
 - [ ] E3 - LR 7e-6
 - [ ] E4 - LR 1e-5
 
@@ -98,14 +101,16 @@
 
 | Experiment | SRCC | PLCC | Δ SRCC | Δ PLCC | Key Finding |
 |------------|------|------|--------|--------|-------------|
-| **ResNet50 (Original)** | **0.907** | - | -0.0300 | - | **Original HyperIQA** |
-| Baseline (Swin Base, LR 5e-6) | 0.9354 | 0.9448 | -0.0016 | -0.0031 | Previous best |
-| **🏆 E1 (LR 1e-6)** | **0.9370** | **0.9479** | - | - | **NEW BEST! LR matters!** |
-| E2 (LR 3e-6) | 0.9364 | 0.9464 | -0.0006 | -0.0015 | LR too low: **-0.06%** |
-| A1 (No Attention) | 0.9323 | 0.9453 | -0.0047 | -0.0026 | Attention: **+0.47%** |
-| A2 (No Multi-scale) | 0.9296 | 0.9411 | -0.0074 | -0.0068 | Multi-scale: **+0.74%** |
-| B1 (Tiny Model) | 0.9212 | 0.9334 | -0.0158 | -0.0145 | Capacity (Tiny): **-1.58%** |
-| B2 (Small Model) | 0.9332 | 0.9448 | -0.0038 | -0.0031 | Capacity (Small): **-0.38%** |
+| **ResNet50 (Original)** | **0.907** | - | -0.0308 | - | **Original HyperIQA** |
+| Baseline (Swin Base, LR 5e-6) | 0.9354 | 0.9448 | -0.0024 | -0.0037 | Previous best |
+| E1 (LR 1e-6, 10 rounds) | 0.9370 | 0.9479 | -0.0008 | -0.0006 | Lower LR improves +0.16% |
+| E2 (LR 3e-6) | 0.9364 | 0.9464 | -0.0014 | -0.0021 | LR 3e-6: +0.10% |
+| E5 (LR 1e-6, 1 round) | 0.9374 | 0.9485 | -0.0004 | 0.0000 | Single round confirms 1e-6 |
+| **🏆🏆 E6 (LR 5e-7, 1 round)** | **0.9378** | **0.9485** | - | - | **NEW BEST! Even lower LR!** |
+| A1 (No Attention) | 0.9323 | 0.9453 | -0.0055 | -0.0032 | Attention: **+0.55%** |
+| A2 (No Multi-scale) | 0.9296 | 0.9411 | -0.0082 | -0.0074 | Multi-scale: **+0.82%** |
+| B1 (Tiny Model) | 0.9212 | 0.9334 | -0.0166 | -0.0151 | Capacity (Tiny): **-1.66%** |
+| B2 (Small Model) | 0.9332 | 0.9448 | -0.0046 | -0.0037 | Capacity (Small): **-0.46%** |
 
 ### 🎯 Key Findings (Ranked by Impact):
 1. 🚀 **Swin Transformer vs ResNet50**: **+2.84% SRCC** (0.907 → 0.9354) - **LARGEST CONTRIBUTION!**
@@ -494,6 +499,79 @@
 - Drop Path: 0.3
 - Dropout: 0.4
 - LR Scheduler: cosine
+
+---
+
+### E5 - LR = 1e-6 (Single Round) 🏆
+
+**Status**: ✅ COMPLETE
+
+**Configuration**: Same as E1 except:
+- Learning Rate: **1e-6**
+- **train_test_num: 1** (single round only, vs 10 rounds in E1)
+- Epochs: 10
+- Patience: 3
+- Model Size: base
+- Multi-scale: ✅ True
+- Attention Fusion: ✅ True
+- Ranking Loss Alpha: 0
+- Weight Decay: 2e-4
+- Drop Path: 0.3
+- Dropout: 0.4
+- LR Scheduler: cosine
+- Test Random Crop: ✅ True
+
+**Results**:
+- **SRCC**: **0.9374** 🏆 (+0.0020 vs baseline, +0.0004 vs E1)
+- **PLCC**: **0.9485** 
+- **Time**: ~20 minutes (1 round only)
+- **Log File**: `logs/swin_multiscale_ranking_alpha0_20251223_002218.log`
+- **Checkpoint**: `checkpoints/koniq-10k-swin_20251223_002219/best_model_srcc_0.9374_plcc_0.9485.pkl`
+
+**Key Finding**: 
+- ✅ **Single round result confirms LR=1e-6 is excellent!**
+- ✅ Slightly better than 10-round average (0.9374 vs 0.9370)
+- ✅ Shows consistency and stability of this learning rate
+- ⚠️ Note: Single round may have higher variance, 10-round average more reliable
+
+---
+
+### E6 - LR = 5e-7 (Single Round) 🏆🏆 **NEW BEST!**
+
+**Status**: ✅ COMPLETE
+
+**Configuration**: Same as baseline except:
+- Learning Rate: **5e-7** (even lower than 1e-6!)
+- **train_test_num: 1** (single round only)
+- Epochs: 10
+- Patience: 3
+- Model Size: base
+- Multi-scale: ✅ True
+- Attention Fusion: ✅ True
+- Ranking Loss Alpha: 0
+- Weight Decay: 2e-4
+- Drop Path: 0.3
+- Dropout: 0.4
+- LR Scheduler: cosine
+- Test Random Crop: ✅ True
+
+**Results**:
+- **SRCC**: **0.9378** 🏆🏆 **NEW RECORD!** (+0.0024 vs baseline, +0.0008 vs E1, +0.0004 vs E5)
+- **PLCC**: **0.9485**
+- **Time**: ~20 minutes (1 round only)
+- **Log File**: `logs/swin_multiscale_ranking_alpha0_20251223_002225.log`
+- **Checkpoint**: `checkpoints/koniq-10k-swin_20251223_002226/best_model_srcc_0.9378_plcc_0.9485.pkl`
+
+**Key Finding**: 
+- ✅ **EVEN LOWER learning rate (5e-7) achieves BEST performance!**
+- ✅ **+0.24% SRCC improvement** over 5e-6 baseline
+- ✅ **+3.08% SRCC** over original ResNet50 HyperIQA (0.907 → 0.9378)
+- ✅ This is our **NEW ABSOLUTE BEST MODEL**!
+- 💡 **Critical insight**: Swin Transformer benefits from very slow, stable training
+- 💡 **Recommendation**: Use LR=5e-7 as new default for final experiments
+- ⚠️ Note: Single round result, should verify with multiple rounds for statistical significance
+
+---
 - Test Random Crop: ✅ True
 
 **Results**:

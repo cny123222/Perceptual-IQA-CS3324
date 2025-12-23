@@ -163,15 +163,15 @@ def main(config):
         # Original logic for other datasets
         sel_num = img_num[config.dataset]
         
-        for i in range(config.train_test_num):
-            print('Round %d' % (i+1))
-            # Randomly select 80% images for training and the rest for testing
-            random.shuffle(sel_num)
-            train_index = sel_num[0:int(round(0.8 * len(sel_num)))]
-            test_index = sel_num[int(round(0.8 * len(sel_num))):len(sel_num)]
+    for i in range(config.train_test_num):
+        print('Round %d' % (i+1))
+        # Randomly select 80% images for training and the rest for testing
+        random.shuffle(sel_num)
+        train_index = sel_num[0:int(round(0.8 * len(sel_num)))]
+        test_index = sel_num[int(round(0.8 * len(sel_num))):len(sel_num)]
 
-            solver = HyperIQASolver(config, folder_path[config.dataset], train_index, test_index)
-            srcc_all[i], plcc_all[i] = solver.train()
+        solver = HyperIQASolver(config, folder_path[config.dataset], train_index, test_index)
+        srcc_all[i], plcc_all[i] = solver.train()
 
     # print(srcc_all)
     # print(plcc_all)
