@@ -20,9 +20,9 @@ echo ""
 # 可自定义参数
 DATASET="${1:-koniq-10k}"                    # 数据集
 EPOCHS="${2:-50}"                            # Epochs
-LR_MAIN="${3:-1e-6}"                         # HyperNet学习率
+LR_MAIN="${3:-5e-7}"                         # 主学习率（根据实验优化）
 LR_ENCODER="${4:-5e-7}"                      # Encoder学习率
-BATCH_SIZE="${5:-8}"                         # Batch size
+BATCH_SIZE="${5:-32}"                        # Batch size（根据实验优化）
 
 echo "Configuration:"
 echo "  Dataset: $DATASET"
@@ -42,7 +42,7 @@ python train_swin.py \
     --pretrained_encoder "$PRETRAIN_WEIGHTS" \
     --lr_encoder_pretrained $LR_ENCODER \
     --model_size base \
-    --train_patch_num 5 \
+    --train_patch_num 20 \
     --no_color_jitter \
     --no_spaq \
     2>&1 | tee logs/qualiclip_finetune_$(date +%Y%m%d_%H%M%S).log
