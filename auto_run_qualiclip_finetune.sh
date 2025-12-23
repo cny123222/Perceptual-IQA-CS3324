@@ -141,6 +141,7 @@ python train_swin.py \
     --lr $LR_MAIN \
     --pretrained_encoder "$PRETRAIN_WEIGHTS" \
     --lr_encoder_pretrained $LR_ENCODER \
+    --no_color_jitter \
     2>&1 | tee "$FINETUNE_LOG"
 
 # 检查训练是否成功
