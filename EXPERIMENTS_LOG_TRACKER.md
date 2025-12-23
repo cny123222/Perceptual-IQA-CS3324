@@ -91,8 +91,8 @@
 - [x] **F1** - L1 Loss (MAE) - **SRCC 0.9375**, PLCC 0.9488 ✅
 - [x] **F2** - L2 Loss (MSE) - **SRCC 0.9373**, PLCC 0.9469 ✅
 - [x] **F3** - SRCC Loss (Spearman) - **SRCC 0.9313**, PLCC 0.9416 ✅
-- [ ] **F4** - Rank Loss (Pairwise Ranking)
-- [ ] **F5** - Pairwise Fidelity Loss
+- [ ] **F4** - Rank Loss (Pairwise Ranking) - Running...
+- [x] **F5** - Pairwise Fidelity Loss - **SRCC 0.9315**, PLCC 0.9373 ✅
 
 ---
 
@@ -895,7 +895,7 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=1 python train_swin.py --
 
 ### F5 - Pairwise Fidelity Loss
 
-**Status**: ⏳ PENDING
+**Status**: ✅ COMPLETE (2025-12-23)
 
 **Configuration**: Same as baseline except:
 - Primary Loss Type: **Pairwise Fidelity** - Fidelity-aware pairwise loss
@@ -903,12 +903,17 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=1 python train_swin.py --
 - Epochs: 10
 
 **Results**:
-- **SRCC**: TBD
-- **PLCC**: TBD
-- **Time**: -
-- **Log File**: TBD
+- **SRCC**: **0.9315** (F1 Baseline: 0.9375, **Δ -0.0060**)
+- **PLCC**: **0.9373** (F1 Baseline: 0.9488, Δ -0.0115)
+- **Time**: ~2 hours (10 epochs)
+- **Log File**: `/root/Perceptual-IQA-CS3324/logs/swin_multiscale_ranking_alpha0_20251223_182151.log`
+- **Checkpoint**: `checkpoints/koniq-10k-swin_20251223_182151/best_model_srcc_0.9315_plcc_0.9373.pkl`
 
-**Purpose**: Test fidelity-aware loss function.
+**Finding**: 
+- ⚠️ **Pairwise Fidelity loss performs worse than L1/L2** by -0.60%
+- ⚠️ Similar performance to SRCC loss (both around 0.931)
+- 💡 **Key insight**: Complex pairwise losses do not improve over simple regression
+- 🤔 Pairwise formulations may have optimization difficulties or require different hyperparameters
 
 ---
 
@@ -919,13 +924,15 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=1 python train_swin.py --
 | **L1 (MAE)** 🏆 | **0.9375** | **0.9488** | - | - | ✅ Baseline |
 | **L2 (MSE)** | **0.9373** | **0.9469** | -0.0002 | -0.0019 | ✅ Nearly identical |
 | **SRCC (Spearman)** | **0.9313** | **0.9416** | -0.0062 | -0.0072 | ✅ Worse |
-| Rank (Pairwise) | TBD | TBD | TBD | TBD | ⏳ |
-| Pairwise Fidelity | TBD | TBD | TBD | TBD | ⏳ |
+| **Pairwise Fidelity** | **0.9315** | **0.9373** | -0.0060 | -0.0115 | ✅ Worse |
+| Rank (Pairwise) | TBD | TBD | TBD | TBD | ⏳ Running |
 
 **Key Findings**:
 1. 🥇 **L1 (MAE) and L2 (MSE) are nearly equivalent** - both achieve ~0.937 SRCC
-2. 🥈 **Simple regression losses outperform rank-based losses**
+2. 🥈 **Simple regression losses significantly outperform complex losses**
 3. ⚠️ **Direct SRCC optimization underperforms** by -0.62%
-4. 💡 **Recommendation**: Use L1 (MAE) as default - simple, effective, and well-tested
+4. ⚠️ **Pairwise Fidelity loss also underperforms** by -0.60%
+5. 💡 **Key insight**: Complex pairwise and rank-based losses do not improve performance
+6. 💡 **Recommendation**: Use L1 (MAE) as default - simple, effective, and well-tested
 
 ---
