@@ -88,10 +88,10 @@
 - [ ] C4 - Alpha=0.7
 
 **Loss Function Comparison Experiments** (LR 5e-7, 10 epochs):
-- [x] **F1** - L1 Loss (MAE) - **SRCC 0.9375**, PLCC 0.9488 ✅
+- [x] **F1** - L1 Loss (MAE) - **SRCC 0.9375**, PLCC 0.9488 ✅ 🏆 **BEST**
 - [x] **F2** - L2 Loss (MSE) - **SRCC 0.9373**, PLCC 0.9469 ✅
 - [x] **F3** - SRCC Loss (Spearman) - **SRCC 0.9313**, PLCC 0.9416 ✅
-- [ ] **F4** - Rank Loss (Pairwise Ranking) - Running...
+- [x] **F4** - Rank Loss (Pairwise Ranking) - **SRCC 0.9292**, PLCC 0.9249 ✅ ⚠️ **WORST**
 - [x] **F5** - Pairwise Fidelity Loss - **SRCC 0.9315**, PLCC 0.9373 ✅
 
 ---
@@ -876,7 +876,7 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=1 python train_swin.py --
 
 ### F4 - Rank Loss (Pairwise Ranking)
 
-**Status**: ⏳ PENDING
+**Status**: ✅ COMPLETE (2025-12-23)
 
 **Configuration**: Same as baseline except:
 - Primary Loss Type: **Rank (Pairwise Ranking)** - Margin ranking loss
@@ -884,12 +884,20 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=1 python train_swin.py --
 - Epochs: 10
 
 **Results**:
-- **SRCC**: TBD
-- **PLCC**: TBD
-- **Time**: -
-- **Log File**: TBD
+- **SRCC**: **0.9292** (F1 Baseline: 0.9375, **Δ -0.0083**)
+- **PLCC**: **0.9249** (F1 Baseline: 0.9488, Δ -0.0239)
+- **Time**: ~2 hours (10 epochs)
+- **Log File**: `/root/Perceptual-IQA-CS3324/logs/swin_multiscale_ranking_alpha0_20251223_182639.log`
+- **Checkpoint**: `checkpoints/koniq-10k-swin_20251223_182639/best_model_srcc_0.9292_plcc_0.9249.pkl`
 
-**Purpose**: Test pairwise ranking loss for quality assessment.
+**Finding**: 
+- ❌ **Rank loss performs WORST among all loss functions** by -0.83% SRCC!
+- ❌ Largest performance drop: -0.83% SRCC, -2.39% PLCC
+- 💡 **Critical insight**: Pairwise ranking formulation is not suitable for this task
+- 🤔 Possible reasons:
+  - Margin ranking loss may be too strict/unstable for quality assessment
+  - Regression formulation is fundamentally better for continuous quality scores
+  - Ranking loss may require different training strategy or hyperparameters
 
 ---
 
@@ -919,20 +927,29 @@ cd /root/Perceptual-IQA-CS3324 && CUDA_VISIBLE_DEVICES=1 python train_swin.py --
 
 ## 📊 Loss Function Comparison Summary
 
-| Loss Type | SRCC | PLCC | Δ SRCC | Δ PLCC | Status |
-|-----------|------|------|--------|--------|--------|
-| **L1 (MAE)** 🏆 | **0.9375** | **0.9488** | - | - | ✅ Baseline |
-| **L2 (MSE)** | **0.9373** | **0.9469** | -0.0002 | -0.0019 | ✅ Nearly identical |
-| **SRCC (Spearman)** | **0.9313** | **0.9416** | -0.0062 | -0.0072 | ✅ Worse |
-| **Pairwise Fidelity** | **0.9315** | **0.9373** | -0.0060 | -0.0115 | ✅ Worse |
-| Rank (Pairwise) | TBD | TBD | TBD | TBD | ⏳ Running |
+| Loss Type | SRCC | PLCC | Δ SRCC | Δ PLCC | Ranking |
+|-----------|------|------|--------|--------|---------|
+| **L1 (MAE)** 🏆 | **0.9375** | **0.9488** | - | - | 🥇 **1st** |
+| **L2 (MSE)** | **0.9373** | **0.9469** | -0.0002 | -0.0019 | 🥈 **2nd** |
+| **Pairwise Fidelity** | **0.9315** | **0.9373** | -0.0060 | -0.0115 | 🥉 **3rd** |
+| **SRCC (Spearman)** | **0.9313** | **0.9416** | -0.0062 | -0.0072 | 4️⃣ **4th** |
+| **Rank (Pairwise)** ❌ | **0.9292** | **0.9249** | -0.0083 | -0.0239 | 5️⃣ **WORST** |
 
 **Key Findings**:
-1. 🥇 **L1 (MAE) and L2 (MSE) are nearly equivalent** - both achieve ~0.937 SRCC
-2. 🥈 **Simple regression losses significantly outperform complex losses**
-3. ⚠️ **Direct SRCC optimization underperforms** by -0.62%
-4. ⚠️ **Pairwise Fidelity loss also underperforms** by -0.60%
-5. 💡 **Key insight**: Complex pairwise and rank-based losses do not improve performance
-6. 💡 **Recommendation**: Use L1 (MAE) as default - simple, effective, and well-tested
+1. 🥇 **L1 (MAE) is the clear winner** - achieves highest SRCC (0.9375) and PLCC (0.9488)
+2. 🥈 **L2 (MSE) is nearly equivalent to L1** - only 0.02% difference
+3. ⚠️ **All complex losses underperform significantly**:
+   - Pairwise Fidelity: -0.60% SRCC
+   - SRCC (Spearman): -0.62% SRCC
+   - **Rank (Pairwise): -0.83% SRCC** (worst!)
+4. 💡 **Critical insight**: Simple regression losses >> Complex ranking/pairwise losses
+5. 💡 **Recommendation**: **Use L1 (MAE) as default** - simple, effective, stable, and proven best
+6. 🎯 **Performance gap**: Up to **0.83% SRCC difference** between best (L1) and worst (Rank)
+
+**Surprising Finding**:
+❌ Despite being theoretically motivated for ranking tasks, **pairwise ranking loss performs WORST** - even worse than direct SRCC optimization! This suggests that:
+- Regression formulation is fundamentally better for continuous quality scores
+- Ranking losses may have optimization difficulties or require different hyperparameters
+- Simple is better: L1/L2 regression >> complex ranking formulations
 
 ---
