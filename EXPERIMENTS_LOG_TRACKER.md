@@ -24,11 +24,28 @@
 2. 🥈 **注意力机制**: +0.25% SRCC (8% of total improvement)
 3. 🥉 **多尺度融合**: +0.15% SRCC (5% of total improvement)
 
-### 🎯 **LEARNING RATE OPTIMIZATION**
-- 🚀 **LR 5e-6 (Initial baseline)**: SRCC **0.9354**
-- 🚀 **LR 1e-6**: SRCC **0.9374** (+0.20%)
-- 🚀 **LR 5e-7**: SRCC **0.9378** 🏆🏆 **BEST!** (+0.24%)
-- ✅ **Lower learning rate = Better performance for Swin Transformer**
+### 🎯 **LEARNING RATE OPTIMIZATION** (完整敏感度分析)
+
+| Learning Rate | SRCC | PLCC | Δ SRCC | Epochs | 状态 |
+|---------------|------|------|--------|--------|------|
+| 5e-6 (baseline) | 0.9354 | 0.9448 | - | 5 | ✅ |
+| 3e-6 (E2) | 0.9364 | 0.9464 | +0.10% | 5 | ✅ |
+| 1e-6 (E1, 10轮) | 0.9370 | 0.9479 | +0.16% | 50 | ✅ |
+| 1e-6 (E5, 1轮) | 0.9374 | 0.9485 | +0.20% | 10 | ✅ |
+| **5e-7 (E6)** 🏆 | **0.9378** | **0.9485** | **+0.24%** | 10 | ✅ **BEST!** |
+| 1e-7 (E7) | 0.9375 | 0.9488 | +0.21% | 14 | ✅ |
+| 7e-6 (E3) | - | - | - | - | ❌ 未完成 |
+| 1e-5 (E4) | - | - | - | - | ❌ 未完成 |
+
+**关键发现**:
+- ✅ **5e-7是最优学习率** (SRCC 0.9378) - 比ResNet50的1e-4低200倍!
+- ✅ **学习率曲线呈现倒U型**: 
+  - 5e-6 → 1e-6: 持续提升
+  - 1e-6 → 5e-7: 达到峰值 🏆
+  - 5e-7 → 1e-7: 开始下降 (0.9375 < 0.9378)
+- ✅ **1e-7学习率过低**: SRCC回落到0.9375，说明训练不够充分或收敛过慢
+- ✅ **Swin Transformer对学习率极其敏感**，需要精确调优
+- ✅ **训练稳定性很好** (E1多轮 vs E5单轮差异很小)
 
 ### Other Important Findings:
 - ✅ **Ranking Loss is HARMFUL!** Removing it improves SRCC: 0.9354 vs 0.9332 (+0.0022)
