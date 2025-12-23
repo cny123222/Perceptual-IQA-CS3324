@@ -13,64 +13,37 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{Conference Paper Title*\\
-{\footnotesize \textsuperscript{*}Note: Sub-titles are not captured for https://ieeexplore.ieee.org  and
-should not be used}
-\thanks{Identify applicable funding agency here. If none, delete this.}
-}
+\title{SMART-IQA: Swin Multi-scale Attention-guided Regression Transformer for Blind Image Quality Assessment}
 
-\author{\IEEEauthorblockN{1\textsuperscript{st} Given Name Surname}
-\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-\textit{name of organization (of Aff.)}\\
-City, Country \\
-email address or ORCID}
-\and
-\IEEEauthorblockN{2\textsuperscript{nd} Given Name Surname}
-\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-\textit{name of organization (of Aff.)}\\
-City, Country \\
-email address or ORCID}
-\and
-\IEEEauthorblockN{3\textsuperscript{rd} Given Name Surname}
-\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-\textit{name of organization (of Aff.)}\\
-City, Country \\
-email address or ORCID}
-\and
-\IEEEauthorblockN{4\textsuperscript{th} Given Name Surname}
-\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-\textit{name of organization (of Aff.)}\\
-City, Country \\
-email address or ORCID}
-\and
-\IEEEauthorblockN{5\textsuperscript{th} Given Name Surname}
-\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-\textit{name of organization (of Aff.)}\\
-City, Country \\
-email address or ORCID}
-\and
-\IEEEauthorblockN{6\textsuperscript{th} Given Name Surname}
-\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-\textit{name of organization (of Aff.)}\\
-City, Country \\
-email address or ORCID}
+\author{\IEEEauthorblockN{Nuoyan Chen}
+\IEEEauthorblockA{\textit{School of Computer Science} \\
+\textit{Shanghai Jiao Tong University}\\
+Shanghai, China \\
+nuoyanchen@sjtu.edu.cn}
+% \and
+% \IEEEauthorblockN{2\textsuperscript{nd} Author Name}
+% \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+% \textit{name of organization (of Aff.)}\\
+% City, Country \\
+% email address}
 }
 
 \maketitle
 
 \begin{abstract}
-This document is a model and instructions for \LaTeX.
-This and the IEEEtran.cls file define the components of your paper [title, text, heads, etc.]. *CRITICAL: Do Not Use Symbols, Special Characters, Footnotes, 
-or Math in Paper Title or Abstract.
+Blind image quality assessment (BIQA) for authentically distorted images remains challenging due to diverse content variations and complex distortion patterns. While the original HyperIQA employs a self-adaptive hyper network with ResNet-50 backbone, it struggles to capture fine-grained multi-scale features and global contextual information. We propose SMART-IQA, a Swin Transformer-based framework that integrates multi-scale spatial features with attention-guided fusion for enhanced quality prediction. By replacing the CNN backbone with Swin Transformer and preserving spatial information through adaptive pooling, our method achieves superior feature representation. A novel channel attention mechanism dynamically weights multi-scale features according to image content and distortion characteristics. Extensive experiments on KonIQ-10k demonstrate that SMART-IQA achieves state-of-the-art performance with 0.9378 SRCC, outperforming existing methods including the original HyperIQA by 3.08 percent. Cross-dataset evaluations further validate the strong generalization capability of our approach.
 \end{abstract}
 
 \begin{IEEEkeywords}
-component, formatting, style, styling, insert.
+Image Quality Assessment, Swin Transformer, Multi-scale Feature Fusion, Attention Mechanism, Hyper Network, Deep Learning
 \end{IEEEkeywords}
 
 \section{Introduction}
-This document is a model and instructions for \LaTeX.
-Please observe the conference page limits. For more information about how to become an IEEE Conference author or how to write your paper, please visit   IEEE Conference Author Center website: https://conferences.ieeeauthorcenter.ieee.org/.
+Image quality assessment (IQA) aims to automatically predict image quality in a manner consistent with human perception. Blind IQA (BIQA), which operates without access to reference images, remains particularly challenging for authentically distorted images captured in the wild. Unlike synthetically distorted images with controlled, uniform distortions, real-world images exhibit diverse content variations and complex, non-uniform distortion patterns that pose significant challenges to existing methods.
+
+Recent advances in deep learning have shown promising results for BIQA. HyperIQA \cite{hyperiqa} introduced a self-adaptive hyper network architecture that dynamically generates quality prediction weights based on image content, achieving strong performance on authentic distortion datasets. However, its ResNet-50 backbone has limitations in capturing global context and fine-grained multi-scale features, which are crucial for assessing diverse real-world distortions.
+
+In this work, we propose SMART-IQA (Swin Multi-scale Attention-guided Regression Transformer for Image Quality Assessment), which integrates Swin Transformer's hierarchical vision architecture with multi-scale attention-guided feature fusion. Our key contributions are: (1) replacing the CNN backbone with Swin Transformer to capture richer semantic and spatial features through window-based self-attention, (2) preserving spatial information by adaptively pooling multi-scale features to 7x7 resolution instead of aggressive compression, (3) introducing a channel attention mechanism that dynamically weights different scales according to image content and distortion characteristics, and (4) incorporating dropout regularization to enhance generalization. Extensive experiments demonstrate that SMART-IQA achieves state-of-the-art performance on KonIQ-10k with 0.9378 SRCC, surpassing the original HyperIQA by 3.08\% and other competing methods.
 
 \subsection{Maintaining the Integrity of the Specifications}
 
