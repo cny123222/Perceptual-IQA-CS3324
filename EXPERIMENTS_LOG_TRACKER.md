@@ -7,19 +7,28 @@
 
 ## 🔥 Round 2 Changes - IMPORTANT DISCOVERIES! 
 
-### 🎯 **BIGGEST CONTRIBUTION: Swin Transformer vs ResNet50** 
-- 🚀 **ResNet50 (Original HyperIQA)**: SRCC **0.907**
-- 🚀 **Swin Transformer Base (Ours, LR 1e-6)**: SRCC **0.9374** 🏆
-- 🚀 **Improvement: +3.04% SRCC** (0.0304 absolute)
-- ✅ **This is BY FAR the largest single improvement!**
+### 🎯 **COMPLETE ABLATION STUDY (LR 5e-7)** 
 
-### 🎯 **SECOND BIGGEST: Learning Rate Tuning is CRITICAL!**
+#### 正向消融（从简单到复杂）:
+| 实验 | 配置 | SRCC | 贡献 | 百分比 |
+|------|------|------|------|--------|
+| C0 | ResNet50 (Original HyperIQA) | 0.907 | - | - |
+| A2/C1 | Swin-Base (单尺度) | **0.9338** | +0.0268 | 87% |
+| A1/C2 | Swin-Base + 多尺度 | **0.9353** | +0.0015 | 5% |
+| E6/C3 | Swin-Base + 多尺度 + 注意力 | **0.9378** 🏆 | +0.0025 | 8% |
+
+**总提升**: +3.08% SRCC (0.0308 absolute)
+
+#### 关键发现:
+1. 🥇 **Swin Transformer**: +2.68% SRCC (87% of total improvement) - **主要贡献者**
+2. 🥈 **注意力机制**: +0.25% SRCC (8% of total improvement)
+3. 🥉 **多尺度融合**: +0.15% SRCC (5% of total improvement)
+
+### 🎯 **LEARNING RATE OPTIMIZATION**
 - 🚀 **LR 5e-6 (Initial baseline)**: SRCC **0.9354**
-- 🚀 **LR 1e-6 (Latest, 1 round)**: SRCC **0.9374** 🏆
-- 🚀 **LR 5e-7 (Latest, 1 round)**: SRCC **0.9378** 🏆🏆 **BEST!**
-- 🚀 **Improvement: +0.24% SRCC** (0.0024 absolute, 5e-7 vs 5e-6)
-- ✅ **Even lower learning rate (5e-7) performs BEST!**
-- ✅ **This is the SECOND largest improvement** - hyperparameter tuning matters!
+- 🚀 **LR 1e-6**: SRCC **0.9374** (+0.20%)
+- 🚀 **LR 5e-7**: SRCC **0.9378** 🏆🏆 **BEST!** (+0.24%)
+- ✅ **Lower learning rate = Better performance for Swin Transformer**
 
 ### Other Important Findings:
 - ✅ **Ranking Loss is HARMFUL!** Removing it improves SRCC: 0.9354 vs 0.9332 (+0.0022)
@@ -34,14 +43,14 @@
 
 ## Progress Overview
 
-**Completed**: 10/11 (Baseline + A1 + A2 + B1 + B2 + D1 + D2 + E1 + E2 + E5 ✅)  
+**Completed**: 12/11 (Baseline + A1 + A2 + B1 + B2 + D1 + D2 + E1 + E2 + E5 + E6 + E7 ✅)  
 **Running**: 0/11  
-**Remaining**: 1/11
+**Remaining**: 0/11 🎉
 
 **Core Experiments** (11 total):
-- [x] **Baseline** - Full Model (Base) - **SRCC 0.9354** ✅
-- [x] **A1** - Remove Attention - **SRCC 0.9323** (Δ -0.0031) ✅
-- [x] **A2** - Remove Multi-scale - **SRCC 0.9296** (Δ -0.0058) ✅
+- [x] **Baseline (E6)** - Full Model (Base, LR 5e-7) - **SRCC 0.9378** 🏆🏆 ✅
+- [x] **A1 (NEW)** - Remove Attention (LR 5e-7) - **SRCC 0.9353** (Δ -0.0025) ✅
+- [x] **A2 (NEW)** - Remove Multi-scale (LR 5e-7) - **SRCC 0.9338** (Δ -0.0040) ✅
 - [x] **B1** - Model Tiny - **SRCC 0.9212** (Δ -0.0142) ✅
 - [x] **B2** - Model Small - **SRCC 0.9332** (Δ -0.0022) ✅
 - [x] **D1** - Weight Decay 1e-4 - **SRCC 0.9354** (Δ 0.0000) ✅
@@ -190,21 +199,24 @@
 
 ## 🔬 Part A: Core Ablations
 
-### A1 - Remove Attention Fusion
+### A1 - Remove Attention Fusion (LR 5e-7 Re-run)
 
-**Status**: ✅ COMPLETE
+**Status**: ✅ COMPLETE (2025-12-23)
 
-**Configuration**: Same as baseline except:
+**Configuration**: Same as E6 baseline (LR 5e-7) except:
 - Attention Fusion: ❌ **False** (removed, multi-scale without attention)
+- Multi-scale: ✅ **True** (simple concatenation)
 
 **Results**:
-- **SRCC**: **0.9323** (Baseline: 0.9354, **Δ -0.0031**)
-- **PLCC**: **0.9453** (Baseline: 0.9448, Δ +0.0005)
-- **Time**: ~30 minutes (early stopped)
-- **Log File**: `/root/Perceptual-IQA-CS3324/logs/swin_multiscale_ranking_alpha0_20251222_184235.log`
-- **Checkpoint**: `checkpoints/koniq-10k-swin_20251222_184236/best_model_srcc_0.9323_plcc_0.9453.pkl`
+- **SRCC**: **0.9353** (E6 Baseline: 0.9378, **Δ -0.0025**)
+- **PLCC**: **0.9469** (E6 Baseline: 0.9485, Δ -0.0016)
+- **Time**: ~1 hour
+- **Log File**: `/root/Perceptual-IQA-CS3324/logs/A1_no_attention_lr5e7_20251223_092034.log`
+- **Checkpoint**: TBD
 
-**Purpose**: Quantify the contribution of attention-based multi-scale feature fusion.
+**Purpose**: Quantify the contribution of attention-based fusion (with optimal LR 5e-7).
+
+**Finding**: ⚠️ Attention contributes **+0.25%** SRCC. Multi-scale with simple concatenation vs dynamic attention weighting.
 
 **Findings**: 
 - ✅ Attention fusion contributes **+0.31% SRCC** (0.0031 absolute)
@@ -229,22 +241,24 @@
 
 ---
 
-### A2 - Remove Multi-scale Features
+### A2 - Remove Multi-scale Features (LR 5e-7 Re-run)
 
-**Status**: ✅ COMPLETE
+**Status**: ✅ COMPLETE (2025-12-23)
 
-**Configuration**: Same as baseline except:
+**Configuration**: Same as E6 baseline (LR 5e-7) except:
 - Multi-scale: ❌ **False** (single-scale, last layer only)
-- Attention Fusion: N/A (only one scale)
+- Attention Fusion: ❌ N/A (only one scale, --attention_fusion has no effect)
 
 **Results**:
-- **SRCC**: **0.9296** (Baseline: 0.9354, **Δ -0.0058**)
-- **PLCC**: **0.9411** (Baseline: 0.9448, Δ -0.0037)
-- **Time**: ~20 minutes (early stopped)
-- **Log File**: `/root/Perceptual-IQA-CS3324/logs/swin_ranking_alpha0_20251222_184358.log`
-- **Checkpoint**: `checkpoints/koniq-10k-swin_20251222_184358/best_model_srcc_0.9296_plcc_0.9411.pkl`
+- **SRCC**: **0.9338** (E6 Baseline: 0.9378, **Δ -0.0040**)
+- **PLCC**: **0.9445** (E6 Baseline: 0.9485, Δ -0.0040)
+- **Time**: ~1 hour
+- **Log File**: `/root/Perceptual-IQA-CS3324/logs/A2_no_multiscale_lr5e7_20251223_092034.log`
+- **Checkpoint**: TBD
 
-**Purpose**: Quantify the contribution of multi-scale feature extraction.
+**Purpose**: Quantify the contribution of multi-scale feature extraction (with optimal LR 5e-7).
+
+**Finding**: ⚠️ Multi-scale + Attention together contribute **+0.40%** SRCC compared to single-scale.
 
 **Findings**: 
 - ✅ Multi-scale features contribute **+0.62% SRCC** (0.0058 absolute)
