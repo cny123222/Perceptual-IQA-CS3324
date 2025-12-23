@@ -42,6 +42,7 @@ python train_swin.py \
     --pretrained_encoder "$PRETRAIN_WEIGHTS" \
     --lr_encoder_pretrained $LR_ENCODER \
     --model_size base \
+    --train_patch_num 5 \
     --no_color_jitter \
     --no_spaq \
     2>&1 | tee logs/qualiclip_finetune_$(date +%Y%m%d_%H%M%S).log
