@@ -47,40 +47,31 @@ class ResNetImprovedSolver:
         else:
             print("💾 Image preloading DISABLED - loading on-the-fly")
         
-        self.train_loader = DataLoader(
-            data_loader.DataLoader(
-                config.dataset, 
-                config.data_path, 
-                train_idx, 
-                config.patch_size, 
-                config.train_patch_num,
-                batch_size=config.batch_size,
-                istrain=True,
-                use_color_jitter=config.use_color_jitter,
-                preload=config.preload_images
-            ),
-            batch_size=1,  # Our custom DataLoader handles batching
-            shuffle=True,
-            num_workers=4 if not config.preload_images else 0,  # Use workers only if not preloaded
-            pin_memory=True
+        # Our data_loader.DataLoader returns a PyTorch DataLoader via .get_data()
+        train_data_wrapper = data_loader.DataLoader(
+            config.dataset, 
+            config.data_path, 
+            train_idx, 
+            config.patch_size, 
+            config.train_patch_num,
+            batch_size=config.batch_size,
+            istrain=True,
+            use_color_jitter=config.use_color_jitter,
+            preload=config.preload_images
         )
+        self.train_loader = train_data_wrapper.get_data()
         
-        self.test_loader = DataLoader(
-            data_loader.DataLoader(
-                config.dataset,
-                config.data_path,
-                test_idx,
-                config.patch_size,
-                config.test_patch_num,
-                istrain=False,
-                test_random_crop=config.test_random_crop,
-                preload=config.preload_images
-            ),
-            batch_size=1,
-            shuffle=False,
-            num_workers=4 if not config.preload_images else 0,
-            pin_memory=True
+        test_data_wrapper = data_loader.DataLoader(
+            config.dataset,
+            config.data_path,
+            test_idx,
+            config.patch_size,
+            config.test_patch_num,
+            istrain=False,
+            test_random_crop=config.test_random_crop,
+            preload=config.preload_images
         )
+        self.test_loader = test_data_wrapper.get_data()
         
         if config.preload_images:
             print("✓ All images loaded into memory!\n")

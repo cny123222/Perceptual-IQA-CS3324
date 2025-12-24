@@ -8,8 +8,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 
+# 使用Times字体（serif系列）
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['font.serif'] = ['Times New Roman', 'Times', 'DejaVu Serif', 'Liberation Serif']
 plt.rcParams['font.size'] = 11
 plt.rcParams['axes.unicode_minus'] = False
+plt.rcParams['mathtext.fontset'] = 'stix'  # STIX fonts similar to Times
 
 output_dir = 'paper_figures'
 os.makedirs(output_dir, exist_ok=True)
@@ -41,11 +45,11 @@ fig, axes = plt.subplots(1, 3, figsize=(18, 5))
 # 子图1: Loss
 ax1 = axes[0]
 ax1.plot(epochs, train_losses, 'o-', linewidth=2.5, markersize=8, 
-        color='#4ECDC4', label='Train Loss', markeredgecolor='black', markeredgewidth=1.5)
+        color='#4ECDC4', markeredgecolor='black', markeredgewidth=1.5)
 ax1.set_xlabel('Epoch', fontsize=13, weight='bold')
 ax1.set_ylabel('Loss (L1)', fontsize=13, weight='bold')
 ax1.set_title('Training Loss', fontsize=14, weight='bold')
-ax1.legend(fontsize=11, frameon=True, shadow=True)
+# No legend - as per user request
 ax1.grid(True, alpha=0.3, linestyle='--')
 ax1.set_xticks(epochs)
 
@@ -139,13 +143,13 @@ ax.scatter([epochs[best_plcc_idx]], [test_plccs[best_plcc_idx]], s=600, c='gold'
 # 子图4: Train vs Test SRCC
 ax = axes[1, 1]
 ax.plot(epochs, train_srccs, 's-', linewidth=2.5, markersize=8, 
-       color='#4ECDC4', label='Train SRCC', markeredgecolor='black', markeredgewidth=1.5)
+       color='#4ECDC4', markeredgecolor='black', markeredgewidth=1.5)
 ax.plot(epochs, test_srccs, 'D-', linewidth=2.5, markersize=8, 
-       color='#FF6B6B', label='Test SRCC', markeredgecolor='black', markeredgewidth=1.5)
+       color='#FF6B6B', markeredgecolor='black', markeredgewidth=1.5)
 ax.set_xlabel('Epoch', fontsize=12, weight='bold')
 ax.set_ylabel('SRCC', fontsize=12, weight='bold')
 ax.set_title('Train vs Test SRCC', fontsize=13, weight='bold')
-ax.legend(fontsize=11, frameon=True, shadow=True)
+# No legend - as per user request
 ax.grid(True, alpha=0.3, linestyle='--')
 ax.set_xticks(epochs)
 
