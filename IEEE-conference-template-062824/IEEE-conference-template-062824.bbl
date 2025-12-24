@@ -94,6 +94,12 @@ S.~Bosse, D.~Maniry, K.-R. Muller, T.~Wiegand, and W.~Samek, ``Deep neural
   \emph{IEEE Transactions on Image Processing}, vol.~27, no.~1.\hskip 1em plus
   0.5em minus 0.4em\relax IEEE, 2017, pp. 206--219.
 
+\bibitem{li2022sfa}
+D.~Li, T.~Jiang, W.~Lin, and M.~Jiang, ``Blindly assess image quality in the
+  wild guided by a self-adaptive hyper network,'' \emph{IEEE Transactions on
+  Circuits and Systems for Video Technology}, vol.~32, no.~3, pp. 1287--1299,
+  2022.
+
 \bibitem{zhang2018dbcnn}
 W.~Zhang, K.~Ma, J.~Yan, D.~Deng, and Z.~Wang, ``Blind image quality assessment
   using a deep bilinear convolutional neural network,'' \emph{IEEE Transactions
@@ -106,31 +112,25 @@ H.~Zeng, L.~Zhang, and A.~C. Bovik, ``Perceptual quality assessment of
   IEEE/CVF Conference on Computer Vision and Pattern Recognition}, 2021, pp.
   3423--3432.
 
-\bibitem{li2022sfa}
-D.~Li, T.~Jiang, W.~Lin, and M.~Jiang, ``Blindly assess image quality in the
-  wild guided by a self-adaptive hyper network,'' \emph{IEEE Transactions on
-  Circuits and Systems for Video Technology}, vol.~32, no.~3, pp. 1287--1299,
-  2022.
-
-\bibitem{sun2024stairiqa}
-W.~Sun, H.~Zhang, L.~Liao, Y.~Wei, G.~Zhai, and X.~Min, ``Stairiqa: Towards
-  staircase-shaped quality scales for blind image quality assessment,''
-  \emph{IEEE Transactions on Multimedia}, 2024.
+\bibitem{wang2023clipiqa}
+J.~Wang, K.~C. Chan, and C.~C. Loy, ``Exploring clip for assessing the look and
+  feel of images,'' in \emph{Proceedings of the AAAI Conference on Artificial
+  Intelligence}, vol.~37, 2023, pp. 2555--2563.
 
 \bibitem{zhang2021unique}
 W.~Zhang, K.~Ma, G.~Zhai, and X.~Yang, ``Uncertainty-aware blind image quality
   assessment in the laboratory and wild,'' in \emph{Proceedings of the IEEE/CVF
   International Conference on Computer Vision}, 2021, pp. 3142--3151.
 
+\bibitem{sun2024stairiqa}
+W.~Sun, H.~Zhang, L.~Liao, Y.~Wei, G.~Zhai, and X.~Min, ``Stairiqa: Towards
+  staircase-shaped quality scales for blind image quality assessment,''
+  \emph{IEEE Transactions on Multimedia}, 2024.
+
 \bibitem{zhang2023liqe}
 W.~Zhang, G.~Zhai, Y.~Wei, X.~Yang, and K.~Ma, ``Blind image quality assessment
   via vision-language correspondence: A multitask learning perspective,'' in
   \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern
   Recognition}, 2023, pp. 14\,071--14\,081.
-
-\bibitem{wang2023clipiqa}
-J.~Wang, K.~C. Chan, and C.~C. Loy, ``Exploring clip for assessing the look and
-  feel of images,'' in \emph{Proceedings of the AAAI Conference on Artificial
-  Intelligence}, vol.~37, 2023, pp. 2555--2563.
 
 \end{thebibliography}

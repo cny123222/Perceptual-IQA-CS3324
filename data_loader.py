@@ -140,3 +140,37 @@ class DataLoader(object):
                 self.data, batch_size=1, shuffle=False,
                 num_workers=0, pin_memory=False)  # num_workers=0 for macOS compatibility
         return dataloader
+
+
+def get_koniq_splits(root):
+    """Get train/test indices for KonIQ-10k dataset"""
+    import os
+    import json
+    import csv
+    import numpy as np
+    
+    # Load image names from CSV
+    csv_file = os.path.join(root, 'koniq10k_scores_and_distributions.csv')
+    imgnames = []
+    with open(csv_file) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            imgnames.append(row['image_name'])
+    
+    # Load train/test splits from JSON
+    train_json = os.path.join(root, 'koniq_train.json')
+    test_json = os.path.join(root, 'koniq_test.json')
+    
+    with open(train_json) as f:
+        train_data = json.load(f)
+        train_imgs = set([os.path.basename(item['image']) for item in train_data])
+    
+    with open(test_json) as f:
+        test_data = json.load(f)
+        test_imgs = set([os.path.basename(item['image']) for item in test_data])
+    
+    # Map to indices
+    train_idx = [i for i, name in enumerate(imgnames) if name in train_imgs]
+    test_idx = [i for i, name in enumerate(imgnames) if name in test_imgs]
+    
+    return np.array(train_idx), np.array(test_idx)

@@ -48,8 +48,7 @@ ax1.plot(epochs, train_losses, 'o-', linewidth=2.5, markersize=8,
         color='#4ECDC4', markeredgecolor='black', markeredgewidth=1.5)
 ax1.set_xlabel('Epoch', fontsize=13, weight='bold')
 ax1.set_ylabel('Loss (L1)', fontsize=13, weight='bold')
-ax1.set_title('Training Loss', fontsize=14, weight='bold')
-# No legend - as per user request
+# No title - as per user request
 ax1.grid(True, alpha=0.3, linestyle='--')
 ax1.set_xticks(epochs)
 

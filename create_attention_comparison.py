@@ -9,20 +9,36 @@ import numpy as np
 import json
 from PIL import Image
 import os
+import csv
 
-# 设置matplotlib参数
-plt.rcParams['font.size'] = 10
+# 设置matplotlib参数 - 统一使用Times字体
 plt.rcParams['font.family'] = 'serif'
-plt.rcParams['font.serif'] = ['Times New Roman']
-plt.rcParams['text.usetex'] = False
+plt.rcParams['font.serif'] = ['Times New Roman', 'Times', 'DejaVu Serif', 'Liberation Serif']
+plt.rcParams['mathtext.fontset'] = 'stix'
+plt.rcParams['font.size'] = 10
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['ps.fonttype'] = 42
 
 # 读取结果
 with open('attention_visualization_results.json') as f:
     results = json.load(f)
 
+# 读取MOS_zscore (0-100范围)
+mos_zscore_map = {}
+with open('koniq-10k/koniq10k_scores_and_distributions.csv') as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        mos_zscore_map[row['image_name']] = float(row['MOS_zscore'])
+
+# 更新results中的gt_mos为MOS_zscore
+for result in results:
+    if result['image'] in mos_zscore_map:
+        result['gt_mos'] = mos_zscore_map[result['image']]
+
 # 创建大图
 fig = plt.figure(figsize=(12, 8))
-gs = gridspec.GridSpec(2, 3, height_ratios=[1, 1.2], hspace=0.3, wspace=0.3)
+gs = gridspec.GridSpec(2, 3, height_ratios=[1, 1.2], hspace=0.15, wspace=0.3)
 
 # 颜色方案
 colors = ['#4ECDC4', '#95E1D3', '#FFD93D', '#FF6B6B']
@@ -58,10 +74,8 @@ for idx, (result, quality_label) in enumerate(zip(results, quality_labels)):
     ax.set_ylabel('Attention Weight', fontsize=11, weight='bold')
     ax.set_xlabel('Swin Stage', fontsize=11, weight='bold')
     
-    # 标题包含质量信息
-    mos = result['gt_mos']
-    pred = result['pred_score']
-    ax.set_title(f'{quality_label}\nGT MOS: {mos:.2f}, Pred: {pred:.1f}', 
+    # 标题包含质量信息 (只显示质量等级)
+    ax.set_title(f'{quality_label}', 
                 fontsize=11, weight='bold')
     
     ax.grid(axis='y', alpha=0.3, linestyle='--')
@@ -83,27 +97,19 @@ for idx, result in enumerate(results):
     ax.imshow(img)
     ax.axis('off')
     
-    # 添加质量标签
-    quality_texts = ['Low Quality', 'Medium Quality', 'High Quality']
+    # 添加MOS信息（不显示质量标签文字）
+    mos = result['gt_mos']
+    pred = result['pred_score']
     bbox_props = dict(boxstyle='round,pad=0.5', facecolor='white', 
                      edgecolor='black', linewidth=2, alpha=0.9)
-    ax.text(0.5, 0.05, quality_texts[idx], 
+    ax.text(0.5, 0.05, f'GT: {mos:.1f}, Pred: {pred:.1f}', 
            transform=ax.transAxes,
            ha='center', va='bottom',
-           fontsize=12, weight='bold',
+           fontsize=11, weight='bold',
            bbox=bbox_props)
 
-# 总标题
-fig.suptitle('Channel Attention Analysis: Adaptive Feature Selection Based on Image Quality',
-            fontsize=14, weight='bold', y=0.98)
-
-# 添加说明文本
-textstr = 'Key Findings: Low-quality images use balanced multi-scale features (all stages ~25%), ' + \
-          'while high-quality images concentrate on high-level features (Stage 3: 99.6%+)'
-fig.text(0.5, 0.02, textstr, ha='center', va='bottom', fontsize=10, 
-        style='italic', wrap=True)
-
-plt.tight_layout(rect=[0, 0.03, 1, 0.97])
+# 不添加总标题和说明文本
+plt.tight_layout()
 
 # 保存为PDF和PNG
 output_dir = 'attention_visualizations'

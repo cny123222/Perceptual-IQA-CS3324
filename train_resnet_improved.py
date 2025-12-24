@@ -48,13 +48,15 @@ class ResNetImprovedSolver:
             print("💾 Image preloading DISABLED - loading on-the-fly")
         
         # Our data_loader.DataLoader returns a PyTorch DataLoader via .get_data()
+        # Note: HyperIQA processes one image at a time (with multiple patches per image)
+        # So we use batch_size=1 for the DataLoader, even though config.batch_size may be larger
         train_data_wrapper = data_loader.DataLoader(
             config.dataset, 
             config.data_path, 
             train_idx, 
             config.patch_size, 
             config.train_patch_num,
-            batch_size=config.batch_size,
+            batch_size=1,  # Must be 1 for HyperIQA-style training (one image with N patches)
             istrain=True,
             use_color_jitter=config.use_color_jitter,
             preload=config.preload_images
@@ -71,11 +73,17 @@ class ResNetImprovedSolver:
             test_random_crop=config.test_random_crop,
             preload=config.preload_images
         )
+        print(f"  DEBUG: About to call test_loader_wrapper.get_data()...")
+        sys.stdout.flush()
         self.test_loader = test_data_wrapper.get_data()
+        print(f"  DEBUG: test_loader created successfully, len={len(self.test_loader)}")
+        sys.stdout.flush()
         
         if config.preload_images:
             print("✓ All images loaded into memory!\n")
         
+        print("  DEBUG: About to create optimizer...")
+        sys.stdout.flush()
         # Optimizer
         self.optimizer = optim.AdamW(
             self.model.parameters(),
@@ -90,28 +98,28 @@ class ResNetImprovedSolver:
         self.epochs = config.epochs
         self.best_srcc = 0
         self.best_plcc = 0
+        self.train_patch_num = config.train_patch_num
+        self.test_patch_num = config.test_patch_num
         
     def train_epoch(self, epoch):
         """Train one epoch"""
         self.model.train()
         losses = []
+        pred_scores = []
+        gt_scores = []
         
-        for i, (patches, label) in enumerate(self.train_loader):
-            # patches: (1, N, 3, H, W), label: (1,)
-            patches = patches.squeeze(0).to(self.device)  # (N, 3, H, W)
+        # Process one patch at a time (like original HyperIQA)
+        for i, (img, label) in enumerate(self.train_loader):
+            # img: (batch_size, 3, H, W) - single patch per batch
+            img = img.to(self.device)
             label = label.to(self.device).float()
             
-            # Forward pass for all patches
-            outputs = []
-            for patch in patches:
-                out = self.model(patch.unsqueeze(0))
-                outputs.append(out['score'])
-            
-            # Average prediction across patches
-            pred = torch.mean(torch.stack(outputs))
+            # Forward pass
+            out = self.model(img)
+            pred = out['score']
             
             # Compute loss
-            loss = self.criterion(pred, label)
+            loss = self.criterion(pred.squeeze(), label.squeeze())
             
             # Backward pass
             self.optimizer.zero_grad()
@@ -119,9 +127,25 @@ class ResNetImprovedSolver:
             self.optimizer.step()
             
             losses.append(loss.item())
+            pred_scores.append(float(pred.item()))
+            gt_scores.append(float(label.item()))
             
             if (i + 1) % 100 == 0:
-                print(f"  Batch [{i+1}/{len(self.train_loader)}], Loss: {loss.item():.4f}")
+                # Average predictions per image (reshape by patch_num)
+                temp_preds = np.array(pred_scores)
+                temp_gts = np.array(gt_scores)
+                if len(temp_preds) >= self.train_patch_num:
+                    # Reshape to (num_images, patch_num) and average
+                    n_complete = len(temp_preds) // self.train_patch_num
+                    reshaped_preds = temp_preds[:n_complete * self.train_patch_num].reshape(-1, self.train_patch_num)
+                    reshaped_gts = temp_gts[:n_complete * self.train_patch_num].reshape(-1, self.train_patch_num)
+                    avg_preds = np.mean(reshaped_preds, axis=1)
+                    avg_gts = np.mean(reshaped_gts, axis=1)
+                    
+                    train_srcc, _ = stats.spearmanr(avg_preds, avg_gts)
+                    print(f"  Batch [{i+1}/{len(self.train_loader)}], Loss: {loss.item():.4f}, Train SRCC (temp): {train_srcc:.4f}")
+                else:
+                    print(f"  Batch [{i+1}/{len(self.train_loader)}], Loss: {loss.item():.4f}")
         
         avg_loss = np.mean(losses)
         return avg_loss
@@ -129,31 +153,32 @@ class ResNetImprovedSolver:
     def test(self):
         """Test on test set"""
         self.model.eval()
-        predictions = []
-        labels = []
+        pred_scores = []
+        gt_scores = []
         
         with torch.no_grad():
-            for patches, label in self.test_loader:
-                patches = patches.squeeze(0).to(self.device)
+            # Process one patch at a time (like original HyperIQA)
+            for img, label in self.test_loader:
+                # img: (batch_size, 3, H, W) - single patch per batch
+                img = img.to(self.device)
+                label = label.to(self.device).float()
                 
-                # Forward pass for all patches
-                outputs = []
-                for patch in patches:
-                    out = self.model(patch.unsqueeze(0))
-                    outputs.append(out['score'])
+                # Forward pass
+                out = self.model(img)
+                pred = out['score']
                 
-                # Average prediction
-                pred = torch.mean(torch.stack(outputs))
-                
-                predictions.append(pred.cpu().item())
-                labels.append(label.item())
+                pred_scores.append(float(pred.item()))
+                gt_scores.append(float(label.item()))
         
-        # Compute SRCC and PLCC
-        predictions = np.array(predictions)
-        labels = np.array(labels)
+        # Reshape predictions to (num_images, patch_num) and average
+        pred_scores = np.array(pred_scores)
+        gt_scores = np.array(gt_scores)
+        pred_scores = np.mean(np.reshape(pred_scores, (-1, self.test_patch_num)), axis=1)
+        gt_scores = np.mean(np.reshape(gt_scores, (-1, self.test_patch_num)), axis=1)
         
-        srcc = stats.spearmanr(predictions, labels)[0]
-        plcc = stats.pearsonr(predictions, labels)[0]
+        # Calculate metrics
+        srcc = stats.spearmanr(pred_scores, gt_scores)[0]
+        plcc = stats.pearsonr(pred_scores, gt_scores)[0]
         
         return srcc, plcc
     

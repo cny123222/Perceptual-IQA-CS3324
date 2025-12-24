@@ -7,8 +7,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
+# 使用Times字体
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['font.serif'] = ['Times New Roman', 'Times', 'DejaVu Serif', 'Liberation Serif']
 plt.rcParams['font.size'] = 11
 plt.rcParams['axes.unicode_minus'] = False
+plt.rcParams['mathtext.fontset'] = 'stix'
 
 output_dir = 'paper_figures'
 os.makedirs(output_dir, exist_ok=True)
@@ -103,7 +107,6 @@ bars1 = ax1.bar(range(len(models)), srcc, color=colors,
 ax1.set_xticks(range(len(models)))
 ax1.set_xticklabels(models, fontsize=11, weight='bold')
 ax1.set_ylabel('SRCC on KonIQ-10k', fontsize=13, weight='bold')
-ax1.set_title('Performance Comparison', fontsize=14, weight='bold')
 ax1.set_ylim([0.900, 0.945])
 ax1.grid(axis='y', alpha=0.3, linestyle='--')
 
@@ -142,7 +145,6 @@ for i, (param, s, model) in enumerate(zip(params, srcc, models)):
 ax2.plot(params, srcc, 'g--', linewidth=2, alpha=0.5)
 ax2.set_xlabel('Parameters (Millions)', fontsize=13, weight='bold')
 ax2.set_ylabel('SRCC on KonIQ-10k', fontsize=13, weight='bold')
-ax2.set_title('Performance vs Model Size', fontsize=14, weight='bold')
 ax2.grid(True, alpha=0.3, linestyle='--')
 ax2.set_xlim([20, 95])
 ax2.set_ylim([0.900, 0.945])
@@ -238,16 +240,12 @@ bars1 = ax1.bar(range(len(loss_names)), loss_srccs, color=colors_loss,
 ax1.set_xticks(range(len(loss_names)))
 ax1.set_xticklabels(loss_names, fontsize=10, weight='bold')
 ax1.set_ylabel('SRCC on KonIQ-10k', fontsize=13, weight='bold')
-ax1.set_title('Loss Function Comparison (SRCC)', fontsize=14, weight='bold')
 ax1.set_ylim([0.925, 0.940])
 ax1.grid(axis='y', alpha=0.3, linestyle='--')
 
 for i, (name, srcc_val, rank) in enumerate(zip(loss_names, loss_srccs, ranks)):
     ax1.text(i, srcc_val + 0.0008, f'{srcc_val:.4f}', ha='center', 
             fontsize=10, weight='bold')
-    medals = {1: '🥇', 2: '🥈', 3: '🥉'}
-    medal = medals.get(rank, f'{rank}th')
-    ax1.text(i, srcc_val - 0.003, medal, ha='center', fontsize=12)
 
 # 图2: SRCC vs PLCC散点图
 for i, (name, srcc_val, plcc_val, rank) in enumerate(zip(loss_names, loss_srccs, loss_plccs, ranks)):
@@ -266,7 +264,6 @@ for i, (name, srcc_val, plcc_val, rank) in enumerate(zip(loss_names, loss_srccs,
 
 ax2.set_xlabel('SRCC', fontsize=13, weight='bold')
 ax2.set_ylabel('PLCC', fontsize=13, weight='bold')
-ax2.set_title('Loss Function Performance (SRCC vs PLCC)', fontsize=14, weight='bold')
 ax2.grid(True, alpha=0.3, linestyle='--')
 ax2.set_xlim([0.928, 0.938])
 ax2.set_ylim([0.920, 0.950])

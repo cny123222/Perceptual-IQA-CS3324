@@ -32,7 +32,7 @@
 \@writefile{toc}{\contentsline {section}{\numberline {III}Method}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Overview}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Swin Transformer Backbone}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Multi-scale Feature Fusion}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Adaptive Feature Aggregation (AFA)}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Channel Attention Mechanism}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}HyperNet and TargetNet}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-F}}Training Strategy}{2}{}\protected@file@percent }
@@ -51,25 +51,25 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}Model Variants}{3}{}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Performance comparison with state-of-the-art methods on KonIQ-10k dataset. Best results are in bold.}}{4}{}\protected@file@percent }
 \newlabel{tab:sota_comparison}{{I}{4}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Ablation study visualization. Left: SRCC comparison showing Swin Transformer contributes 87\% of total improvement. Right: PLCC comparison demonstrating consistent gains across both metrics. The full model achieves SRCC of 0.9378 and PLCC of 0.9485.}}{4}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Ablation study visualization. Left: SRCC comparison showing Swin Transformer contributes 87\% of total improvement (+0.0268). Right: PLCC comparison demonstrating consistent gains across both metrics. The progressive improvements show: Swin-Base backbone (+2.68\% SRCC), AFA module (+0.15\% SRCC), and attention mechanism (+0.25\% SRCC). The full model achieves SRCC of 0.9378 and PLCC of 0.9485.}}{4}{}\protected@file@percent }
 \newlabel{fig:ablation}{{3}{4}}
 \@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Ablation study on KonIQ-10k: component contribution analysis}}{4}{}\protected@file@percent }
 \newlabel{tab:ablation_study}{{II}{4}}
 \@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Cross-dataset generalization performance (trained on KonIQ-10k)}}{4}{}\protected@file@percent }
 \newlabel{tab:cross_dataset}{{III}{4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-F}}Attention Mechanism Analysis}{4}{}\protected@file@percent }
 \bibstyle{IEEEtran}
 \bibdata{references}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Cross-dataset performance heatmap comparing HyperIQA and SMART-IQA. Our method consistently outperforms HyperIQA across most datasets, demonstrating strong generalization capability.}}{5}{}\protected@file@percent }
-\newlabel{fig:cross_dataset}{{4}{5}}
+\bibcite{su2020hyperiq}{1}
 \@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Performance-efficiency trade-off across model sizes on KonIQ-10k}}{5}{}\protected@file@percent }
 \newlabel{tab:model_size}{{IV}{5}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-F}}Attention Mechanism Analysis}{5}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Performance vs model size trade-off. Left: SRCC comparison showing all variants outperform HyperIQA baseline. Right: Parameter-performance scatter plot highlighting the evolution path. Small variant offers the best balance for deployment.}}{5}{}\protected@file@percent }
+\newlabel{fig:model_size}{{4}{5}}
 \@writefile{toc}{\contentsline {section}{\numberline {V}Conclusion}{5}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Performance vs model size trade-off. Left: SRCC comparison showing all variants outperform HyperIQA baseline. Right: Parameter-performance scatter plot highlighting the evolution path. Small variant offers the best balance for deployment.}}{5}{}\protected@file@percent }
-\newlabel{fig:model_size}{{5}{5}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Channel attention weight distribution for images of different quality levels. Top: Attention weights across four Swin Transformer stages. Low-quality image (left) shows balanced multi-scale attention, while high-quality image (right) concentrates 99.67\% weight on Stage 3. Bottom: Visual examples with ground truth and predicted quality scores. This adaptive attention mechanism enables content-aware feature fusion.}}{5}{}\protected@file@percent }
-\newlabel{fig:attention_analysis}{{6}{5}}
-\bibcite{su2020hyperiq}{1}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Channel attention weight distribution for images of different quality levels. Top: Attention weights across four Swin Transformer stages. Low-quality image (left) shows balanced multi-scale attention, while high-quality image (right) concentrates 99.67\% weight on Stage 3. Bottom: Visual examples with ground truth and predicted quality scores. This adaptive attention mechanism enables content-aware feature fusion.}}{5}{}\protected@file@percent }
+\newlabel{fig:attention_analysis}{{5}{5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Scatter plot of predicted vs ground truth MOS scores on KonIQ-10k test set (500 images). Blue dots represent normal predictions, while red dots indicate large errors (top 10\%). The close clustering around the diagonal line demonstrates high prediction accuracy, with SRCC of 0.9374 and PLCC of 0.9479.}}{5}{}\protected@file@percent }
+\newlabel{fig:error_analysis}{{6}{5}}
 \bibcite{dosovitskiy2021vit}{2}
 \bibcite{liu2021swin}{3}
 \bibcite{talebi2018nima}{4}
@@ -82,13 +82,13 @@
 \bibcite{lin2019kadid}{11}
 \bibcite{li2023agiqa}{12}
 \bibcite{bosse2017wadiqam}{13}
-\bibcite{zhang2018dbcnn}{14}
-\bibcite{zeng2021pqr}{15}
-\bibcite{li2022sfa}{16}
-\bibcite{sun2024stairiqa}{17}
+\bibcite{li2022sfa}{14}
+\bibcite{zhang2018dbcnn}{15}
+\bibcite{zeng2021pqr}{16}
+\bibcite{wang2023clipiqa}{17}
 \bibcite{zhang2021unique}{18}
-\bibcite{zhang2023liqe}{19}
-\bibcite{wang2023clipiqa}{20}
+\bibcite{sun2024stairiqa}{19}
+\bibcite{zhang2023liqe}{20}
 \@writefile{toc}{\contentsline {section}{References}{6}{}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Learning rate sensitivity analysis. Left: SRCC vs learning rate showing optimal LR at $5\times 10^{-7}$ (marked with gold star). Right: Training efficiency showing faster convergence with larger learning rates but slightly worse performance. The y-axis range is extended to better visualize the stability of the training process.}}{6}{}\protected@file@percent }
 \newlabel{fig:lr_sensitivity}{{7}{6}}
@@ -96,17 +96,20 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {A}Learning Rate Sensitivity}{6}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {B}Complete Hyperparameter Settings}{6}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {C}Training Log Analysis}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {D}Computational Complexity}{6}{}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Detailed Experimental Hyperparameters and Training Configuration}}{7}{}\protected@file@percent }
 \newlabel{tab:hyperparameters}{{V}{7}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {D}Computational Complexity}{7}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {E}Data Augmentation}{7}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {F}Loss Function Comparison}{7}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Loss function performance comparison. Left: SRCC comparison showing L1 (MAE) achieves the best performance. Right: SRCC vs PLCC scatter plot demonstrating the consistency of L1 loss across both metrics.}}{7}{}\protected@file@percent }
+\newlabel{fig:loss_comparison}{{8}{7}}
 \@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Epoch-wise Training Log of Best Model (Swin-Base, LR=$5\times 10^{-7}$)}}{8}{}\protected@file@percent }
 \newlabel{tab:training_log}{{VI}{8}}
-\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Computational Complexity Analysis on KonIQ-10k}}{8}{}\protected@file@percent }
-\newlabel{tab:complexity}{{VII}{8}}
-\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces Loss function comparison on KonIQ-10k}}{8}{}\protected@file@percent }
-\newlabel{tab:loss_comparison}{{VIII}{8}}
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Loss function performance comparison. Left: SRCC comparison showing L1 (MAE) achieves the best performance. Right: SRCC vs PLCC scatter plot demonstrating the consistency of L1 loss across both metrics.}}{8}{}\protected@file@percent }
-\newlabel{fig:loss_comparison}{{8}{8}}
-\gdef \@abspage@last{8}
+\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Loss function comparison on KonIQ-10k}}{8}{}\protected@file@percent }
+\newlabel{tab:loss_comparison}{{VII}{8}}
+\@writefile{toc}{\contentsline {section}{Appendix}{8}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Feature map visualization for a high-quality image. The hierarchical feature extraction shows clear semantic understanding in Stage 3.}}{8}{}\protected@file@percent }
+\newlabel{fig:feature_high}{{9}{8}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Feature map visualization for a low-quality image. Strong activations in lower stages (Stage 0-1) indicate the model focuses on local distortions and texture details.}}{9}{}\protected@file@percent }
+\newlabel{fig:feature_low}{{10}{9}}
+\gdef \@abspage@last{9}

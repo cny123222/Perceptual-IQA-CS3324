@@ -27,19 +27,19 @@ cny123222@sjtu.edu.cn}
 \maketitle
 
 \begin{abstract}
-Blind image quality assessment (BIQA) for authentically distorted images remains challenging due to diverse content variations and complex distortion patterns. While the original HyperIQA employs a self-adaptive hyper network with ResNet-50 backbone, it struggles to capture fine-grained multi-scale features and global contextual information. We propose SMART-IQA, a Swin Transformer-based framework that integrates multi-scale spatial features with attention-guided fusion for enhanced quality prediction. By replacing the CNN backbone with Swin Transformer and preserving spatial information through adaptive pooling, our method achieves superior feature representation. A novel channel attention mechanism dynamically weights multi-scale features according to image content and distortion characteristics. Extensive experiments on KonIQ-10k demonstrate that SMART-IQA achieves state-of-the-art performance with 0.9378 SRCC, outperforming existing methods including the original HyperIQA by 3.18\%. Cross-dataset evaluations further validate the strong generalization capability of our approach.
+Blind image quality assessment (BIQA) for authentically distorted images remains challenging due to diverse content variations and complex distortion patterns. While the original HyperIQA employs a self-adaptive hyper network with ResNet-50 backbone, it struggles to capture fine-grained hierarchical features and global contextual information. We propose SMART-IQA, a Swin Transformer-based framework that integrates an Adaptive Feature Aggregation (AFA) module with attention-guided fusion for enhanced quality prediction. By replacing the CNN backbone with Swin Transformer and preserving spatial information through adaptive pooling, our method achieves superior feature representation. A novel channel attention mechanism dynamically weights AFA features according to image content and distortion characteristics. Extensive experiments on KonIQ-10k demonstrate that SMART-IQA achieves state-of-the-art performance with 0.9378 SRCC, outperforming existing methods including the original HyperIQA by 3.18\%. Cross-dataset evaluations further validate the strong generalization capability of our approach.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Image Quality Assessment, Swin Transformer, Multi-scale Feature Fusion, Attention Mechanism, Hyper Network, Deep Learning
+Image Quality Assessment, Swin Transformer, Adaptive Feature Aggregation, Attention Mechanism, Hyper Network, Deep Learning
 \end{IEEEkeywords}
 
 \section{Introduction}
 Image quality assessment (IQA) aims to automatically predict image quality in a manner consistent with human perception. Blind IQA (BIQA), which operates without access to reference images, remains particularly challenging for authentically distorted images captured in the wild. Unlike synthetically distorted images with controlled, uniform distortions, real-world images exhibit diverse content variations and complex, non-uniform distortion patterns that pose significant challenges to existing methods.
 
-Recent advances in deep learning have shown promising results for BIQA. HyperIQA \cite{su2020hyperiq} introduced a self-adaptive hyper network architecture that dynamically generates quality prediction weights based on image content, achieving strong performance on authentic distortion datasets. However, its ResNet-50 backbone has limitations in capturing global context and fine-grained multi-scale features, which are crucial for assessing diverse real-world distortions. Vision Transformers have demonstrated remarkable capabilities in capturing long-range dependencies and global context \cite{dosovitskiy2021vit}. Swin Transformer \cite{liu2021swin} further improves efficiency through hierarchical architecture and shifted window attention, making it particularly suitable for dense prediction tasks like IQA.
+Recent advances in deep learning have shown promising results for BIQA. HyperIQA \cite{su2020hyperiq} introduced a self-adaptive hyper network architecture that dynamically generates quality prediction weights based on image content, achieving strong performance on authentic distortion datasets. However, its ResNet-50 backbone has limitations in capturing global context and fine-grained hierarchical features, which are crucial for assessing diverse real-world distortions. Vision Transformers have demonstrated remarkable capabilities in capturing long-range dependencies and global context \cite{dosovitskiy2021vit}. Swin Transformer \cite{liu2021swin} further improves efficiency through hierarchical architecture and shifted window attention, making it particularly suitable for dense prediction tasks like IQA.
 
-In this work, we propose SMART-IQA (Swin Multi-scale Attention-guided Regression Transformer for Image Quality Assessment), which integrates Swin Transformer's hierarchical vision architecture with multi-scale attention-guided feature fusion. Our key contributions are: (1) replacing the CNN backbone with Swin Transformer to capture richer semantic and spatial features through window-based self-attention, (2) preserving spatial information by adaptively pooling multi-scale features to $7\times7$ resolution instead of aggressive compression, (3) introducing a channel attention mechanism that dynamically weights different scales according to image content and distortion characteristics, and (4) incorporating dropout regularization to enhance generalization. Extensive experiments demonstrate that SMART-IQA achieves state-of-the-art performance on KonIQ-10k with 0.9378 SRCC, surpassing the original HyperIQA by 3.18\% and other competing methods.
+In this work, we propose SMART-IQA (Swin Multi-scale Attention-guided Regression Transformer for Image Quality Assessment), which integrates Swin Transformer's hierarchical vision architecture with our proposed Adaptive Feature Aggregation (AFA) module and attention-guided fusion. Our key contributions are: (1) replacing the CNN backbone with Swin Transformer to capture richer semantic and spatial features through window-based self-attention, (2) designing the AFA module that preserves spatial information by adaptively pooling features from multiple stages to unified $7\times7$ resolution instead of aggressive compression, (3) introducing a channel attention mechanism that dynamically weights different scales according to image content and distortion characteristics, and (4) incorporating dropout regularization to enhance generalization. Extensive experiments demonstrate that SMART-IQA achieves state-of-the-art performance on KonIQ-10k with 0.9378 SRCC, surpassing the original HyperIQA by 3.18\% and other competing methods.
 
 \section{Related Work}
 
@@ -50,12 +50,12 @@ Early BIQA methods rely on hand-crafted features and machine learning techniques
 Recent works have explored Transformers for IQA. MUSIQ \cite{ke2021musiq} introduces multi-scale transformers that process images at multiple resolutions. MANIQA \cite{yang2022maniqa} employs multi-dimensional attention to capture diverse quality-aware features. TReS \cite{golestaneh2022tres} combines transformers with relative ranking loss for improved generalization. However, these methods often require substantial computational resources and large-scale pre-training.
 
 \subsection{Hyper Networks for IQA}
-HyperIQA \cite{su2020hyperiq} pioneered the use of hyper networks for content-aware quality assessment. The hyper network dynamically generates weights for a target network based on image content, enabling adaptive quality prediction. Our work extends this paradigm by replacing the ResNet-50 backbone with Swin Transformer and introducing multi-scale attention-guided fusion to better capture diverse distortion patterns.
+HyperIQA \cite{su2020hyperiq} pioneered the use of hyper networks for content-aware quality assessment. The hyper network dynamically generates weights for a target network based on image content, enabling adaptive quality prediction. Our work extends this paradigm by replacing the ResNet-50 backbone with Swin Transformer and introducing the Adaptive Feature Aggregation (AFA) module with attention-guided fusion to better capture diverse distortion patterns.
 
 \section{Method}
 
 \subsection{Overview}
-SMART-IQA follows the hyper network paradigm where a HyperNet generates weights for a TargetNet based on image content. The key innovation lies in our Swin Transformer backbone with multi-scale attention fusion. Figure \ref{fig:architecture} illustrates the overall architecture of our proposed method.
+SMART-IQA follows the hyper network paradigm where a HyperNet generates weights for a TargetNet based on image content. The key innovation lies in our Swin Transformer backbone with the proposed Adaptive Feature Aggregation (AFA) module and attention-guided fusion. Figure \ref{fig:architecture} illustrates the overall architecture of our proposed method.
 
 \begin{figure*}[t]
 \centering
@@ -65,16 +65,16 @@ SMART-IQA follows the hyper network paradigm where a HyperNet generates weights 
 \end{figure*}
 
 \subsection{Swin Transformer Backbone}
-We adopt Swin Transformer \cite{liu2021swin} as our feature extractor due to its hierarchical architecture and efficient window-based self-attention mechanism. The Swin Transformer produces features at four stages with progressively decreasing spatial resolutions: Stage 0 ($56\times56$), Stage 1 ($28\times28$), Stage 2 ($14\times14$), and Stage 3 ($7\times7$). This multi-scale representation naturally captures both low-level textures and high-level semantic information crucial for quality assessment.
+We adopt Swin Transformer \cite{liu2021swin} as our feature extractor due to its hierarchical architecture and efficient window-based self-attention mechanism. The Swin Transformer produces features at four stages with progressively decreasing spatial resolutions: Stage 0 ($56\times56$), Stage 1 ($28\times28$), Stage 2 ($14\times14$), and Stage 3 ($7\times7$). This hierarchical representation naturally captures both low-level textures and high-level semantic information crucial for quality assessment.
 
-\subsection{Multi-scale Feature Fusion}
-To leverage information from multiple scales, we extract features from Stages 1, 2, and 3. Each stage's features are adaptively pooled to a unified $7\times7$ spatial resolution to preserve spatial structure while enabling effective fusion. This approach differs from global average pooling, which discards spatial information that may be important for localizing distortions.
+\subsection{Adaptive Feature Aggregation (AFA)}
+To leverage information from multiple stages, we propose the Adaptive Feature Aggregation (AFA) module that extracts features from Stages 1, 2, and 3. Each stage's features are adaptively pooled to a unified $7\times7$ spatial resolution to preserve spatial structure while enabling effective fusion. This approach differs from global average pooling, which discards spatial information that may be important for localizing distortions.
 
 \subsection{Channel Attention Mechanism}
 We introduce a lightweight channel attention module to dynamically weight the importance of different feature scales. The attention module consists of global average pooling followed by two fully connected layers with ReLU activation and sigmoid normalization. This mechanism allows the model to adaptively focus on the most relevant scales based on image content and distortion characteristics. For high-quality images, the model tends to emphasize high-level semantic features, while for distorted images, it allocates more weight to low- and mid-level features that capture distortion artifacts.
 
 \subsection{HyperNet and TargetNet}
-Following HyperIQA \cite{su2020hyperiq}, the fused multi-scale features are fed into a HyperNet, which generates weights and biases for a TargetNet. The TargetNet is a simple two-layer MLP that produces the final quality score. This content-adaptive mechanism enables the model to adjust its prediction strategy based on image characteristics.
+Following HyperIQA \cite{su2020hyperiq}, the fused features from AFA are fed into a HyperNet, which generates weights and biases for a TargetNet. The TargetNet is a simple two-layer MLP that produces the final quality score. This content-adaptive mechanism enables the model to adjust its prediction strategy based on image characteristics.
 
 \subsection{Training Strategy}
 We train SMART-IQA using L1 loss on KonIQ-10k dataset. We employ AdamW optimizer with a learning rate of $5\times10^{-7}$ for the Swin Transformer backbone and $5\times10^{-6}$ for other components. This careful learning rate selection is crucial, as we found that Swin Transformer requires significantly smaller learning rates (200$\times$ lower than ResNet-50) for stable training. We incorporate drop path regularization with rate 0.2 and dropout with rate 0.3 to prevent overfitting. The model is trained for 10 epochs with early stopping based on validation performance.
@@ -103,7 +103,7 @@ Figure \ref{fig:training_curves} shows the training process of our best model. T
 
 \subsection{Comparison with State-of-the-Art}
 
-Table \ref{tab:sota_comparison} presents the comparison with state-of-the-art methods on KonIQ-10k. SMART-IQA achieves the best performance with SRCC of 0.9378 and PLCC of 0.9485, outperforming all existing methods. Compared to the original HyperIQA, our method improves SRCC by 3.18\% (from 0.9060 to 0.9378), demonstrating the effectiveness of our Swin Transformer-based architecture with multi-scale attention fusion. Our method also surpasses recent transformer-based approaches like MUSIQ and MANIQA, while using comparable or fewer parameters.
+Table \ref{tab:sota_comparison} presents the comparison with state-of-the-art methods on KonIQ-10k. SMART-IQA achieves the best performance with SRCC of 0.9378 and PLCC of 0.9485, outperforming all existing methods. Compared to the original HyperIQA, our method improves SRCC by 3.18\% (from 0.9060 to 0.9378), demonstrating the effectiveness of our Swin Transformer-based architecture with AFA and attention-guided fusion. Our method also surpasses recent transformer-based approaches like MUSIQ and MANIQA, while using comparable or fewer parameters.
 
 \begin{table*}[t]
 \centering
@@ -137,44 +137,37 @@ Swin-Small & Swin-S (50M) & 0.9338 & 0.9455 \\
 
 \subsection{Ablation Study}
 
-To validate the contribution of each component, we conduct a comprehensive ablation study. Table \ref{tab:ablation_study} presents the progressive ablation results. Starting from the HyperIQA baseline with ResNet-50 (SRCC: 0.9070), we observe that replacing the backbone with Swin Transformer alone brings a substantial improvement of +2.68\% SRCC (to 0.9338), accounting for 87\% of the total gain. Adding multi-scale fusion contributes an additional +0.15\% (to 0.9353), and the channel attention mechanism further improves performance by +0.25\% (to 0.9378). These results demonstrate that the Swin Transformer backbone is the dominant contributor, while multi-scale fusion and attention mechanism provide complementary benefits. Figure \ref{fig:ablation} visualizes these contributions for both SRCC and PLCC metrics.
+To validate the contribution of each component, we conduct a comprehensive ablation study. Table \ref{tab:ablation_study} presents the progressive ablation results. Starting from the HyperIQA baseline with ResNet-50 (SRCC: 0.9070), we observe that replacing the backbone with Swin Transformer alone brings a substantial improvement of +2.68\% SRCC (to 0.9338), accounting for 87\% of the total gain. Adding the AFA module contributes an additional +0.15\% (to 0.9353), and the channel attention mechanism further improves performance by +0.25\% (to 0.9378). These results demonstrate that the Swin Transformer backbone is the dominant contributor, while AFA and attention mechanism provide complementary benefits. Figure \ref{fig:ablation} visualizes these contributions for both SRCC and PLCC metrics.
 
 \begin{table}[t]
 \centering
 \caption{Ablation study on KonIQ-10k: component contribution analysis}
 \label{tab:ablation_study}
-\begin{tabular}{lccc}
+\begin{tabular}{lcccc}
 \hline
-Configuration & Multi-Scale & Attention & SRCC \\
+Configuration & AFA & Attention & SRCC & PLCC \\
 \hline
-\textit{Baseline} & & & \\
-HyperIQA (ResNet50) & - & - & 0.9070 \\
+\textit{Baseline} & & & & \\
+HyperIQA (ResNet50) & - & - & 0.9070 & 0.9180 \\
 \hline
-\textit{Progressive Ablation (Swin-Base)} & & & \\
-Backbone only & $\times$ & $\times$ & 0.9338 \\
-+ Multi-Scale & \checkmark & $\times$ & 0.9353 \\
-+ Attention (Full) & \checkmark & \checkmark & \textbf{0.9378} \\
-\hline
-\textit{Component Contributions} & & & \\
-\multicolumn{4}{l}{Swin Transformer: +0.0268 SRCC (87\% of gain)} \\
-\multicolumn{4}{l}{Multi-Scale Fusion: +0.0015 SRCC (5\% of gain)} \\
-\multicolumn{4}{l}{Attention Mechanism: +0.0025 SRCC (8\% of gain)} \\
-\hline
-\textbf{Total Improvement} & \multicolumn{3}{l}{\textbf{+0.0308 SRCC (+3.18\%)}} \\
+\textit{Progressive Ablation (Swin-Base)} & & & & \\
+Backbone only & $\times$ & $\times$ & 0.9338 & 0.9437 \\
++ AFA & \checkmark & $\times$ & 0.9353 & 0.9469 \\
++ Attention (Full) & \checkmark & \checkmark & \textbf{0.9378} & \textbf{0.9485} \\
 \hline
 \end{tabular}
 \end{table}
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.9\textwidth]{../paper_figures/ablation_dual_bars.pdf}
-\caption{Ablation study visualization. Left: SRCC comparison showing Swin Transformer contributes 87\% of total improvement. Right: PLCC comparison demonstrating consistent gains across both metrics. The full model achieves SRCC of 0.9378 and PLCC of 0.9485.}
+\includegraphics[width=0.9\textwidth]{../paper_figures/ablation_dual_bars_times.pdf}
+\caption{Ablation study visualization. Left: SRCC comparison showing Swin Transformer contributes 87\% of total improvement (+0.0268). Right: PLCC comparison demonstrating consistent gains across both metrics. The progressive improvements show: Swin-Base backbone (+2.68\% SRCC), AFA module (+0.15\% SRCC), and attention mechanism (+0.25\% SRCC). The full model achieves SRCC of 0.9378 and PLCC of 0.9485.}
 \label{fig:ablation}
 \end{figure*}
 
 \subsection{Cross-Dataset Generalization}
 
-To evaluate the generalization capability, we test our model trained on KonIQ-10k on three cross-dataset benchmarks without any fine-tuning. Table \ref{tab:cross_dataset} compares the results with HyperIQA. SMART-IQA consistently outperforms HyperIQA on most datasets, demonstrating strong generalization ability. On SPAQ (smartphone images), our method achieves SRCC of 0.8698 (+2.08\% over HyperIQA). On KADID-10K (synthetic distortions), we obtain SRCC of 0.5412 (+5.64\% improvement). The average cross-domain SRCC is 0.6865, representing a +2.10\% improvement over HyperIQA. These results validate that our Swin-based architecture learns more generalizable quality-aware representations. Figure \ref{fig:cross_dataset} visualizes the performance comparison across all datasets.
+To evaluate the generalization capability, we test our model trained on KonIQ-10k on three cross-dataset benchmarks without any fine-tuning. Table \ref{tab:cross_dataset} compares the results with HyperIQA. SMART-IQA consistently outperforms HyperIQA on most datasets, demonstrating strong generalization ability. On SPAQ (smartphone images), our method achieves SRCC of 0.8698 (+2.08\% over HyperIQA). On KADID-10K (synthetic distortions), we obtain SRCC of 0.5412 (+5.64\% improvement). The average cross-domain SRCC is 0.6865, representing a +2.10\% improvement over HyperIQA. These results validate that our Swin-based architecture learns more generalizable quality-aware representations.
 
 \begin{table}[t]
 \centering
@@ -198,12 +191,6 @@ AGIQA-3K & 0.6627 & 0.7236 & 0.6484 & 0.6830 \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.48\textwidth]{../paper_figures/cross_dataset_heatmap.pdf}
-\caption{Cross-dataset performance heatmap comparing HyperIQA and SMART-IQA. Our method consistently outperforms HyperIQA across most datasets, demonstrating strong generalization capability.}
-\label{fig:cross_dataset}
-\end{figure}
 
 \subsection{Model Variants}
 
@@ -246,7 +233,7 @@ Figure \ref{fig:attention_analysis} reveals a striking pattern: \textbf{low-qual
 
 For low-quality images with visible distortions, the model allocates significant weights to low-level features (Stage 1) to capture local texture degradation, while simultaneously leveraging mid and high-level features for global structure understanding. In contrast, high-quality images without obvious artifacts can be reliably assessed using predominantly high-level semantic features, leading to extreme attention concentration.
 
-This adaptive behavior validates our design hypothesis that different quality levels require different feature hierarchies, and proves that the attention mechanism successfully provides content-aware fusion compared to fixed-weight multi-scale methods.
+This adaptive behavior validates our design hypothesis that different quality levels require different feature hierarchies, and proves that the attention mechanism successfully provides content-aware fusion compared to fixed-weight feature aggregation methods.
 
 \begin{figure}[t]
 \centering
@@ -255,9 +242,16 @@ This adaptive behavior validates our design hypothesis that different quality le
 \label{fig:attention_analysis}
 \end{figure}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.48\textwidth]{../paper_figures/error_analysis.pdf}
+\caption{Scatter plot of predicted vs ground truth MOS scores on KonIQ-10k test set (500 images). Blue dots represent normal predictions, while red dots indicate large errors (top 10\%). The close clustering around the diagonal line demonstrates high prediction accuracy, with SRCC of 0.9374 and PLCC of 0.9479.}
+\label{fig:error_analysis}
+\end{figure}
+
 \section{Conclusion}
 
-We propose SMART-IQA, a Swin Transformer-based framework for blind image quality assessment that achieves state-of-the-art performance on KonIQ-10k. By replacing the CNN backbone with Swin Transformer and introducing multi-scale attention-guided fusion, our method captures richer semantic and spatial features for quality prediction. Extensive experiments demonstrate that SMART-IQA achieves 0.9378 SRCC, outperforming the original HyperIQA by 3.18\% and other competing methods. Ablation studies reveal that the Swin Transformer backbone contributes 87\% of the total improvement, while multi-scale fusion and attention mechanism provide additional gains of 5\% and 8\%, respectively. Cross-dataset evaluations validate the strong generalization capability of our approach. Our work demonstrates the effectiveness of hierarchical vision transformers for IQA and provides insights into the importance of multi-scale feature fusion and adaptive attention mechanisms. Future work will explore lightweight architectures and extensions to video quality assessment.
+We propose SMART-IQA, a Swin Transformer-based framework for blind image quality assessment that achieves state-of-the-art performance on KonIQ-10k. By replacing the CNN backbone with Swin Transformer and introducing the Adaptive Feature Aggregation (AFA) module with attention-guided fusion, our method captures richer semantic and spatial features for quality prediction. Extensive experiments demonstrate that SMART-IQA achieves 0.9378 SRCC, outperforming the original HyperIQA by 3.18\% and other competing methods. Ablation studies reveal that the Swin Transformer backbone contributes 87\% of the total improvement, while the AFA module and attention mechanism provide additional gains of 5\% and 8\%, respectively. Cross-dataset evaluations validate the strong generalization capability of our approach. Our work demonstrates the effectiveness of hierarchical vision transformers for IQA and provides insights into the importance of adaptive feature aggregation and attention mechanisms. Future work will explore lightweight architectures and extensions to video quality assessment.
 
 \section*{Acknowledgment}
 
@@ -295,9 +289,7 @@ Table \ref{tab:training_log} presents the epoch-wise training log of our best mo
 
 \subsection{Computational Complexity}
 
-Table \ref{tab:complexity} analyzes the computational complexity of different models. While SMART-IQA-Base has more parameters (88M) compared to lightweight methods, it achieves significantly better performance. The Tiny variant (28M parameters) offers a competitive balance with only 1.29\% SRCC drop compared to the Base model.
-
-\input{TABLE_COMPLEXITY.tex}
+Our SMART-IQA models have the following parameter counts: Tiny (28M), Small (50M), and Base (88M). While the Base model has more parameters than the ResNet50-based HyperIQA (25M), it achieves significantly better performance (+3.18\% SRCC). The Tiny variant offers an excellent efficiency-performance trade-off with only 1.29\% SRCC drop compared to the Base model while maintaining comparable parameter count to the baseline.
 
 \subsection{Data Augmentation}
 We explored various data augmentation strategies including color jitter, random horizontal flipping, and random cropping. Interestingly, we found that aggressive color jitter can hurt in-domain performance while slightly improving cross-dataset generalization. For the final model, we use only random cropping to balance performance and training efficiency.
@@ -327,6 +319,26 @@ Pairwise Ranking & 0.9292 & 0.9249 & -0.0083 \\
 \includegraphics[width=0.48\textwidth]{../paper_figures/loss_function_comparison.pdf}
 \caption{Loss function performance comparison. Left: SRCC comparison showing L1 (MAE) achieves the best performance. Right: SRCC vs PLCC scatter plot demonstrating the consistency of L1 loss across both metrics.}
 \label{fig:loss_comparison}
+\end{figure}
+
+\appendix
+
+\section{Feature Map Visualization}
+
+To further demonstrate the hierarchical feature learning capability of our Swin Transformer backbone, we visualize the feature activations across four stages for images of different quality levels. Figure \ref{fig:feature_high} shows a high-quality image where Stage 3 (semantic features) captures the overall scene composition, while Figure \ref{fig:feature_low} shows a low-quality image where lower stages (Stage 0-1) exhibit strong activations on local distortions and texture degradation. These visualizations confirm that the multi-scale architecture effectively extracts features at different abstraction levels, which are then adaptively weighted by our channel attention mechanism (as shown in Figure \ref{fig:attention_analysis}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.48\textwidth]{../paper_figures/feature_map_high_quality_appendix.pdf}
+\caption{Feature map visualization for a high-quality image. The hierarchical feature extraction shows clear semantic understanding in Stage 3.}
+\label{fig:feature_high}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.48\textwidth]{../paper_figures/feature_map_low_quality_appendix.pdf}
+\caption{Feature map visualization for a low-quality image. Strong activations in lower stages (Stage 0-1) indicate the model focuses on local distortions and texture details.}
+\label{fig:feature_low}
 \end{figure}
 
 \end{document}
