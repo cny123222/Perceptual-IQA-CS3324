@@ -21,7 +21,7 @@
 \IEEEauthorblockA{\textit{School of Computer Science} \\
 \textit{Shanghai Jiao Tong University}\\
 Shanghai, China \\
-nuoyanchen@sjtu.edu.cn}
+cny123222@sjtu.edu.cn}
 }
 
 \maketitle
@@ -85,6 +85,15 @@ We report Spearman's Rank Correlation Coefficient (SRCC) and Pearson Linear Corr
 \subsubsection{Implementation Details}
 We implement SMART-IQA using PyTorch and train on NVIDIA GPUs. Input images are randomly cropped to $224\times224$ during training and evaluated using 20 patches during testing. We use Swin Transformer pretrained on ImageNet-21K as initialization. Training takes approximately 1.7 hours for 10 epochs.
 
+Figure \ref{fig:training_curves} shows the training process of our best model. The model converges at Epoch 7 with SRCC of 0.9378 and PLCC of 0.9485, demonstrating stable and effective optimization.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.9\textwidth]{../paper_figures/main_training_curves_final.pdf}
+\caption{Training curves of the best model (Swin-Base, LR=$5\times10^{-7}$). Left: Training and validation loss. Middle: Validation SRCC with best performance at Epoch 7 (0.9378). Right: Validation PLCC (0.9485). The model shows stable convergence with early stopping triggered at Epoch 10.}
+\label{fig:training_curves}
+\end{figure*}
+
 \subsection{Comparison with State-of-the-Art}
 
 Table \ref{tab:sota_comparison} presents the comparison with state-of-the-art methods on KonIQ-10k. SMART-IQA achieves the best performance with SRCC of 0.9378 and PLCC of 0.9485, outperforming all existing methods. Compared to the original HyperIQA, our method improves SRCC by 3.18\% (from 0.9060 to 0.9378), demonstrating the effectiveness of our Swin Transformer-based architecture with multi-scale attention fusion. Our method also surpasses recent transformer-based approaches like MUSIQ and MANIQA, while using comparable or fewer parameters.
@@ -111,7 +120,7 @@ MANIQA \cite{yang2022maniqa} & 2022 & ViT-Small & 0.920 & 0.930 \\
 
 \subsection{Ablation Study}
 
-To validate the contribution of each component, we conduct a comprehensive ablation study. Table \ref{tab:ablation_study} presents the progressive ablation results. Starting from the HyperIQA baseline with ResNet-50 (SRCC: 0.9070), we observe that replacing the backbone with Swin Transformer alone brings a substantial improvement of +2.68\% SRCC (to 0.9338), accounting for 87\% of the total gain. Adding multi-scale fusion contributes an additional +0.15\% (to 0.9353), and the channel attention mechanism further improves performance by +0.25\% (to 0.9378). These results demonstrate that the Swin Transformer backbone is the dominant contributor, while multi-scale fusion and attention mechanism provide complementary benefits.
+To validate the contribution of each component, we conduct a comprehensive ablation study. Table \ref{tab:ablation_study} presents the progressive ablation results. Starting from the HyperIQA baseline with ResNet-50 (SRCC: 0.9070), we observe that replacing the backbone with Swin Transformer alone brings a substantial improvement of +2.68\% SRCC (to 0.9338), accounting for 87\% of the total gain. Adding multi-scale fusion contributes an additional +0.15\% (to 0.9353), and the channel attention mechanism further improves performance by +0.25\% (to 0.9378). These results demonstrate that the Swin Transformer backbone is the dominant contributor, while multi-scale fusion and attention mechanism provide complementary benefits. Figure \ref{fig:ablation} visualizes these contributions for both SRCC and PLCC metrics.
 
 \begin{table}[t]
 \centering
@@ -139,9 +148,16 @@ Backbone only & $\times$ & $\times$ & 0.9338 \\
 \end{tabular}
 \end{table}
 
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.9\textwidth]{../paper_figures/ablation_dual_bars.pdf}
+\caption{Ablation study visualization. Left: SRCC comparison showing Swin Transformer contributes 87\% of total improvement. Right: PLCC comparison demonstrating consistent gains across both metrics. The full model achieves SRCC of 0.9378 and PLCC of 0.9485.}
+\label{fig:ablation}
+\end{figure*}
+
 \subsection{Cross-Dataset Generalization}
 
-To evaluate the generalization capability, we test our model trained on KonIQ-10k on three cross-dataset benchmarks without any fine-tuning. Table \ref{tab:cross_dataset} compares the results with HyperIQA. SMART-IQA consistently outperforms HyperIQA on most datasets, demonstrating strong generalization ability. On SPAQ (smartphone images), our method achieves SRCC of 0.8698 (+2.08\% over HyperIQA). On KADID-10K (synthetic distortions), we obtain SRCC of 0.5412 (+5.64\% improvement). The average cross-domain SRCC is 0.6865, representing a +2.10\% improvement over HyperIQA. These results validate that our Swin-based architecture learns more generalizable quality-aware representations.
+To evaluate the generalization capability, we test our model trained on KonIQ-10k on three cross-dataset benchmarks without any fine-tuning. Table \ref{tab:cross_dataset} compares the results with HyperIQA. SMART-IQA consistently outperforms HyperIQA on most datasets, demonstrating strong generalization ability. On SPAQ (smartphone images), our method achieves SRCC of 0.8698 (+2.08\% over HyperIQA). On KADID-10K (synthetic distortions), we obtain SRCC of 0.5412 (+5.64\% improvement). The average cross-domain SRCC is 0.6865, representing a +2.10\% improvement over HyperIQA. These results validate that our Swin-based architecture learns more generalizable quality-aware representations. Figure \ref{fig:cross_dataset} visualizes the performance comparison across all datasets.
 
 \begin{table}[t]
 \centering
@@ -165,9 +181,16 @@ AGIQA-3K & 0.6627 & 0.7236 & 0.6484 & 0.6830 \\
 \end{tabular}
 \end{table}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.48\textwidth]{../paper_figures/cross_dataset_heatmap.pdf}
+\caption{Cross-dataset performance heatmap comparing HyperIQA and SMART-IQA. Our method consistently outperforms HyperIQA across most datasets, demonstrating strong generalization capability.}
+\label{fig:cross_dataset}
+\end{figure}
+
 \subsection{Model Variants}
 
-To explore the performance-efficiency trade-off, we evaluate SMART-IQA with three Swin Transformer sizes: Tiny (28M parameters), Small (50M parameters), and Base (88M parameters). Table \ref{tab:model_size} presents the results. The Base model achieves the best performance (SRCC: 0.9378), while the Small variant offers an excellent balance with only 0.40\% SRCC drop but 43\% fewer parameters (SRCC: 0.9338, 50M parameters). The Tiny model, with 68\% parameter reduction, experiences a 1.29\% SRCC decrease (SRCC: 0.9249, 28M parameters). These results demonstrate that our method is flexible and can be adapted to different computational budgets. The Small variant is particularly attractive for deployment scenarios where resource constraints are important.
+To explore the performance-efficiency trade-off, we evaluate SMART-IQA with three Swin Transformer sizes: Tiny (28M parameters), Small (50M parameters), and Base (88M parameters). Table \ref{tab:model_size} presents the results. The Base model achieves the best performance (SRCC: 0.9378), while the Small variant offers an excellent balance with only 0.40\% SRCC drop but 43\% fewer parameters (SRCC: 0.9338, 50M parameters). The Tiny model, with 68\% parameter reduction, experiences a 1.29\% SRCC decrease (SRCC: 0.9249, 28M parameters). These results demonstrate that our method is flexible and can be adapted to different computational budgets. The Small variant is particularly attractive for deployment scenarios where resource constraints are important. Figure \ref{fig:model_size} visualizes the performance-efficiency trade-off across model sizes.
 
 \begin{table}[t]
 \centering
@@ -191,6 +214,13 @@ Small & 50M & 0.9338 & 0.9455 \\
 \end{tabular}
 \end{table}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.48\textwidth]{../paper_figures/model_size_final.pdf}
+\caption{Performance vs model size trade-off. Left: SRCC comparison showing all variants outperform HyperIQA baseline. Right: Parameter-performance scatter plot highlighting the evolution path. Small variant offers the best balance for deployment.}
+\label{fig:model_size}
+\end{figure}
+
 \section{Conclusion}
 
 We propose SMART-IQA, a Swin Transformer-based framework for blind image quality assessment that achieves state-of-the-art performance on KonIQ-10k. By replacing the CNN backbone with Swin Transformer and introducing multi-scale attention-guided fusion, our method captures richer semantic and spatial features for quality prediction. Extensive experiments demonstrate that SMART-IQA achieves 0.9378 SRCC, outperforming the original HyperIQA by 3.18\% and other competing methods. Ablation studies reveal that the Swin Transformer backbone contributes 87\% of the total improvement, while multi-scale fusion and attention mechanism provide additional gains of 5\% and 8\%, respectively. Cross-dataset evaluations validate the strong generalization capability of our approach. Our work demonstrates the effectiveness of hierarchical vision transformers for IQA and provides insights into the importance of multi-scale feature fusion and adaptive attention mechanisms. Future work will explore lightweight architectures and extensions to video quality assessment.
@@ -208,12 +238,43 @@ The author would like to thank Shanghai Jiao Tong University for providing compu
 \section{Additional Experimental Details}
 
 \subsection{Learning Rate Sensitivity}
-We conducted extensive learning rate sensitivity analysis and found that Swin Transformer requires significantly smaller learning rates compared to CNNs. The optimal learning rate of $5\times10^{-7}$ is 200$\times$ lower than the learning rate used for ResNet-50 ($1\times10^{-4}$). Learning rates larger than $5\times10^{-6}$ lead to training instability, while rates smaller than $1\times10^{-7}$ result in slow convergence.
+We conducted extensive learning rate sensitivity analysis and found that Swin Transformer requires significantly smaller learning rates compared to CNNs. The optimal learning rate of $5\times10^{-7}$ is 200$\times$ lower than the learning rate used for ResNet-50 ($1\times10^{-4}$). Learning rates larger than $5\times10^{-6}$ lead to training instability, while rates smaller than $1\times10^{-7}$ result in slow convergence. Figure \ref{fig:lr_sensitivity} shows the complete learning rate sensitivity analysis.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.48\textwidth]{../paper_figures/lr_sensitivity_final.pdf}
+\caption{Learning rate sensitivity analysis. Left: SRCC vs learning rate showing optimal LR at $5\times10^{-7}$ (marked with gold star). Right: Training efficiency showing faster convergence with larger learning rates but slightly worse performance. The y-axis range is extended to better visualize the stability of the training process.}
+\label{fig:lr_sensitivity}
+\end{figure}
 
 \subsection{Data Augmentation}
 We explored various data augmentation strategies including color jitter, random horizontal flipping, and random cropping. Interestingly, we found that aggressive color jitter can hurt in-domain performance while slightly improving cross-dataset generalization. For the final model, we use only random cropping to balance performance and training efficiency.
 
 \subsection{Loss Function Comparison}
-We compared five loss functions: L1 (MAE), L2 (MSE), SRCC loss, Pairwise Ranking loss, and Pairwise Fidelity loss. Simple L1 loss consistently outperformed more complex ranking-based losses in our experiments. L1 achieves SRCC of 0.9375, while Pairwise Ranking loss only reaches 0.9292. This suggests that direct regression with L1 loss is more effective than relative comparison approaches for this task.
+We compared five loss functions: L1 (MAE), L2 (MSE), SRCC loss, Pairwise Ranking loss, and Pairwise Fidelity loss. Simple L1 loss consistently outperformed more complex ranking-based losses in our experiments. L1 achieves SRCC of 0.9375, while Pairwise Ranking loss only reaches 0.9292. This suggests that direct regression with L1 loss is more effective than relative comparison approaches for this task. Table \ref{tab:loss_comparison} provides the detailed comparison. Figure \ref{fig:loss_comparison} visualizes the performance differences across different loss functions.
+
+\begin{table}[t]
+\centering
+\caption{Loss function comparison on KonIQ-10k}
+\label{tab:loss_comparison}
+\begin{tabular}{lccc}
+\hline
+Loss Function & SRCC & PLCC & $\Delta$ SRCC \\
+\hline
+\textbf{L1 (MAE)} & \textbf{0.9375} & \textbf{0.9488} & - \\
+L2 (MSE) & 0.9373 & 0.9469 & -0.0002 \\
+Pairwise Fidelity & 0.9315 & 0.9373 & -0.0060 \\
+SRCC Loss & 0.9313 & 0.9416 & -0.0062 \\
+Pairwise Ranking & 0.9292 & 0.9249 & -0.0083 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.48\textwidth]{../paper_figures/loss_function_comparison.pdf}
+\caption{Loss function performance comparison. Left: SRCC comparison showing L1 (MAE) achieves the best performance. Right: SRCC vs PLCC scatter plot demonstrating the consistency of L1 loss across both metrics.}
+\label{fig:loss_comparison}
+\end{figure}
 
 \end{document}
