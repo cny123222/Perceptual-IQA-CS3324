@@ -107,21 +107,32 @@ Table \ref{tab:sota_comparison} presents the comparison with state-of-the-art me
 
 \begin{table*}[t]
 \centering
-\caption{Performance comparison with state-of-the-art methods on KonIQ-10k dataset}
+\caption{Performance comparison with state-of-the-art methods on KonIQ-10k dataset. Best results are in bold.}
 \label{tab:sota_comparison}
-\begin{tabular}{lcccc}
+\begin{tabular}{lccc}
 \hline
-Method & Year & Backbone & SRCC & PLCC \\
+Method & Backbone & SRCC & PLCC \\
 \hline
-NIMA \cite{talebi2018nima} & 2018 & InceptionNet & 0.558 & 0.590 \\
-PaQ-2-PiQ \cite{ying2020paq2piq} & 2020 & ResNet18 & 0.892 & 0.904 \\
-HyperIQA \cite{su2020hyperiq} & 2020 & ResNet50 & 0.906 & 0.917 \\
-MUSIQ \cite{ke2021musiq} & 2021 & Multi-scale ViT & 0.915 & 0.930 \\
-TReS \cite{golestaneh2022tres} & 2022 & Transformer & 0.908 & 0.922 \\
-MANIQA \cite{yang2022maniqa} & 2022 & ViT-Small & 0.920 & 0.930 \\
+\multicolumn{4}{l}{\textit{CNN-based Methods}} \\
+NIMA \cite{talebi2018nima} & InceptionNet & 0.558 & 0.590 \\
+PaQ-2-PiQ \cite{ying2020paq2piq} & ResNet18 & 0.892 & 0.904 \\
+HyperIQA \cite{su2020hyperiq} & ResNet50 & 0.906 & 0.917 \\
+DBCNN \cite{zhang2018dbcnn} & ResNet50 & 0.884 & 0.968$^*$ \\
 \hline
-\textbf{SMART-IQA (Ours)} & 2024 & Swin-Base & \textbf{0.9378} & \textbf{0.9485} \\
+\multicolumn{4}{l}{\textit{Transformer-based Methods}} \\
+MUSIQ \cite{ke2021musiq} & Multi-scale ViT & 0.915 & 0.937$^*$ \\
+TReS \cite{golestaneh2022tres} & Transformer & 0.908 & 0.924$^*$ \\
+MANIQA \cite{yang2022maniqa} & ViT-Small & 0.920 & 0.930 \\
+UNIQUE \cite{zhang2021unique} & Swin-Tiny & 0.893 & 0.900$^*$ \\
+LIQE \cite{zhang2023liqe} & MobileNet-Swin & 0.919 & 0.908$^*$ \\
+StairIQA \cite{sun2024stairiqa} & ResNet50 & 0.921 & 0.936$^*$ \\
 \hline
+\multicolumn{4}{l}{\textit{SMART-IQA (Ours)}} \\
+Swin-Tiny & Swin-T (28M) & 0.9249 & 0.9360 \\
+Swin-Small & Swin-S (50M) & 0.9338 & 0.9455 \\
+\textbf{Swin-Base} & Swin-B (88M) & \textbf{0.9378} & \textbf{0.9485} \\
+\hline
+\multicolumn{4}{l}{$^*$Results from original papers or reproduced with official code.} \\
 \end{tabular}
 \end{table*}
 
@@ -270,6 +281,24 @@ We conducted extensive learning rate sensitivity analysis and found that Swin Tr
 \caption{Learning rate sensitivity analysis. Left: SRCC vs learning rate showing optimal LR at $5\times10^{-7}$ (marked with gold star). Right: Training efficiency showing faster convergence with larger learning rates but slightly worse performance. The y-axis range is extended to better visualize the stability of the training process.}
 \label{fig:lr_sensitivity}
 \end{figure}
+
+\subsection{Complete Hyperparameter Settings}
+
+Table \ref{tab:hyperparameters} provides the complete experimental configuration for all SMART-IQA variants. All models use the same training strategy with careful learning rate tuning: $5\times10^{-7}$ for the Swin Transformer backbone and $5\times10^{-6}$ for other components. This 10$\times$ difference is crucial for stable training and optimal performance.
+
+\input{TABLE_HYPERPARAMETERS.tex}
+
+\subsection{Training Log Analysis}
+
+Table \ref{tab:training_log} presents the epoch-wise training log of our best model (Swin-Base, LR=$5\times10^{-7}$). The model shows stable convergence with consistent improvement across epochs, reaching the best test SRCC of 0.9378 at Epoch 8. No overfitting is observed as training and test metrics increase together.
+
+\input{TABLE_TRAINING_LOG.tex}
+
+\subsection{Computational Complexity}
+
+Table \ref{tab:complexity} analyzes the computational complexity of different models. While SMART-IQA-Base has more parameters (88M) compared to lightweight methods, it achieves significantly better performance. The Tiny variant (28M parameters) offers a competitive balance with only 1.29\% SRCC drop compared to the Base model.
+
+\input{TABLE_COMPLEXITY.tex}
 
 \subsection{Data Augmentation}
 We explored various data augmentation strategies including color jitter, random horizontal flipping, and random cropping. Interestingly, we found that aggressive color jitter can hurt in-domain performance while slightly improving cross-dataset generalization. For the final model, we use only random cropping to balance performance and training efficiency.

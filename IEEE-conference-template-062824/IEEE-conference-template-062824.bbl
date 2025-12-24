@@ -88,4 +88,26 @@ C.~Li, Z.~Zhang, H.~Wu, W.~Sun, X.~Min, X.~Liu, G.~Zhai, and W.~Lin,
   ``Agiqa-3k: An open database for ai-generated image quality assessment,''
   \emph{IEEE Transactions on Circuits and Systems for Video Technology}, 2023.
 
+\bibitem{zhang2018dbcnn}
+W.~Zhang, K.~Ma, J.~Yan, D.~Deng, and Z.~Wang, ``Blind image quality assessment
+  using a deep bilinear convolutional neural network,'' \emph{IEEE Transactions
+  on Circuits and Systems for Video Technology}, vol.~30, no.~1, pp. 36--47,
+  2018.
+
+\bibitem{zhang2021unique}
+W.~Zhang, K.~Ma, G.~Zhai, and X.~Yang, ``Uncertainty-aware blind image quality
+  assessment in the laboratory and wild,'' in \emph{Proceedings of the IEEE/CVF
+  International Conference on Computer Vision}, 2021, pp. 3142--3151.
+
+\bibitem{zhang2023liqe}
+W.~Zhang, G.~Zhai, Y.~Wei, X.~Yang, and K.~Ma, ``Blind image quality assessment
+  via vision-language correspondence: A multitask learning perspective,'' in
+  \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern
+  Recognition}, 2023, pp. 14\,071--14\,081.
+
+\bibitem{sun2024stairiqa}
+W.~Sun, H.~Zhang, L.~Liao, Y.~Wei, G.~Zhai, and X.~Min, ``Stairiqa: Towards
+  staircase-shaped quality scales for blind image quality assessment,''
+  \emph{IEEE Transactions on Multimedia}, 2024.
+
 \end{thebibliography}

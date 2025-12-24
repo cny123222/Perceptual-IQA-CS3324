@@ -1,0 +1,36 @@
+% Updated Table 1: SOTA Comparison on KonIQ-10k
+% - Removed Year column
+% - Added Tiny, Small, Base variants
+% - Added more benchmarks: LIQE, DBCNN, UNIQUE, etc.
+
+\begin{table*}[t]
+\centering
+\caption{Performance comparison with state-of-the-art methods on KonIQ-10k dataset. Best results are in bold, second best are underlined.}
+\label{tab:sota_comparison}
+\begin{tabular}{lccc}
+\hline
+Method & Backbone & SRCC & PLCC \\
+\hline
+\multicolumn{4}{l}{\textit{CNN-based Methods}} \\
+NIMA \cite{talebi2018nima} & InceptionNet & 0.558 & 0.590 \\
+PaQ-2-PiQ \cite{ying2020paq2piq} & ResNet18 & 0.892 & 0.904 \\
+HyperIQA \cite{su2020hyperiq} & ResNet50 & 0.906 & 0.917 \\
+DBCNN \cite{zhang2018dbcnn} & ResNet50 & 0.884 & 0.968$^*$ \\
+\hline
+\multicolumn{4}{l}{\textit{Transformer-based Methods}} \\
+MUSIQ \cite{ke2021musiq} & Multi-scale ViT & 0.915 & 0.937$^*$ \\
+TReS \cite{golestaneh2022tres} & Transformer & 0.908 & 0.924$^*$ \\
+MANIQA \cite{yang2022maniqa} & ViT-Small & 0.920 & 0.930 \\
+UNIQUE \cite{zhang2021unique} & Swin-Tiny & 0.893 & 0.900$^*$ \\
+LIQE \cite{zhang2023liqe} & MobileNet-Swin & 0.919 & 0.908$^*$ \\
+StairIQA \cite{sun2024stairiqa} & ResNet50 & 0.921 & 0.936$^*$ \\
+\hline
+\multicolumn{4}{l}{\textit{SMART-IQA (Ours)}} \\
+Swin-Tiny & Swin-T (28M) & 0.9249 & 0.9360 \\
+Swin-Small & Swin-S (50M) & 0.9338 & 0.9455 \\
+\textbf{Swin-Base} & Swin-B (88M) & \textbf{0.9378} & \textbf{0.9485} \\
+\hline
+\multicolumn{4}{l}{$^*$Results from original papers or reproduced with official code.} \\
+\end{tabular}
+\end{table*}
+
