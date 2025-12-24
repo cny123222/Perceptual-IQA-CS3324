@@ -175,7 +175,7 @@ class CSIQFolder(data.Dataset):
 
 class Koniq_10kFolder(data.Dataset):
 
-    def __init__(self, root, index, transform, patch_num):
+    def __init__(self, root, index, transform, patch_num, preload=False):
         imgname = []
         mos_all = []
         csv_file = os.path.join(root, 'koniq10k_scores_and_distributions.csv')
@@ -264,27 +264,45 @@ class Koniq_10kFolder(data.Dataset):
             self.crop_transform = None
             has_resize = False
         
-        # Cache resized images for faster access
+        # Cache strategy based on preload flag
         self._resized_cache = {}
+        self._preload = preload
+        self._preloaded_samples = {}  # For full preloading (patch_idx -> tensor)
         unique_paths = list(set([s[0] for s in sample]))
         
-        # Pre-load and resize unique images (avoids repeated file I/O and resizing)
-        print(f'Pre-loading {len(unique_paths)} unique images into cache...')
-        for path in tqdm(unique_paths, desc='  Loading images', unit='img'):
-            if os.path.exists(path):
+        if preload:
+            # Full preloading: load and transform all patches into memory
+            print(f'⚡ FULL PRELOAD MODE: Loading ALL {len(sample)} samples (images + transforms) into memory...')
+            print(f'   This will use ~10GB RAM but significantly speed up training!')
+            for idx in tqdm(range(len(sample)), desc='  Preloading samples', unit='sample'):
+                path, target = sample[idx]
                 try:
                     img = pil_loader(path)
-                    # Only cache if Resize is part of transform
-                    if has_resize:
-                        self._resized_cache[path] = self.resize_transform(img)
-                    else:
-                        # If no Resize in transform, cache original image
-                        self._resized_cache[path] = img
+                    if self.transform is not None:
+                        img = self.transform(img)
+                    self._preloaded_samples[idx] = (img, target)
                 except Exception as e:
-                    # Skip images that can't be loaded, but log the error
-                    print(f'  Warning: Failed to load {path}: {e}')
+                    print(f'  Warning: Failed to preload sample {idx} ({path}): {e}')
                     continue
-        print(f'  Cached {len(self._resized_cache)} images successfully')
+            print(f'  ✓ Successfully preloaded {len(self._preloaded_samples)} samples into memory!')
+        else:
+            # Original caching: only cache resized images (lighter memory footprint)
+            print(f'Pre-loading {len(unique_paths)} unique images into cache (resize only)...')
+            for path in tqdm(unique_paths, desc='  Loading images', unit='img'):
+                if os.path.exists(path):
+                    try:
+                        img = pil_loader(path)
+                        # Only cache if Resize is part of transform
+                        if has_resize:
+                            self._resized_cache[path] = self.resize_transform(img)
+                        else:
+                            # If no Resize in transform, cache original image
+                            self._resized_cache[path] = img
+                    except Exception as e:
+                        # Skip images that can't be loaded, but log the error
+                        print(f'  Warning: Failed to load {path}: {e}')
+                        continue
+            print(f'  Cached {len(self._resized_cache)} images successfully')
 
     def __getitem__(self, index):
         """
@@ -294,6 +312,10 @@ class Koniq_10kFolder(data.Dataset):
         Returns:
             tuple: (sample, target) where target is class_index of the target class.
         """
+        # If fully preloaded, return directly from cache
+        if self._preload and index in self._preloaded_samples:
+            return self._preloaded_samples[index]
+        
         path, target = self.samples[index]
         try:
             # Get cached image (pre-resized if Resize was in transform)

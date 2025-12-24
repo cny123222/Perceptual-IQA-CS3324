@@ -17,13 +17,14 @@ echo ""
 
 # 设置通用参数
 DATASET="koniq-10k"
-DATA_PATH="./koniq-10k"
+DATA_PATH="koniq-10k"  # Will auto-detect correct path
 EPOCHS=10
 LR=1e-4
 BATCH_SIZE=32
 TRAIN_PATCHES=25
 TEST_PATCHES=25
 SEED=42
+PRELOAD="--preload_images"  # Enable image preloading for faster training
 
 # 创建日志目录
 LOG_DIR="logs/resnet_ablation_$(date +%Y%m%d_%H%M%S)"
@@ -57,6 +58,7 @@ python3 train_resnet_improved.py \
     --test_random_crop \
     --seed $SEED \
     --save_model \
+    $PRELOAD \
     2>&1 | tee $LOG_DIR/exp1_baseline.log
 
 echo ""
@@ -91,6 +93,7 @@ python3 train_resnet_improved.py \
     --test_random_crop \
     --seed $SEED \
     --save_model \
+    $PRELOAD \
     2>&1 | tee $LOG_DIR/exp2_multiscale.log
 
 echo ""
@@ -126,6 +129,7 @@ python3 train_resnet_improved.py \
     --test_random_crop \
     --seed $SEED \
     --save_model \
+    $PRELOAD \
     2>&1 | tee $LOG_DIR/exp3_multiscale_attention.log
 
 echo ""

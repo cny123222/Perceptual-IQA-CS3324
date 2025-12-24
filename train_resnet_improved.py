@@ -40,7 +40,13 @@ class ResNetImprovedSolver:
         total_params = sum(p.numel() for p in self.model.parameters())
         print(f"Total parameters: {total_params / 1e6:.2f}M\n")
         
-        # Data loaders
+        # Data loaders with preloading
+        print("Initializing data loaders...")
+        if config.preload_images:
+            print("⚡ Image preloading ENABLED - loading images into memory...")
+        else:
+            print("💾 Image preloading DISABLED - loading on-the-fly")
+        
         self.train_loader = DataLoader(
             data_loader.DataLoader(
                 config.dataset, 
@@ -50,10 +56,13 @@ class ResNetImprovedSolver:
                 config.train_patch_num,
                 batch_size=config.batch_size,
                 istrain=True,
-                use_color_jitter=config.use_color_jitter
+                use_color_jitter=config.use_color_jitter,
+                preload=config.preload_images
             ),
             batch_size=1,  # Our custom DataLoader handles batching
-            shuffle=True
+            shuffle=True,
+            num_workers=4 if not config.preload_images else 0,  # Use workers only if not preloaded
+            pin_memory=True
         )
         
         self.test_loader = DataLoader(
@@ -64,11 +73,17 @@ class ResNetImprovedSolver:
                 config.patch_size,
                 config.test_patch_num,
                 istrain=False,
-                test_random_crop=config.test_random_crop
+                test_random_crop=config.test_random_crop,
+                preload=config.preload_images
             ),
             batch_size=1,
-            shuffle=False
+            shuffle=False,
+            num_workers=4 if not config.preload_images else 0,
+            pin_memory=True
         )
+        
+        if config.preload_images:
+            print("✓ All images loaded into memory!\n")
         
         # Optimizer
         self.optimizer = optim.AdamW(
@@ -223,6 +238,51 @@ class ResNetImprovedSolver:
         return self.best_srcc, self.best_plcc
 
 
+def get_koniq_train_test_indices(root_path):
+    """Get train and test indices for KonIQ-10k based on official split"""
+    import csv
+    import json
+    
+    csv_file = os.path.join(root_path, 'koniq10k_scores_and_distributions.csv')
+    train_json = os.path.join(root_path, 'koniq_train.json')
+    test_json = os.path.join(root_path, 'koniq_test.json')
+    
+    # Read CSV to get all image names
+    csv_images = []
+    with open(csv_file) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            csv_images.append(row['image_name'])
+    
+    # Read official train/test split from JSON
+    train_images = set()
+    test_images = set()
+    
+    if os.path.exists(train_json):
+        with open(train_json) as f:
+            train_data = json.load(f)
+            for item in train_data:
+                train_images.add(os.path.basename(item['image']))
+    
+    if os.path.exists(test_json):
+        with open(test_json) as f:
+            test_data = json.load(f)
+            for item in test_data:
+                test_images.add(os.path.basename(item['image']))
+    
+    # Get indices for train and test images from CSV
+    train_indices = []
+    test_indices = []
+    
+    for idx, img_name in enumerate(csv_images):
+        if img_name in train_images:
+            train_indices.append(idx)
+        elif img_name in test_images:
+            test_indices.append(idx)
+    
+    return train_indices, test_indices
+
+
 def main(config):
     """Main function"""
     # Set random seed
@@ -233,11 +293,33 @@ def main(config):
     print(f"Loading dataset: {config.dataset}")
     
     if config.dataset == 'koniq-10k':
-        import scipy.io
-        data_path = config.data_path
-        mat_file = scipy.io.loadmat(os.path.join(data_path, 'koniq10k_distributions_sets.mat'))
-        train_idx = mat_file['train_sel'][0] - 1  # MATLAB index to Python
-        test_idx = mat_file['test_sel'][0] - 1
+        # Try different path locations
+        possible_paths = [
+            config.data_path,
+            'koniq-10k',
+            './koniq-10k',
+            '../koniq-10k',
+            '/root/Perceptual-IQA-CS3324/koniq-10k'
+        ]
+        
+        dataset_path = None
+        for path in possible_paths:
+            test_file = os.path.join(path, 'koniq10k_scores_and_distributions.csv')
+            if os.path.exists(test_file):
+                dataset_path = path
+                config.data_path = path  # Update config with correct path
+                print(f"✓ Found dataset at: {path}")
+                break
+        
+        if dataset_path is None:
+            raise FileNotFoundError(
+                f"Could not find koniq-10k dataset in any of:\n" +
+                "\n".join([f"  - {p}" for p in possible_paths])
+            )
+        
+        train_idx, test_idx = get_koniq_train_test_indices(dataset_path)
+        train_idx = np.array(train_idx)
+        test_idx = np.array(test_idx)
         print(f"Train images: {len(train_idx)}")
         print(f"Test images: {len(test_idx)}")
     else:
@@ -293,6 +375,8 @@ if __name__ == '__main__':
                        help='Random seed')
     parser.add_argument('--save_model', action='store_true',
                        help='Save best model')
+    parser.add_argument('--preload_images', action='store_true',
+                       help='Preload all images into memory (faster training, requires ~10GB RAM)')
     
     config = parser.parse_args()
     

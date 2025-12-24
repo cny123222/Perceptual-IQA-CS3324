@@ -5,7 +5,7 @@ import folders
 class DataLoader(object):
     """Dataset class for IQA databases"""
 
-    def __init__(self, dataset, path, img_indx, patch_size, patch_num, batch_size=1, istrain=True, test_random_crop=False, use_color_jitter=True):
+    def __init__(self, dataset, path, img_indx, patch_size, patch_num, batch_size=1, istrain=True, test_random_crop=False, use_color_jitter=True, preload=False):
 
         self.batch_size = batch_size
         self.istrain = istrain
@@ -116,9 +116,12 @@ class DataLoader(object):
             self.data = folders.CSIQFolder(
                 root=path, index=img_indx, transform=transforms, patch_num=patch_num)
         elif dataset == 'koniq-10k':
-            print(f'Loading Koniq-10k dataset from {path}...')
+            if preload:
+                print(f'⚡ Loading Koniq-10k dataset into memory from {path}...')
+            else:
+                print(f'Loading Koniq-10k dataset from {path}...')
             self.data = folders.Koniq_10kFolder(
-                root=path, index=img_indx, transform=transforms, patch_num=patch_num)
+                root=path, index=img_indx, transform=transforms, patch_num=patch_num, preload=preload)
             print(f'Dataset loaded. Total samples: {len(self.data)}')
         elif dataset == 'bid':
             self.data = folders.BIDFolder(
