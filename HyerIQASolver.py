@@ -6,6 +6,7 @@ import data_loader
 from tqdm import tqdm
 import os
 from datetime import datetime
+import time
 
 # 自动检测可用设备：优先使用 CUDA，然后是 MPS (macOS GPU)，最后使用 CPU
 def get_device():
@@ -156,11 +157,16 @@ class HyperIQASolver(object):
             print(f'Early stopping enabled with patience={self.patience}')
         
         if self.spaq_path is not None:
-            print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC\tSPAQ_SRCC\tSPAQ_PLCC')
+            print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC\tSPAQ_SRCC\tSPAQ_PLCC\tTime')
         else:
-            print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC')
+            print('Epoch\tTrain_Loss\tTrain_SRCC\tTest_SRCC\tTest_PLCC\tTime')
+        
+        # Start total training timer
+        training_start_time = time.time()
         
         for t in range(self.epochs):
+            # Start epoch timer
+            epoch_start_time = time.time()
             epoch_loss = []
             pred_scores = []
             gt_scores = []
@@ -185,7 +191,10 @@ class HyperIQASolver(object):
                 pred_scores = pred_scores + pred.cpu().tolist()
                 gt_scores = gt_scores + label.cpu().tolist()
 
-                loss = self.l1_loss(pred.squeeze(), label.float().detach())
+                # Ensure pred and label have same shape for loss calculation
+                pred_flat = pred.view(-1)  # Flatten to 1D
+                label_flat = label.view(-1)  # Flatten to 1D
+                loss = self.l1_loss(pred_flat, label_flat)
                 epoch_loss.append(loss.item())
                 loss.backward()
                 self.solver.step()
@@ -214,13 +223,17 @@ class HyperIQASolver(object):
             if self.spaq_path is not None:
                 spaq_srcc, spaq_plcc = self.test_spaq()
             
-            # Print epoch results
+            # Calculate epoch time
+            epoch_time = time.time() - epoch_start_time
+            epoch_time_str = f"{epoch_time/60:.1f}min" if epoch_time >= 60 else f"{epoch_time:.1f}s"
+            
+            # Print epoch results with time
             if self.spaq_path is not None and spaq_srcc is not None:
-                print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
-                      (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc, spaq_srcc, spaq_plcc))
+                print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f\t\t%4.4f\t\t%4.4f\t%s' %
+                      (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc, spaq_srcc, spaq_plcc, epoch_time_str))
             else:
-                print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f' %
-                      (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc))
+                print('%d\t%4.3f\t\t%4.4f\t\t%4.4f\t\t%4.4f\t%s' %
+                      (t + 1, sum(epoch_loss) / len(epoch_loss), train_srcc, test_srcc, test_plcc, epoch_time_str))
 
             # Only save best model (not every epoch to save disk space)
             if improved:
@@ -258,7 +271,17 @@ class HyperIQASolver(object):
                 print(f'  Learning rates: HyperNet={hypernet_lr:.6f}, Backbone={backbone_lr:.6f}')
             # else: constant LR, no update needed
 
-        print('Best test SRCC %f, PLCC %f' % (best_srcc, best_plcc))
+        # Calculate total training time
+        total_training_time = time.time() - training_start_time
+        hours = int(total_training_time // 3600)
+        minutes = int((total_training_time % 3600) // 60)
+        seconds = int(total_training_time % 60)
+        
+        print('\n' + '=' * 80)
+        print(f'Training completed!')
+        print(f'Total time: {hours}h {minutes}min {seconds}s')
+        print(f'Best test SRCC: {best_srcc:.4f}, PLCC: {best_plcc:.4f}')
+        print('=' * 80)
 
         return best_srcc, best_plcc
 

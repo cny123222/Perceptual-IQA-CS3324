@@ -60,20 +60,12 @@ ax2.plot(epochs, test_srccs, 'D-', linewidth=2.5, markersize=8,
         markeredgecolor='black', markeredgewidth=1.5)
 ax2.set_xlabel('Epoch', fontsize=13, weight='bold')
 ax2.set_ylabel('SRCC', fontsize=13, weight='bold')
+ax2.set_ylim(top=0.941)
 ax2.set_title('Validation SRCC', fontsize=14, weight='bold')
 ax2.grid(True, alpha=0.3, linestyle='--')
 ax2.set_xticks(epochs)
 
-# 标注最佳值
-best_idx = np.argmax(test_srccs)
-ax2.scatter([epochs[best_idx]], [test_srccs[best_idx]], s=500, c='gold', 
-           marker='*', edgecolors='black', linewidths=2, zorder=5)
-ax2.annotate(f'Best: {test_srccs[best_idx]:.4f}\nEpoch {epochs[best_idx]}', 
-            xy=(epochs[best_idx], test_srccs[best_idx]), 
-            xytext=(epochs[best_idx] + 0.8, test_srccs[best_idx] - 0.008),
-            fontsize=10, weight='bold',
-            bbox=dict(boxstyle='round', facecolor='yellow', alpha=0.7),
-            arrowprops=dict(arrowstyle='->', lw=2, color='red'))
+# No annotation - as per user request
 
 # 子图3: PLCC
 ax3 = axes[2]
@@ -85,10 +77,7 @@ ax3.set_title('Validation PLCC', fontsize=14, weight='bold')
 ax3.grid(True, alpha=0.3, linestyle='--')
 ax3.set_xticks(epochs)
 
-# 标注最佳值
-best_plcc_idx = np.argmax(test_plccs)
-ax3.scatter([epochs[best_plcc_idx]], [test_plccs[best_plcc_idx]], s=500, c='gold', 
-           marker='*', edgecolors='black', linewidths=2, zorder=5)
+# No annotation - as per user request
 
 plt.tight_layout()
 plt.savefig(f'{output_dir}/main_training_curves_real.pdf', dpi=300, bbox_inches='tight')
@@ -123,9 +112,7 @@ ax.set_ylabel('Test SRCC', fontsize=12, weight='bold')
 ax.set_title('Validation SRCC Progression', fontsize=13, weight='bold')
 ax.grid(True, alpha=0.3, linestyle='--')
 ax.set_xticks(epochs)
-best_idx = np.argmax(test_srccs)
-ax.scatter([epochs[best_idx]], [test_srccs[best_idx]], s=600, c='gold', 
-          marker='*', edgecolors='black', linewidths=3, zorder=10)
+# No annotation - as per user request
 
 # 子图3: Test PLCC
 ax = axes[1, 0]
@@ -136,9 +123,7 @@ ax.set_ylabel('Test PLCC', fontsize=12, weight='bold')
 ax.set_title('Validation PLCC Progression', fontsize=13, weight='bold')
 ax.grid(True, alpha=0.3, linestyle='--')
 ax.set_xticks(epochs)
-best_plcc_idx = np.argmax(test_plccs)
-ax.scatter([epochs[best_plcc_idx]], [test_plccs[best_plcc_idx]], s=600, c='gold', 
-          marker='*', edgecolors='black', linewidths=3, zorder=10)
+# No annotation - as per user request
 
 # 子图4: Train vs Test SRCC
 ax = axes[1, 1]
@@ -167,6 +152,7 @@ print(f"\n生成的文件:")
 print(f"  1. main_training_curves_real.pdf/.png     - 主图（3子图）论文使用")
 print(f"  2. training_curves_detailed_real.pdf/.png - 详细版（4子图）")
 print("\n关键数据:")
+best_idx = np.argmax(test_srccs)
 print(f"  最佳Epoch: {epochs[best_idx]}")
 print(f"  Test SRCC: {test_srccs[best_idx]:.4f}")
 print(f"  Test PLCC: {test_plccs[best_idx]:.4f}")

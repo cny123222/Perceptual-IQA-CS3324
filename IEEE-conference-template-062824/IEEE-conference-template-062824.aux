@@ -7,11 +7,11 @@
 \citation{ke2021musiq}
 \citation{yang2022maniqa}
 \citation{golestaneh2022tres}
-\citation{su2020hyperiq}
 \@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{1}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}Blind Image Quality Assessment}{1}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}Transformer-based IQA}{1}{}\protected@file@percent }
+\citation{su2020hyperiq}
 \citation{liu2021swin}
 \citation{su2020hyperiq}
 \citation{hosu2020koniq}
@@ -42,11 +42,11 @@
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {IV-A}2}Evaluation Metrics}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {IV-A}3}Implementation Details}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Comparison with State-of-the-Art}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Ablation Study}{2}{}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Architecture of SMART-IQA. The pipeline consists of: (1) Swin Transformer backbone with four hierarchical stages extracting multi-scale features, (2) Adaptive Feature Aggregation (AFA) module that unifies spatial dimensions of Stage 1-3 features to $7\times 7$ through adaptive pooling and convolution, (3) Channel Attention Fusion module that uses Stage 4 features to generate attention weights for dynamically weighting multi-scale features, (4) HyperNet that generates dynamic weights $\theta $ for the TargetNet based on Stage 4 features, and (5) TargetNet that predicts the final quality score using weighted multi-scale features and dynamic parameters. The orange-highlighted attention module enables content-aware feature fusion, while the red dashed arrows indicate dynamic weight generation.}}{3}{}\protected@file@percent }
 \newlabel{fig:architecture}{{1}{3}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Training curves of the best model (Swin-Base, LR=$5\times 10^{-7}$). Left: Training loss decreases from 11.64 to 3.66 over 10 epochs. Middle: Validation SRCC with best performance at Epoch 8 (0.9378, marked with gold star). Right: Validation PLCC reaches 0.9485 at Epoch 8. The model shows stable convergence without overfitting.}}{3}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Training curves of the best model (Swin-Base, LR=$5\times 10^{-7}$). Left: Training loss decreases from 11.64 to 3.66 over 10 epochs. Middle: Validation SRCC with best performance at Epoch 8 (0.9378). Right: Validation PLCC reaches 0.9485 at Epoch 8. The model shows stable convergence without overfitting.}}{3}{}\protected@file@percent }
 \newlabel{fig:training_curves}{{2}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Ablation Study}{3}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Cross-Dataset Generalization}{3}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}Model Variants}{3}{}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Performance comparison with state-of-the-art methods on KonIQ-10k dataset. Best results are in bold.}}{4}{}\protected@file@percent }
@@ -57,22 +57,21 @@
 \newlabel{tab:ablation_study}{{II}{4}}
 \@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Cross-dataset generalization performance (trained on KonIQ-10k)}}{4}{}\protected@file@percent }
 \newlabel{tab:cross_dataset}{{III}{4}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-F}}Attention Mechanism Analysis}{4}{}\protected@file@percent }
 \bibstyle{IEEEtran}
 \bibdata{references}
-\bibcite{su2020hyperiq}{1}
-\bibcite{dosovitskiy2021vit}{2}
-\bibcite{liu2021swin}{3}
 \@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Cross-dataset performance heatmap comparing HyperIQA and SMART-IQA. Our method consistently outperforms HyperIQA across most datasets, demonstrating strong generalization capability.}}{5}{}\protected@file@percent }
 \newlabel{fig:cross_dataset}{{4}{5}}
 \@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Performance-efficiency trade-off across model sizes on KonIQ-10k}}{5}{}\protected@file@percent }
 \newlabel{tab:model_size}{{IV}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-F}}Attention Mechanism Analysis}{5}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {V}Conclusion}{5}{}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Performance vs model size trade-off. Left: SRCC comparison showing all variants outperform HyperIQA baseline. Right: Parameter-performance scatter plot highlighting the evolution path. Small variant offers the best balance for deployment.}}{5}{}\protected@file@percent }
 \newlabel{fig:model_size}{{5}{5}}
 \@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Channel attention weight distribution for images of different quality levels. Top: Attention weights across four Swin Transformer stages. Low-quality image (left) shows balanced multi-scale attention, while high-quality image (right) concentrates 99.67\% weight on Stage 3. Bottom: Visual examples with ground truth and predicted quality scores. This adaptive attention mechanism enables content-aware feature fusion.}}{5}{}\protected@file@percent }
 \newlabel{fig:attention_analysis}{{6}{5}}
-\@writefile{toc}{\contentsline {section}{References}{5}{}\protected@file@percent }
+\bibcite{su2020hyperiq}{1}
+\bibcite{dosovitskiy2021vit}{2}
+\bibcite{liu2021swin}{3}
 \bibcite{talebi2018nima}{4}
 \bibcite{ying2020paq2piq}{5}
 \bibcite{ke2021musiq}{6}
@@ -90,23 +89,24 @@
 \bibcite{zhang2021unique}{18}
 \bibcite{zhang2023liqe}{19}
 \bibcite{wang2023clipiqa}{20}
-\@writefile{toc}{\contentsline {section}{Appendix}{6}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {A}Learning Rate Sensitivity}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{6}{}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Learning rate sensitivity analysis. Left: SRCC vs learning rate showing optimal LR at $5\times 10^{-7}$ (marked with gold star). Right: Training efficiency showing faster convergence with larger learning rates but slightly worse performance. The y-axis range is extended to better visualize the stability of the training process.}}{6}{}\protected@file@percent }
 \newlabel{fig:lr_sensitivity}{{7}{6}}
+\@writefile{toc}{\contentsline {section}{Appendix}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A}Learning Rate Sensitivity}{6}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {B}Complete Hyperparameter Settings}{6}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {C}Training Log Analysis}{6}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {D}Computational Complexity}{6}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {E}Data Augmentation}{6}{}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Detailed Experimental Hyperparameters and Training Configuration}}{7}{}\protected@file@percent }
 \newlabel{tab:hyperparameters}{{V}{7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {D}Computational Complexity}{7}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {E}Data Augmentation}{7}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {F}Loss Function Comparison}{7}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Loss function performance comparison. Left: SRCC comparison showing L1 (MAE) achieves the best performance. Right: SRCC vs PLCC scatter plot demonstrating the consistency of L1 loss across both metrics.}}{7}{}\protected@file@percent }
-\newlabel{fig:loss_comparison}{{8}{7}}
 \@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Epoch-wise Training Log of Best Model (Swin-Base, LR=$5\times 10^{-7}$)}}{8}{}\protected@file@percent }
 \newlabel{tab:training_log}{{VI}{8}}
 \@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Computational Complexity Analysis on KonIQ-10k}}{8}{}\protected@file@percent }
 \newlabel{tab:complexity}{{VII}{8}}
 \@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces Loss function comparison on KonIQ-10k}}{8}{}\protected@file@percent }
 \newlabel{tab:loss_comparison}{{VIII}{8}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Loss function performance comparison. Left: SRCC comparison showing L1 (MAE) achieves the best performance. Right: SRCC vs PLCC scatter plot demonstrating the consistency of L1 loss across both metrics.}}{8}{}\protected@file@percent }
+\newlabel{fig:loss_comparison}{{8}{8}}
 \gdef \@abspage@last{8}
