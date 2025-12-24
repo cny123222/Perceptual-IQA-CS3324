@@ -197,6 +197,8 @@ if __name__ == '__main__':
     parser.add_argument('--train_test_num', dest='train_test_num', type=int, default=10, help='Train-test times')
     parser.add_argument('--lr_scheduler', dest='lr_scheduler_type', type=str, default='step', choices=['step', 'cosine', 'none'], help='Learning rate scheduler type (step: original HyperIQA, cosine: smooth decay)')
     parser.add_argument('--no_lr_scheduler', dest='use_lr_scheduler', action='store_false', help='Disable learning rate scheduler')
+    parser.add_argument('--test_random_crop', dest='test_random_crop', action='store_true', help='Use RandomCrop for testing (original paper setup, default: CenterCrop for reproducibility)')
+    parser.add_argument('--no_color_jitter', dest='use_color_jitter', action='store_false', help='Disable ColorJitter augmentation (disabled by default for ResNet baseline to match original paper)')
     parser.add_argument('--no_spaq', dest='test_spaq', action='store_false', help='Disable SPAQ cross-dataset testing (enabled by default, use this flag to skip)')
 
     config = parser.parse_args()

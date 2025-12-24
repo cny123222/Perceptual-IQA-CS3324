@@ -38,6 +38,9 @@ class HyperIQASolver(object):
         # Test crop method
         self.test_random_crop = getattr(config, 'test_random_crop', False)  # Default: CenterCrop for reproducibility
         
+        # Color jitter augmentation
+        self.use_color_jitter = getattr(config, 'use_color_jitter', True)  # Default: enable ColorJitter
+        
         # SPAQ cross-dataset testing
         self.test_spaq = getattr(config, 'test_spaq', True)  # Default: enable SPAQ testing
         
@@ -63,7 +66,7 @@ class HyperIQASolver(object):
                  ]
         self.solver = torch.optim.Adam(paras, weight_decay=self.weight_decay)
 
-        train_loader = data_loader.DataLoader(config.dataset, path, train_idx, config.patch_size, config.train_patch_num, batch_size=config.batch_size, istrain=True)
+        train_loader = data_loader.DataLoader(config.dataset, path, train_idx, config.patch_size, config.train_patch_num, batch_size=config.batch_size, istrain=True, use_color_jitter=self.use_color_jitter)
         test_loader = data_loader.DataLoader(config.dataset, path, test_idx, config.patch_size, config.test_patch_num, istrain=False, test_random_crop=self.test_random_crop)
         self.train_data = train_loader.get_data()
         self.test_data = test_loader.get_data()
@@ -116,6 +119,7 @@ class HyperIQASolver(object):
         print(f"  Optimizer:                Adam")
         print("-" * 80)
         print(f"Data:")
+        print(f"  Train ColorJitter:        {'ENABLED' if self.use_color_jitter else 'DISABLED'}")
         print(f"  Test Crop Method:         {'RandomCrop' if self.test_random_crop else 'CenterCrop'}")
         print(f"  Test Patch Num:           {self.test_patch_num}")
         print(f"  Cross-Dataset Test:       {'SPAQ' if self.spaq_path else 'None'}")
