@@ -343,7 +343,7 @@ if __name__ == '__main__':
                        help='Number of epochs')
     parser.add_argument('--lr', type=float, default=1e-4,
                        help='Learning rate (default: 1e-4 for ResNet)')
-    parser.add_argument('--batch_size', type=int, default=32,
+    parser.add_argument('--batch_size', type=int, default=96,
                        help='Batch size')
     parser.add_argument('--weight_decay', type=float, default=1e-4,
                        help='Weight decay')
