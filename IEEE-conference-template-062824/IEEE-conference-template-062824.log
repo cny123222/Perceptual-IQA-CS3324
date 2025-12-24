@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2022/dev/Debian) (preloaded format=xelatex 2025.12.23)  24 DEC 2025 19:50
+This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2022/dev/Debian) (preloaded format=xelatex 2025.12.23)  24 DEC 2025 20:05
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -362,31 +362,31 @@ File: ../paper_figures/main_training_curves_real.pdf Graphic file (type pdf)
 
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 133.
+(Font)              using `TU/ptm/bx/n' instead on input line 137.
 
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 133.
+(Font)              using `TU/ptm/bx/n' instead on input line 137.
 
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 133.
+(Font)              using `TU/ptm/bx/n' instead on input line 137.
 
 [2]
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 157.
+(Font)              using `TU/ptm/bx/n' instead on input line 160.
 
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 164.
+(Font)              using `TU/ptm/bx/n' instead on input line 167.
 
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 164.
+(Font)              using `TU/ptm/bx/n' instead on input line 167.
 
 
-Overfull \hbox (22.3281pt too wide) in paragraph at lines 147--167
+Overfull \hbox (22.3281pt too wide) in paragraph at lines 150--170
  [][] 
  []
 
@@ -394,14 +394,6 @@ File: ../paper_figures/ablation_dual_bars.pdf Graphic file (type pdf)
 <use ../paper_figures/ablation_dual_bars.pdf>
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 190.
-
-
-LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 190.
-
-
-LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
 (Font)              using `TU/ptm/bx/n' instead on input line 193.
 
 
@@ -410,15 +402,11 @@ LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
 
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 194.
+(Font)              using `TU/ptm/bx/n' instead on input line 196.
 
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 194.
-
-
-LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 197.
+(Font)              using `TU/ptm/bx/n' instead on input line 196.
 
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
@@ -427,47 +415,53 @@ LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
 (Font)              using `TU/ptm/bx/n' instead on input line 197.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 200.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 200.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 200.
 
 File: ../paper_figures/cross_dataset_heatmap.pdf Graphic file (type pdf)
 <use ../paper_figures/cross_dataset_heatmap.pdf>
-[3]
-Underfull \vbox (badness 3240) has occurred while \output is active []
-
-
-Underfull \vbox (badness 3281) has occurred while \output is active []
-
- [4]
+[3] [4]
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 227.
+(Font)              using `TU/ptm/bx/n' instead on input line 230.
 
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 227.
+(Font)              using `TU/ptm/bx/n' instead on input line 230.
 
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 227.
+(Font)              using `TU/ptm/bx/n' instead on input line 230.
 
 File: ../paper_figures/model_size_final.pdf Graphic file (type pdf)
 <use ../paper_figures/model_size_final.pdf>
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 246.
+(Font)              using `TU/ptm/bx/n' instead on input line 249.
 
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 246.
+(Font)              using `TU/ptm/bx/n' instead on input line 249.
 
 File: ../attention_visualizations/attention_comparison_combined.pdf Graphic file (type pdf)
 <use ../attention_visualizations/attention_comparison_combined.pdf>
 
-Underfull \hbox (badness 1902) in paragraph at lines 261--262
+Underfull \hbox (badness 1902) in paragraph at lines 264--265
 \TU/ptm/m/sc/10 framework for blind image quality assessment that
  []
 
 [5] (./IEEE-conference-template-062824.bbl)
-** WARNING: Ignoring useless \section in Appendix (line 273).
+** WARNING: Ignoring useless \section in Appendix (line 276).
 File: ../paper_figures/lr_sensitivity_final.pdf Graphic file (type pdf)
 <use ../paper_figures/lr_sensitivity_final.pdf>
 (./TABLE_HYPERPARAMETERS.tex
@@ -491,7 +485,7 @@ LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
 (Font)              using `TU/ptm/bx/n' instead on input line 54.
 
-) (./TABLE_TRAINING_LOG.tex
+) [6] (./TABLE_TRAINING_LOG.tex
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
 (Font)              using `TU/ptm/bx/n' instead on input line 17.
@@ -542,18 +536,21 @@ Overfull \hbox (40.04808pt too wide) in paragraph at lines 6--26
  [][] 
  []
 
-) [6]
+)
+Underfull \vbox (badness 1270) has occurred while \output is active []
+
+ [7]
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 317.
+(Font)              using `TU/ptm/bx/n' instead on input line 320.
 
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 317.
+(Font)              using `TU/ptm/bx/n' instead on input line 320.
 
 
 LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
-(Font)              using `TU/ptm/bx/n' instead on input line 317.
+(Font)              using `TU/ptm/bx/n' instead on input line 320.
 
 File: ../paper_figures/loss_function_comparison.pdf Graphic file (type pdf)
 <use ../paper_figures/loss_function_comparison.pdf>
@@ -568,18 +565,19 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[7] [8
-
-] (./IEEE-conference-template-062824.aux)
+[8] (./IEEE-conference-template-062824.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
  ) 
 Here is how much of TeX's memory you used:
- 4018 strings out of 478158
- 66898 string characters out of 5853401
- 399735 words of memory out of 5000000
- 24581 multiletter control sequences out of 15000+600000
+ 4022 strings out of 478158
+ 66957 string characters out of 5853401
+ 392735 words of memory out of 5000000
+ 24585 multiletter control sequences out of 15000+600000
  474138 words of font info for 58 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  55i,10n,62p,1192b,268s stack positions out of 5000i,500n,10000p,200000b,80000s
