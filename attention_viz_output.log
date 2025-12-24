@@ -1,0 +1,78 @@
+================================================================================
+SMART-IQA 注意力可视化工具
+================================================================================
+
+Initializing visualizer...
+Using device: cuda
+Loading model from: checkpoints/koniq-10k-swin_20251223_002226/best_model_srcc_0.9378_plcc_0.9485.pkl
+Loading Swin Transformer BASE (~88M parameters)
+Using attention-based multi-scale feature fusion for BASE
+HyperNet input channels: 1920 (multi_scale=True, model=base)
+✓ Model loaded successfully
+✓ Registered hook for model.multiscale_attention
+
+
+################################################################################
+# LOW QUALITY IMAGE (GT MOS: 1.2321)
+################################################################################
+
+================================================================================
+Processing: 7358286276
+================================================================================
+✓ Image loaded: (1024, 768)
+  [Hook] Captured attention weights: [0.27494633 0.17360012 0.28694776 0.26450583]
+✓ Predicted quality score: 17.6384
+✓ Attention weights: [0.27494633 0.17360012 0.28694776 0.26450583]
+   Stage distribution: [27.49463  17.36001  28.694773 26.45058 ]
+✓ Attention weights visualization saved to: attention_visualizations/7358286276_attention_weights.png
+✓ Attention heatmap saved to: attention_visualizations/7358286276_attention_heatmap.png
+================================================================================
+
+
+
+################################################################################
+# MID QUALITY IMAGE (GT MOS: 3.2816)
+################################################################################
+
+================================================================================
+Processing: 7292878318
+================================================================================
+✓ Image loaded: (1024, 768)
+  [Hook] Captured attention weights: [3.6074768e-04 9.3781220e-04 9.9615097e-01 2.5505095e-03]
+✓ Predicted quality score: 65.3594
+✓ Attention weights: [3.6074768e-04 9.3781220e-04 9.9615097e-01 2.5505095e-03]
+   Stage distribution: [3.6074769e-02 9.3781218e-02 9.9615097e+01 2.5505096e-01]
+✓ Attention weights visualization saved to: attention_visualizations/7292878318_attention_weights.png
+✓ Attention heatmap saved to: attention_visualizations/7292878318_attention_heatmap.png
+================================================================================
+
+
+
+################################################################################
+# HIGH QUALITY IMAGE (GT MOS: 4.1121)
+################################################################################
+
+================================================================================
+Processing: 320987228
+================================================================================
+✓ Image loaded: (1024, 768)
+  [Hook] Captured attention weights: [2.9345811e-04 7.2553119e-04 9.9674964e-01 2.2313562e-03]
+✓ Predicted quality score: 72.9231
+✓ Attention weights: [2.9345811e-04 7.2553119e-04 9.9674964e-01 2.2313562e-03]
+   Stage distribution: [2.9345810e-02 7.2553121e-02 9.9674965e+01 2.2313562e-01]
+✓ Attention weights visualization saved to: attention_visualizations/320987228_attention_weights.png
+✓ Attention heatmap saved to: attention_visualizations/320987228_attention_heatmap.png
+================================================================================
+
+
+
+================================================================================
+✅ 注意力可视化完成！
+================================================================================
+
+生成的文件:
+  - attention_visualizations/*_attention_weights.png  (注意力权重柱状图)
+  - attention_visualizations/*_attention_heatmap.png  (注意力热力图)
+  - attention_visualization_results.json              (数值结果)
+
+================================================================================

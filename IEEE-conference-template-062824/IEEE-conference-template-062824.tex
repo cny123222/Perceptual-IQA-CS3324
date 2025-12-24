@@ -55,7 +55,14 @@ HyperIQA \cite{su2020hyperiq} pioneered the use of hyper networks for content-aw
 \section{Method}
 
 \subsection{Overview}
-SMART-IQA follows the hyper network paradigm where a HyperNet generates weights for a TargetNet based on image content. The key innovation lies in our Swin Transformer backbone with multi-scale attention fusion.
+SMART-IQA follows the hyper network paradigm where a HyperNet generates weights for a TargetNet based on image content. The key innovation lies in our Swin Transformer backbone with multi-scale attention fusion. Figure \ref{fig:architecture} illustrates the overall architecture of our proposed method.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.95\textwidth]{../paper_figures/architecture_new.png}
+\caption{Architecture of SMART-IQA. The pipeline consists of: (1) Swin Transformer backbone with four hierarchical stages extracting multi-scale features, (2) Adaptive Feature Aggregation (AFA) module that unifies spatial dimensions of Stage 1-3 features to $7\times7$ through adaptive pooling and convolution, (3) Channel Attention Fusion module that uses Stage 4 features to generate attention weights for dynamically weighting multi-scale features, (4) HyperNet that generates dynamic weights $\theta$ for the TargetNet based on Stage 4 features, and (5) TargetNet that predicts the final quality score using weighted multi-scale features and dynamic parameters. The orange-highlighted attention module enables content-aware feature fusion, while the red dashed arrows indicate dynamic weight generation.}
+\label{fig:architecture}
+\end{figure*}
 
 \subsection{Swin Transformer Backbone}
 We adopt Swin Transformer \cite{liu2021swin} as our feature extractor due to its hierarchical architecture and efficient window-based self-attention mechanism. The Swin Transformer produces features at four stages with progressively decreasing spatial resolutions: Stage 0 ($56\times56$), Stage 1 ($28\times28$), Stage 2 ($14\times14$), and Stage 3 ($7\times7$). This multi-scale representation naturally captures both low-level textures and high-level semantic information crucial for quality assessment.
