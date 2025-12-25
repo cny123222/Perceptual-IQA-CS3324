@@ -100,25 +100,11 @@ S.~Yang, T.~Wu, S.~Shi, S.~Lao, Y.~Gong, M.~Cao, J.~Wang, and Y.~Yang,
   \url{https://arxiv.org/abs/2204.08958}
 \BIBentrySTDinterwordspacing
 
-\bibitem{golestaneh2022tres}
-\BIBentryALTinterwordspacing
-S.~A. Golestaneh, S.~Dadsetan, and K.~M. Kitani, ``No-reference image quality
-  assessment via transformers, relative ranking, and self-consistency,'' 2022.
-  [Online]. Available: \url{https://arxiv.org/abs/2108.06858}
-\BIBentrySTDinterwordspacing
-
 \bibitem{zhang2023liqe}
 \BIBentryALTinterwordspacing
 W.~Zhang, G.~Zhai, Y.~Wei, X.~Yang, and K.~Ma, ``Blind image quality assessment
   via vision-language correspondence: A multitask learning perspective,'' 2023.
   [Online]. Available: \url{https://arxiv.org/abs/2303.14968}
-\BIBentrySTDinterwordspacing
-
-\bibitem{wang2023clipiqa}
-\BIBentryALTinterwordspacing
-J.~Wang, K.~C.~K. Chan, and C.~C. Loy, ``Exploring clip for assessing the look
-  and feel of images,'' 2022. [Online]. Available:
-  \url{https://arxiv.org/abs/2207.12396}
 \BIBentrySTDinterwordspacing
 
 \bibitem{hosu2020koniq}
@@ -153,6 +139,13 @@ S.~Su, Q.~Yan, Y.~Zhu, C.~Zhang, X.~Ge, J.~Sun, and Y.~Zhang, ``Blindly assess
 X.~Sui, K.~Ma, Y.~Yao, and Y.~Fang, ``Perceptual quality assessment of
   omnidirectional images as moving camera videos,'' \emph{IEEE Transactions on
   Visualization and Computer Graphics}, vol.~28, no.~8, pp. 3022--3034, 2022.
+
+\bibitem{wang2023clipiqa}
+\BIBentryALTinterwordspacing
+J.~Wang, K.~C.~K. Chan, and C.~C. Loy, ``Exploring clip for assessing the look
+  and feel of images,'' 2022. [Online]. Available:
+  \url{https://arxiv.org/abs/2207.12396}
+\BIBentrySTDinterwordspacing
 
 \bibitem{zhang2021unique}
 W.~Zhang, K.~Ma, G.~Zhai, and X.~Yang, ``Uncertainty-aware blind image quality

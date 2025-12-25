@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.12.23)  25 DEC 2025 18:48
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.12.23)  25 DEC 2025 19:12
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -342,30 +342,27 @@ Underfull \hbox (badness 5064) in paragraph at lines 50--51
 \OT1/ptm/m/n/10 SMART-IQA achieves state-of-the-art per-for-mance with
  []
 
-
-Underfull \hbox (badness 1383) in paragraph at lines 60--62
-\OT1/ptm/b/n/10 Ar-chi-tec-tures. \OT1/ptm/m/n/10 Re-cent years have wit-nessed
- the rise of
- []
-
 <../paper_figures/architecture_new.png, id=12, 1029.738pt x 399.894pt>
 File: ../paper_figures/architecture_new.png Graphic file (type png)
 <use ../paper_figures/architecture_new.png>
 Package pdftex.def Info: ../paper_figures/architecture_new.png  used on input l
-ine 69.
+ine 66.
 (pdftex.def)             Requested size: 490.19843pt x 190.36653pt.
-[2] [3 <../paper_figures/architecture_new.png>]
-Overfull \hbox (0.5725pt too wide) detected at line 145
+[2]
+Underfull \vbox (badness 4981) has occurred while \output is active []
+
+ [3 <../paper_figures/architecture_new.png>]
+Overfull \hbox (0.5725pt too wide) detected at line 142
 []\OML/cmm/m/it/10 v[] \OT1/cmr/m/n/10 = [] [] = [] []
  []
 
 [4]
-Underfull \hbox (badness 4144) in paragraph at lines 152--153
+Underfull \hbox (badness 4144) in paragraph at lines 149--150
 []\OT1/ptm/m/n/10 Following Hy-per-IQA's content-adaptive paradigm [5],
  []
 
 
-Underfull \hbox (badness 4647) in paragraph at lines 152--153
+Underfull \hbox (badness 4647) in paragraph at lines 149--150
 \OT1/ptm/m/n/10 we em-ploy a HyperNetwork-TargetNetwork ar-chi-tec-ture
  []
 
@@ -375,10 +372,10 @@ Underfull \hbox (badness 4647) in paragraph at lines 152--153
 File: ../paper_figures/main_training_curves_real.pdf Graphic file (type pdf)
 <use ../paper_figures/main_training_curves_real.pdf>
 Package pdftex.def Info: ../paper_figures/main_training_curves_real.pdf  used o
-n input line 194.
+n input line 191.
 (pdftex.def)             Requested size: 464.39685pt x 126.86319pt.
 
-Underfull \hbox (badness 2293) in paragraph at lines 201--202
+Underfull \hbox (badness 2293) in paragraph at lines 198--199
 []\OT1/ptm/m/n/10 We com-pare SMART-IQA with state-of-the-art BIQA
  []
 
@@ -388,79 +385,74 @@ t>
 File: ../paper_figures/ablation_dual_bars_times.pdf Graphic file (type pdf)
 <use ../paper_figures/ablation_dual_bars_times.pdf>
 Package pdftex.def Info: ../paper_figures/ablation_dual_bars_times.pdf  used on
- input line 273.
+ input line 270.
 (pdftex.def)             Requested size: 252.0pt x 95.73155pt.
- [7 <../paper_figures/main_training_curves_real.pdf> <../paper_figures/ablation
-_dual_bars_times.pdf>]
-Underfull \hbox (badness 10000) in paragraph at lines 284--285
+
+Underfull \hbox (badness 10000) in paragraph at lines 281--282
 []\OT1/ptm/b/n/10 Synthetic Dis-tor-tions (KADID-10K). \OT1/ptm/m/n/10 KADID-10
 K
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 284--285
+Underfull \hbox (badness 10000) in paragraph at lines 281--282
 \OT1/ptm/m/n/10 generated syn-thetic dis-tor-tions (Gaus-sian blur, JPEG
  []
 
 
-Underfull \hbox (badness 1571) in paragraph at lines 284--285
+Underfull \hbox (badness 1571) in paragraph at lines 281--282
 \OT1/ptm/m/n/10 IQA achieves 0.5412 SRCC, sub-stan-tially out-per-form-ing
  []
 
 
-Underfull \hbox (badness 5245) in paragraph at lines 284--285
+Underfull \hbox (badness 5245) in paragraph at lines 281--282
 \OT1/ptm/m/n/10 Hy-per-IQA (+5.64% im-prove-ment). While the ab-so-lute
  []
 
 
-Underfull \hbox (badness 1742) in paragraph at lines 284--285
-\OT1/ptm/m/n/10 low-level dis-tor-tion fea-tures. We hy-poth-e-size this stems
+Underfull \hbox (badness 1484) in paragraph at lines 281--282
+\OT1/ptm/m/n/10 prop-er-ties dif-fer from train-ing data. \OT1/ptm/b/n/10 Im-pl
+i-ca-tion: \OT1/ptm/m/n/10 While
  []
 
 
-Underfull \hbox (badness 1635) in paragraph at lines 286--287
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [7 <../paper_figures/main_training_curves_real.pdf> <../paper_figures/ablation
+_dual_bars_times.pdf>]
+Underfull \hbox (badness 1635) in paragraph at lines 283--284
 []\OT1/ptm/b/n/10 AI-Generated Im-ages (AGIQA-3K). \OT1/ptm/m/n/10 In-ter-est-i
 ngly, on
  []
 
 
-Underfull \hbox (badness 3701) in paragraph at lines 288--289
+Underfull \hbox (badness 3701) in paragraph at lines 285--286
 \OT1/ptm/m/n/10 cross-dataset eval-u-a-tions, SMART-IQA achieves av-er-age
  []
 
 
-Underfull \hbox (badness 1484) in paragraph at lines 315--316
-\OT1/ptm/m/n/10 con-straints that ne-ces-si-tate bal-anc-ing model per-for-manc
-e
- []
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[8]
-<../paper_figures/model_size_final.pdf, id=117, 1074.27165pt x 424.62485pt>
-File: ../paper_figures/model_size_final.pdf Graphic file (type pdf)
-<use ../paper_figures/model_size_final.pdf>
-Package pdftex.def Info: ../paper_figures/model_size_final.pdf  used on input l
-ine 344.
-(pdftex.def)             Requested size: 252.0pt x 99.60542pt.
-<../attention_visualizations/attention_comparison_combined.pdf, id=118, 730.792
+ [8]
+<../attention_visualizations/attention_comparison_combined.pdf, id=117, 730.792
 74pt x 431.11911pt>
 File: ../attention_visualizations/attention_comparison_combined.pdf Graphic fil
 e (type pdf)
 <use ../attention_visualizations/attention_comparison_combined.pdf>
 Package pdftex.def Info: ../attention_visualizations/attention_comparison_combi
-ned.pdf  used on input line 363.
+ned.pdf  used on input line 325.
 (pdftex.def)             Requested size: 252.0pt x 148.66388pt.
-<../paper_figures/error_analysis.pdf, id=119, 568.34146pt x 496.67433pt>
+<../paper_figures/error_analysis.pdf, id=118, 568.34146pt x 496.67433pt>
 File: ../paper_figures/error_analysis.pdf Graphic file (type pdf)
 <use ../paper_figures/error_analysis.pdf>
 Package pdftex.def Info: ../paper_figures/error_analysis.pdf  used on input lin
-e 370.
+e 332.
 (pdftex.def)             Requested size: 252.0pt x 220.2274pt.
- [9 <../paper_figures/model_size_final.pdf> <../attention_visualizations/attent
-ion_comparison_combined.pdf>] (./IEEE-conference-template-062824.bbl
-[10 <../paper_figures/error_analysis.pdf>])
-** WARNING: Ignoring useless \section in Appendix (line 399).
 
-Overfull \hbox (81.37611pt too wide) detected at line 437
+[9 <../attention_visualizations/attention_comparison_combined.pdf> <../paper_fi
+gures/error_analysis.pdf>] (./IEEE-conference-template-062824.bbl)
+** WARNING: Ignoring useless \section in Appendix (line 361).
+
+Overfull \hbox (81.37611pt too wide) detected at line 399
 []\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 ^^R[]\OMS/cmsy/m/n/10 j \OT1/cmr/m/n/10 = 
 \OML/cmm/m/it/10 d \OMS/cmsy/m/n/10 ^^B \OML/cmm/m/it/10 d[] \OT1/cmr/m/n/10 + 
 \OML/cmm/m/it/10 d[] \OT1/cmr/m/n/10 + \OML/cmm/m/it/10 d[] \OMS/cmsy/m/n/10 ^^
@@ -468,85 +460,91 @@ B \OT1/cmr/m/n/10 1 + 1 = 100[]352 \OMS/cmsy/m/n/10 ^^B \OT1/cmr/m/n/10 128 + 1
 28 + 128 + 1 = 12[]845[]313
  []
 
-** WARNING: Ignoring useless \section in Appendix (line 442).
-[11]
-Underfull \hbox (badness 2529) in paragraph at lines 467--468
+[10]
+** WARNING: Ignoring useless \section in Appendix (line 404).
+
+Underfull \hbox (badness 2529) in paragraph at lines 429--430
 []\OT1/ptm/m/it/10 HyperNetwork & Tar-get-Net-work: \OT1/ptm/m/n/10 Hid-den di-
 men-sion
  []
 
 (./TABLE_HYPERPARAMETERS.tex)
-** WARNING: Ignoring useless \section in Appendix (line 488).
-<../paper_figures/lr_sensitivity_final.pdf, id=229, 389.1752pt x 264.27591pt>
+** WARNING: Ignoring useless \section in Appendix (line 450).
+[11]
+Underfull \vbox (badness 4621) has occurred while \output is active []
+
+<../paper_figures/lr_sensitivity_final.pdf, id=165, 389.1752pt x 264.27591pt>
 File: ../paper_figures/lr_sensitivity_final.pdf Graphic file (type pdf)
 <use ../paper_figures/lr_sensitivity_final.pdf>
 Package pdftex.def Info: ../paper_figures/lr_sensitivity_final.pdf  used on inp
-ut line 508.
+ut line 470.
 (pdftex.def)             Requested size: 189.0pt x 128.34302pt.
-[12 <../paper_figures/lr_sensitivity_final.pdf>]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [13]
+ [12]
 (./TABLE_TRAINING_LOG.tex) (../complexity/TABLE_COMPLEXITY.tex)
-Underfull \hbox (badness 1803) in paragraph at lines 535--536
+Underfull \hbox (badness 1803) in paragraph at lines 497--498
 \OT1/ptm/m/n/10 crease. No-tably, SMART-Tiny (4.47G FLOPs) main-tains
  []
 
 
-Underfull \hbox (badness 2600) in paragraph at lines 545--546
+Underfull \hbox (badness 2600) in paragraph at lines 507--508
 []\OT1/ptm/m/n/10 The coun-ter-in-tu-itive ob-ser-va-tion that SMART-Base is
  []
 
 
-Underfull \hbox (badness 1642) in paragraph at lines 553--554
+Underfull \hbox (badness 1642) in paragraph at lines 515--516
 []\OT1/ptm/m/n/10 We sys-tem-at-i-cally ex-plored var-i-ous data aug-men-ta-tio
 n
  []
 
-[14]
-<../paper_figures/loss_function_comparison.pdf, id=280, 1074.36195pt x 424.6248
+[13 <../paper_figures/lr_sensitivity_final.pdf>]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [14]
+<../paper_figures/loss_function_comparison.pdf, id=217, 1074.36195pt x 424.6248
 5pt>
 File: ../paper_figures/loss_function_comparison.pdf Graphic file (type pdf)
 <use ../paper_figures/loss_function_comparison.pdf>
 Package pdftex.def Info: ../paper_figures/loss_function_comparison.pdf  used on
- input line 598.
+ input line 560.
 (pdftex.def)             Requested size: 247.6778pt x 97.88843pt.
 
-** WARNING: Ignoring useless \section in Appendix (line 603).
-[15 <../paper_figures/loss_function_comparison.pdf>]
-Underfull \hbox (badness 1546) in paragraph at lines 612--614
+** WARNING: Ignoring useless \section in Appendix (line 565).
+
+Underfull \hbox (badness 1546) in paragraph at lines 574--576
 \OT1/ptm/m/n/10 We then nor-mal-ize each $\OML/cmm/m/it/10 A[]$ \OT1/ptm/m/n/10
  to [0,1] range and ap-ply
  []
 
 
-Underfull \hbox (badness 1383) in paragraph at lines 622--623
+Underfull \hbox (badness 1383) in paragraph at lines 584--585
 []\OT1/ptm/m/it/10 Stage 4 (Se-man-tic): \OT1/ptm/m/n/10 Main-tains strong ac-t
 i-va-tions in
  []
 
 
-Underfull \hbox (badness 2173) in paragraph at lines 625--626
+Underfull \hbox (badness 2173) in paragraph at lines 587--588
 []\OT1/ptm/b/n/10 Key In-sight: \OT1/ptm/m/n/10 For high-quality im-ages, the a
 c-ti-va-tion
  []
 
-<../paper_figures/feature_map_high_quality_appendix.pdf, id=341, 550.56686pt x 
+[15 <../paper_figures/loss_function_comparison.pdf>]
+<../paper_figures/feature_map_high_quality_appendix.pdf, id=277, 550.56686pt x 
 641.04086pt>
 File: ../paper_figures/feature_map_high_quality_appendix.pdf Graphic file (type
  pdf)
 <use ../paper_figures/feature_map_high_quality_appendix.pdf>
 Package pdftex.def Info: ../paper_figures/feature_map_high_quality_appendix.pdf
-  used on input line 650.
+  used on input line 612.
 (pdftex.def)             Requested size: 247.6778pt x 288.37769pt.
-<../paper_figures/feature_map_low_quality_appendix.pdf, id=342, 550.56686pt x 6
+<../paper_figures/feature_map_low_quality_appendix.pdf, id=278, 550.56686pt x 6
 41.04086pt>
 File: ../paper_figures/feature_map_low_quality_appendix.pdf Graphic file (type 
 pdf)
 <use ../paper_figures/feature_map_low_quality_appendix.pdf>
 Package pdftex.def Info: ../paper_figures/feature_map_low_quality_appendix.pdf 
- used on input line 657.
+ used on input line 619.
 (pdftex.def)             Requested size: 247.6778pt x 288.37769pt.
+
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -558,46 +556,44 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[16 <../paper_figures/feature_map_high_quality_appendix.pdf>] [17
-
- <../paper_figures/feature_map_low_quality_appendix.pdf>]
-(./IEEE-conference-template-062824.aux) ) 
+[16 <../paper_figures/feature_map_high_quality_appendix.pdf> <../paper_figures/
+feature_map_low_quality_appendix.pdf>] (./IEEE-conference-template-062824.aux) 
+) 
 Here is how much of TeX's memory you used:
- 4441 strings out of 480171
- 72075 string characters out of 5894488
- 384102 words of memory out of 5000000
- 22315 multiletter control sequences out of 15000+600000
+ 4431 strings out of 480171
+ 71726 string characters out of 5894488
+ 385974 words of memory out of 5000000
+ 22306 multiletter control sequences out of 15000+600000
  516719 words of font info for 118 fonts, out of 8000000 for 9000
  59 hyphenation exceptions out of 8191
  55i,11n,62p,1654b,297s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texlive/texmf-dist/fonts/e
-nc/dvips/base/8r.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
-/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
-ex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.p
-fb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share
-/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texliv
-e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf
--dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/f
-onts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/typ
-e1/public/amsfonts/cm/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
-c/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
-ts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
-sy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pf
-b></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr
-/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/
-texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/share/texlive
-/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/share/texlive/
-texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/share/texlive/t
-exmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts
-/type1/urw/times/utmbi8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/tim
-es/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-
-Output written on IEEE-conference-template-062824.pdf (17 pages, 6788362 bytes)
+{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texlive
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/
+type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
+ublic/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr
+10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb><
+/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/sha
+re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texli
+ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texlive/texmf-dist/fonts/t
+ype1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/pu
+blic/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/am
+sfonts/cm/cmsy9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/
+symbols/msam10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/s
+ymbols/msbm10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.p
+fb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/share
+/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-
+dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on IEEE-conference-template-062824.pdf (16 pages, 6765310 bytes)
 .
 PDF statistics:
- 513 PDF objects out of 1000 (max. 8388607)
- 212 compressed objects within 3 object streams
+ 446 PDF objects out of 1000 (max. 8388607)
+ 201 compressed objects within 3 object streams
  0 named destinations out of 1000 (max. 500000)
- 51 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 46 words of extra memory for PDF output out of 10000 (max. 10000000)
 
