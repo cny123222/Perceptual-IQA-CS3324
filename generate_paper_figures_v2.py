@@ -39,47 +39,47 @@ srcc_values = [lr_data[lr]['srcc'] for lr in lr_values]
 plcc_values = [lr_data[lr]['plcc'] for lr in lr_values]
 epochs_values = [lr_data[lr]['epochs'] for lr in lr_values]
 
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+# 绘制单图，同时显示SRCC和PLCC
+fig, ax1 = plt.subplots(1, 1, figsize=(6, 4))
 
-# 图1: SRCC vs Learning Rate
-ax1.plot(lr_values, srcc_values, 'o-', linewidth=2.5, markersize=10, 
-         color='#4ECDC4', markerfacecolor='#FF6B6B', 
-         markeredgecolor='black', markeredgewidth=2)
+# SRCC曲线（左Y轴）
+color1 = '#FF6B6B'
+ax1.plot(lr_values, srcc_values, 'o-', linewidth=2.5, markersize=8, 
+         color=color1, markerfacecolor=color1, 
+         markeredgecolor='black', markeredgewidth=1.5, label='SRCC')
 
-best_idx = srcc_values.index(max(srcc_values))
-ax1.scatter([lr_values[best_idx]], [srcc_values[best_idx]], 
-            s=500, c='gold', marker='*', edgecolors='black', 
+best_srcc_idx = srcc_values.index(max(srcc_values))
+ax1.scatter([lr_values[best_srcc_idx]], [srcc_values[best_srcc_idx]], 
+            s=300, c='gold', marker='*', edgecolors='black', 
             linewidths=2, zorder=5)
 
-for i, (lr, srcc) in enumerate(zip(lr_values, srcc_values)):
-    offset_y = 0.0008 if i != best_idx else 0.0015
-    ax1.annotate(f'{srcc:.4f}', (lr, srcc), 
-                 xytext=(0, offset_y), textcoords='offset points',
-                 ha='center', fontsize=10, weight='bold')
-
 ax1.set_xscale('log')
-ax1.set_xlabel('Learning Rate', fontsize=13, weight='bold')
-ax1.set_ylabel('SRCC on KonIQ-10k', fontsize=13, weight='bold')
-ax1.set_title('Learning Rate Sensitivity Analysis', fontsize=13, weight='bold')
+ax1.set_xlabel('Learning Rate', fontsize=11, weight='bold')
+ax1.set_ylabel('SRCC', fontsize=11, weight='bold', color=color1)
+ax1.tick_params(axis='y', labelcolor=color1)
+ax1.set_ylim([0.930, 0.950])  # 统一范围
 ax1.grid(True, alpha=0.3, linestyle='--')
-ax1.set_ylim([0.9340, 0.9390])  # 扩大范围，看起来更稳定
-ax1.axvspan(3e-7, 1e-6, alpha=0.1, color='green')
 
-# 图2: Training Epochs
-colors = ['#FF6B6B' if e == min(epochs_values) else '#95E1D3' for e in epochs_values]
-bars = ax2.bar(range(len(lr_values)), epochs_values, color=colors, 
-               edgecolor='black', linewidth=1.5, alpha=0.8)
-bars[best_idx].set_facecolor('gold')
+# PLCC曲线（右Y轴）
+ax2 = ax1.twinx()
+color2 = '#4ECDC4'
+ax2.plot(lr_values, plcc_values, 's-', linewidth=2.5, markersize=8,
+         color=color2, markerfacecolor=color2,
+         markeredgecolor='black', markeredgewidth=1.5, label='PLCC')
 
-ax2.set_xticks(range(len(lr_values)))
-ax2.set_xticklabels([f'{lr:.0e}' for lr in lr_values], fontsize=10)
-ax2.set_xlabel('Learning Rate', fontsize=13, weight='bold')
-ax2.set_ylabel('Epochs to Converge', fontsize=13, weight='bold')
-ax2.set_title('Training Efficiency', fontsize=13, weight='bold')
-ax2.grid(axis='y', alpha=0.3, linestyle='--')
+best_plcc_idx = plcc_values.index(max(plcc_values))
+ax2.scatter([lr_values[best_plcc_idx]], [plcc_values[best_plcc_idx]], 
+            s=300, c='gold', marker='*', edgecolors='black', 
+            linewidths=2, zorder=5)
 
-for i, epoch in enumerate(epochs_values):
-    ax2.text(i, epoch + 0.3, str(epoch), ha='center', fontsize=11, weight='bold')
+ax2.set_ylabel('PLCC', fontsize=11, weight='bold', color=color2)
+ax2.tick_params(axis='y', labelcolor=color2)
+ax2.set_ylim([0.930, 0.950])  # 统一范围
+
+# 添加图例
+lines1, labels1 = ax1.get_legend_handles_labels()
+lines2, labels2 = ax2.get_legend_handles_labels()
+ax1.legend(lines1 + lines2, labels1 + labels2, loc='lower left', fontsize=9)
 
 plt.tight_layout()
 plt.savefig(f'{output_dir}/lr_sensitivity_final.pdf', dpi=300, bbox_inches='tight')
@@ -133,11 +133,27 @@ for i, (param, s, model) in enumerate(zip(params, srcc, models)):
     ax2.scatter(param, s, s=size, c=colors[i], marker=marker, 
                alpha=0.8, edgecolors='black', linewidths=edgewidth)
     
-    offset_x = -5 if 'SMART' in model else 5
-    offset_y = 0.001 if param != 88 else -0.002
-    ax2.annotate(f'{param}M\n{s:.4f}', (param, s), 
+    # 标注模型名称，避免与点重合
+    if 'Tiny' in model:
+        label = 'Swin-Tiny'
+        offset_x = 50
+        offset_y = -10
+    elif 'Small' in model:
+        label = 'Swin-Small'
+        offset_x = 0
+        offset_y = 25
+    elif 'Base' in model:
+        label = 'Swin-Base'
+        offset_x = 8
+        offset_y = -30
+    else:
+        label = 'HyperIQA\n(ResNet50)'
+        offset_x = 50
+        offset_y = -10
+    
+    ax2.annotate(label, (param, s), 
                 xytext=(offset_x, offset_y), textcoords='offset points',
-                fontsize=9, weight='bold',
+                fontsize=9, weight='bold', ha='center',
                 bbox=dict(boxstyle='round,pad=0.3', 
                          facecolor='yellow' if 'Base' in model else 'white',
                          alpha=0.7, edgecolor='black'))
@@ -254,8 +270,21 @@ for i, (name, srcc_val, plcc_val, rank) in enumerate(zip(loss_names, loss_srccs,
                marker='o' if rank <= 2 else 's',
                alpha=0.8, edgecolors='black', linewidths=2)
     
-    offset_x = 0.0002 if i < 3 else -0.0002
-    offset_y = 0.0005 if i != 2 else -0.002
+    if i == 0:  # L1 (MAE)
+        offset_x = -70
+        offset_y = 0
+    elif i == 1:  # L2 (MSE)
+        offset_x = -70
+        offset_y = 0
+    elif i == 2:  # Pairwise Fidelity
+        offset_x = 20
+        offset_y = 0
+    elif i == 3:  # SRCC Loss
+        offset_x = 20
+        offset_y = 0
+    else:  # Pairwise Ranking (i == 4)
+        offset_x = 20
+        offset_y = 0
     ax2.annotate(name.replace('\n', ' '), (srcc_val, plcc_val),
                 xytext=(offset_x, offset_y), textcoords='offset points',
                 fontsize=9, weight='bold',

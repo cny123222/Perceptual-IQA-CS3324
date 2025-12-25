@@ -40,9 +40,25 @@ Z.~Liu, Y.~Lin, Y.~Cao, H.~Hu, Y.~Wei, Z.~Zhang, S.~Lin, and B.~Guo, ``Swin
   \emph{Proceedings of the IEEE/CVF International Conference on Computer
   Vision}, 2021, pp. 10\,012--10\,022.
 
+\bibitem{mittal2012brisque}
+A.~Mittal, A.~K. Moorthy, and A.~C. Bovik, ``No-reference image quality
+  assessment in the spatial domain,'' \emph{IEEE Transactions on Image
+  Processing}, vol.~21, no.~12, pp. 4695--4708, 2012.
+
+\bibitem{mittal2013niqe}
+A.~Mittal, R.~Soundararajan, and A.~C. Bovik, ``Making a "completely blind"
+  image quality analyzer,'' in \emph{IEEE Signal processing letters}, vol.~20,
+  no.~3.\hskip 1em plus 0.5em minus 0.4em\relax IEEE, 2013, pp. 209--212.
+
 \bibitem{talebi2018nima}
 H.~Talebi and P.~Milanfar, ``Nima: Neural image assessment,'' \emph{IEEE
   Transactions on Image Processing}, vol.~27, no.~8, pp. 3998--4011, 2018.
+
+\bibitem{zhang2018dbcnn}
+W.~Zhang, K.~Ma, J.~Yan, D.~Deng, and Z.~Wang, ``Blind image quality assessment
+  using a deep bilinear convolutional neural network,'' \emph{IEEE Transactions
+  on Circuits and Systems for Video Technology}, vol.~30, no.~1, pp. 36--47,
+  2018.
 
 \bibitem{ying2020paq2piq}
 Z.~Ying, H.~Niu, P.~Gupta, D.~Mahajan, D.~Ghadiyaram, and A.~Bovik, ``From
@@ -50,22 +66,33 @@ Z.~Ying, H.~Niu, P.~Gupta, D.~Mahajan, D.~Ghadiyaram, and A.~Bovik, ``From
   quality,'' in \emph{Proceedings of the IEEE/CVF Conference on Computer Vision
   and Pattern Recognition}, 2020, pp. 3575--3585.
 
-\bibitem{ke2021musiq}
-J.~Ke, Q.~Wang, Y.~Wang, P.~Milanfar, and F.~Yang, ``Musiq: Multi-scale image
-  quality transformer,'' in \emph{Proceedings of the IEEE/CVF International
-  Conference on Computer Vision}, 2021, pp. 5148--5157.
-
 \bibitem{yang2022maniqa}
 S.~Yang, T.~Wu, S.~Shi, S.~Lao, Y.~Gong, M.~Cao, J.~Wang, and Y.~Yang,
   ``Maniqa: Multi-dimension attention network for no-reference image quality
   assessment,'' in \emph{Proceedings of the IEEE/CVF Conference on Computer
   Vision and Pattern Recognition Workshops}, 2022, pp. 1191--1200.
 
+\bibitem{ke2021musiq}
+J.~Ke, Q.~Wang, Y.~Wang, P.~Milanfar, and F.~Yang, ``Musiq: Multi-scale image
+  quality transformer,'' in \emph{Proceedings of the IEEE/CVF International
+  Conference on Computer Vision}, 2021, pp. 5148--5157.
+
 \bibitem{golestaneh2022tres}
 S.~A. Golestaneh, S.~Dadsetan, and K.~M. Kitani, ``No-reference image quality
   assessment via transformers, relative ranking, and self-consistency,'' in
   \emph{Proceedings of the IEEE/CVF Winter Conference on Applications of
   Computer Vision}, 2022, pp. 1220--1230.
+
+\bibitem{zhang2023liqe}
+W.~Zhang, G.~Zhai, Y.~Wei, X.~Yang, and K.~Ma, ``Blind image quality assessment
+  via vision-language correspondence: A multitask learning perspective,'' in
+  \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern
+  Recognition}, 2023, pp. 14\,071--14\,081.
+
+\bibitem{wang2023clipiqa}
+J.~Wang, K.~C. Chan, and C.~C. Loy, ``Exploring clip for assessing the look and
+  feel of images,'' in \emph{Proceedings of the AAAI Conference on Artificial
+  Intelligence}, vol.~37, 2023, pp. 2555--2563.
 
 \bibitem{hosu2020koniq}
 V.~Hosu, H.~Lin, T.~Sziranyi, and D.~Saupe, ``Koniq-10k: An ecologically valid
@@ -100,22 +127,11 @@ D.~Li, T.~Jiang, W.~Lin, and M.~Jiang, ``Blindly assess image quality in the
   Circuits and Systems for Video Technology}, vol.~32, no.~3, pp. 1287--1299,
   2022.
 
-\bibitem{zhang2018dbcnn}
-W.~Zhang, K.~Ma, J.~Yan, D.~Deng, and Z.~Wang, ``Blind image quality assessment
-  using a deep bilinear convolutional neural network,'' \emph{IEEE Transactions
-  on Circuits and Systems for Video Technology}, vol.~30, no.~1, pp. 36--47,
-  2018.
-
 \bibitem{zeng2021pqr}
 H.~Zeng, L.~Zhang, and A.~C. Bovik, ``Perceptual quality assessment of
   omnidirectional images as moving camera videos,'' in \emph{Proceedings of the
   IEEE/CVF Conference on Computer Vision and Pattern Recognition}, 2021, pp.
   3423--3432.
-
-\bibitem{wang2023clipiqa}
-J.~Wang, K.~C. Chan, and C.~C. Loy, ``Exploring clip for assessing the look and
-  feel of images,'' in \emph{Proceedings of the AAAI Conference on Artificial
-  Intelligence}, vol.~37, 2023, pp. 2555--2563.
 
 \bibitem{zhang2021unique}
 W.~Zhang, K.~Ma, G.~Zhai, and X.~Yang, ``Uncertainty-aware blind image quality
@@ -126,11 +142,5 @@ W.~Zhang, K.~Ma, G.~Zhai, and X.~Yang, ``Uncertainty-aware blind image quality
 W.~Sun, H.~Zhang, L.~Liao, Y.~Wei, G.~Zhai, and X.~Min, ``Stairiqa: Towards
   staircase-shaped quality scales for blind image quality assessment,''
   \emph{IEEE Transactions on Multimedia}, 2024.
-
-\bibitem{zhang2023liqe}
-W.~Zhang, G.~Zhai, Y.~Wei, X.~Yang, and K.~Ma, ``Blind image quality assessment
-  via vision-language correspondence: A multitask learning perspective,'' in
-  \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern
-  Recognition}, 2023, pp. 14\,071--14\,081.
 
 \end{thebibliography}
