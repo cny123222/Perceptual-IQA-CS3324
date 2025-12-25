@@ -3,8 +3,8 @@
 \citation{zhang2018dbcnn,talebi2018nima}
 \citation{su2020hyperiq}
 \citation{dosovitskiy2021vit,liu2021swin}
-\citation{liu2021swin}
 \@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{}\protected@file@percent }
+\citation{liu2021swin}
 \citation{mittal2012brisque,mittal2013niqe}
 \citation{bosse2017wadiqam,zhang2018dbcnn,talebi2018nima,ying2020paq2piq}
 \citation{su2020hyperiq}
@@ -17,9 +17,9 @@
 \@writefile{toc}{\contentsline {section}{\numberline {III}Method}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Overview}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Hierarchical Feature Extraction via Swin Transformer}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Adaptive Feature Aggregation (AFA) Module}{2}{}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Architecture of SMART-IQA. The pipeline consists of: (1) Swin Transformer backbone with $K$ hierarchical stages extracting multi-scale features $\{F^1, F^2, \ldots  , F^K\}$ with progressively decreasing spatial resolutions and increasing channel dimensions, (2) Adaptive Feature Aggregation (AFA) module that unifies spatial dimensions through adaptive pooling and $1\times 1$ convolution, producing aligned features $\{F^1_{\text  {pool}}, F^2_{\text  {pool}}, \ldots  , F^{K-1}_{\text  {pool}}\}$ at target resolution $H_{\text  {target}} \times W_{\text  {target}}$, (3) Channel Attention Fusion module that uses the deepest feature $F^K$ to generate attention weights $\alpha = \{\alpha _1, \alpha _2, \ldots  , \alpha _K\}$ via global pooling and FC layers, dynamically weighting multi-scale features based on content, (4) HyperNet that generates dynamic parameters $\theta _x = \{W_1, b_1, W_2, b_2\}$ for the TargetNet based on $F^K$, and (5) TargetNet that predicts the final quality score $q$ using the attention-weighted feature vector $v_x$ and content-adaptive parameters $\theta _x$. The orange-highlighted attention module enables content-aware feature fusion, while the red dashed arrows indicate dynamic weight generation. In our implementation, we use $K=4$ stages (see Section 3.3 for details).}}{3}{}\protected@file@percent }
 \newlabel{fig:architecture}{{1}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Adaptive Feature Aggregation (AFA) Module}{3}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Channel Attention for Content-Aware Feature Weighting}{4}{}\protected@file@percent }
 \citation{su2020hyperiq}
 \citation{hosu2020koniq}
@@ -50,9 +50,9 @@
 \newlabel{fig:training_curves}{{2}{7}}
 \@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Performance comparison with state-of-the-art methods on KonIQ-10k dataset. Best results are in bold.}}{7}{}\protected@file@percent }
 \newlabel{tab:sota_comparison}{{I}{7}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Ablation study visualization. Left: SRCC comparison showing Swin Transformer contributes 87\% of total improvement (+0.0268). Right: PLCC comparison demonstrating consistent gains across both metrics. The progressive improvements show: Swin-Base backbone (+2.68\% SRCC), AFA module (+0.15\% SRCC), and attention mechanism (+0.25\% SRCC). The full model achieves SRCC of 0.9378 and PLCC of 0.9485.}}{7}{}\protected@file@percent }
-\newlabel{fig:ablation}{{3}{7}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Cross-Dataset Generalization}{7}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Ablation study visualization clearly decomposing the performance gain. Left: SRCC comparison. Right: PLCC comparison. The progressive improvements demonstrate: Swin-Base backbone contributes +2.68\% SRCC (87\% of total gain), followed by the AFA module (+0.15\% SRCC, 5\% of total gain), and the Channel Attention mechanism (+0.25\% SRCC, 8\% of total gain). The full model achieves SRCC of 0.9378 and PLCC of 0.9485, validating that each component provides complementary improvements.}}{7}{}\protected@file@percent }
+\newlabel{fig:ablation}{{3}{7}}
 \@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Ablation study on KonIQ-10k: component contribution analysis}}{8}{}\protected@file@percent }
 \newlabel{tab:ablation_study}{{II}{8}}
 \@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Cross-dataset generalization performance (trained on KonIQ-10k)}}{8}{}\protected@file@percent }
@@ -89,22 +89,22 @@
 \@writefile{toc}{\contentsline {section}{References}{10}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{Appendix}{10}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {A}HyperNetwork Architecture}{10}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {B}TargetNetwork Details}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {B}TargetNetwork Details}{11}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {C}Model Architecture Specifications}{11}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {D}Design Rationale}{11}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {E}Complete Hyperparameter Configuration}{11}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {F}Learning Rate Sensitivity Analysis}{11}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Detailed Experimental Hyperparameters and Training Configuration}}{12}{}\protected@file@percent }
-\newlabel{tab:hyperparameters}{{IV}{12}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {E}Complete Hyperparameter Configuration}{12}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {F}Learning Rate Sensitivity Analysis}{12}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {G}Training Dynamics and Convergence Analysis}{12}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Learning rate sensitivity analysis. SRCC (red, left y-axis) and PLCC (cyan, right y-axis) versus learning rate. The optimal learning rate of $5\times 10^{-7}$ (marked with gold star) achieves the best SRCC performance. Both metrics are unified to [0.930, 0.950] range for better comparison.}}{13}{}\protected@file@percent }
-\newlabel{fig:lr_sensitivity}{{6}{13}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {H}Computational Complexity and Efficiency Analysis}{13}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {I}Data Augmentation Strategy Analysis}{13}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Learning rate sensitivity analysis. SRCC (red, left y-axis) and PLCC (cyan, right y-axis) versus learning rate. The optimal learning rate of $5\times 10^{-7}$ (marked with gold star) achieves the best SRCC performance. Both metrics are unified to [0.930, 0.950] range for better comparison.}}{12}{}\protected@file@percent }
+\newlabel{fig:lr_sensitivity}{{6}{12}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {H}Computational Complexity and Efficiency Analysis}{12}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Detailed Experimental Hyperparameters and Training Configuration}}{13}{}\protected@file@percent }
+\newlabel{tab:hyperparameters}{{IV}{13}}
 \@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Epoch-wise Training Log of Best Model (Swin-Base, LR=$5\times 10^{-7}$)}}{14}{}\protected@file@percent }
 \newlabel{tab:training_log}{{V}{14}}
 \@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Computational Complexity Comparison across Model Variants}}{14}{}\protected@file@percent }
 \newlabel{tab:complexity}{{VI}{14}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {I}Data Augmentation Strategy Analysis}{14}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {J}Loss Function Comparison and Analysis}{14}{}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Loss function comparison on KonIQ-10k}}{15}{}\protected@file@percent }
 \newlabel{tab:loss_comparison}{{VII}{15}}
@@ -113,9 +113,9 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {K}Visualization Methodology}{15}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {L}High-Quality Image Analysis (Figure\nobreakspace  {}8\hbox {})}{15}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {M}Low-Quality Image Analysis (Figure\nobreakspace  {}9\hbox {})}{15}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {N}Connection to Channel Attention}{15}{}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Feature map visualization for a high-quality image (MOS 81.4/100). The hierarchical feature extraction shows increasing activation strength from low to high stages, with Stage 3-4 dominating. This pattern indicates the model relies on semantic understanding for high-quality assessment.}}{16}{}\protected@file@percent }
 \newlabel{fig:feature_high}{{8}{16}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {N}Connection to Channel Attention}{16}{}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Feature map visualization for a low-quality image (MOS 20.1/100). Strong activations in lower stages (Stage 1-2) indicate the model focuses on local distortions (compression artifacts, noise, texture degradation), while higher stages show weaker activations due to semantic content being obscured by distortions.}}{16}{}\protected@file@percent }
 \newlabel{fig:feature_low}{{9}{16}}
 \gdef \@abspage@last{16}
