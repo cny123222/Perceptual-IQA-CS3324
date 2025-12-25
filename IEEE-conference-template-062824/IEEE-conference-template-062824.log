@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.12.23)  25 DEC 2025 15:05
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.12.23)  25 DEC 2025 15:26
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -448,39 +448,54 @@ figures/error_analysis.pdf>] (./IEEE-conference-template-062824.bbl)
 ** WARNING: Ignoring useless \section in Appendix (line 465).
 [11] (./TABLE_HYPERPARAMETERS.tex)
 ** WARNING: Ignoring useless \section in Appendix (line 492).
-<../paper_figures/lr_sensitivity_final.pdf, id=229, 425.31021pt x 278.7299pt>
+<../paper_figures/lr_sensitivity_final.pdf, id=229, 389.1752pt x 264.27591pt>
 File: ../paper_figures/lr_sensitivity_final.pdf Graphic file (type pdf)
 <use ../paper_figures/lr_sensitivity_final.pdf>
 Package pdftex.def Info: ../paper_figures/lr_sensitivity_final.pdf  used on inp
 ut line 499.
-(pdftex.def)             Requested size: 247.6778pt x 162.31842pt.
-(./TABLE_TRAINING_LOG.tex)
+(pdftex.def)             Requested size: 189.0pt x 128.34302pt.
+(./TABLE_TRAINING_LOG.tex) (../complexity/TABLE_COMPLEXITY.tex
+Overfull \hbox (22.11835pt too wide) in paragraph at lines 5--15
+ [][] 
+ []
+
+)
+Underfull \hbox (badness 4569) in paragraph at lines 516--517
+[]\OT1/ptm/b/n/10 Parameter Count Anal-y-sis: \OT1/ptm/m/n/10 SMART-Tiny (29.52
+M)
+ []
+
+
+Underfull \hbox (badness 1622) in paragraph at lines 516--517
+\OT1/ptm/m/n/10 has com-pa-ra-ble pa-ram-e-ter count to HyperIQA-ResNet50
+ []
+
 <../paper_figures/loss_function_comparison.pdf, id=230, 1074.36195pt x 424.6248
 5pt>
 File: ../paper_figures/loss_function_comparison.pdf Graphic file (type pdf)
 <use ../paper_figures/loss_function_comparison.pdf>
 Package pdftex.def Info: ../paper_figures/loss_function_comparison.pdf  used on
- input line 539.
+ input line 549.
 (pdftex.def)             Requested size: 247.6778pt x 97.88843pt.
+** WARNING: Ignoring useless \section in Appendix (line 554).
+[12 <../paper_figures/lr_sensitivity_final.pdf>]
+Underfull \vbox (badness 2922) has occurred while \output is active []
 
-** WARNING: Ignoring useless \section in Appendix (line 544).
-[12 <../paper_figures/lr_sensitivity_final.pdf> <../paper_figures/loss_function
-_comparison.pdf>]
-<../paper_figures/feature_map_high_quality_appendix.pdf, id=330, 550.56686pt x 
+<../paper_figures/feature_map_high_quality_appendix.pdf, id=274, 550.56686pt x 
 641.04086pt>
 File: ../paper_figures/feature_map_high_quality_appendix.pdf Graphic file (type
  pdf)
 <use ../paper_figures/feature_map_high_quality_appendix.pdf>
 Package pdftex.def Info: ../paper_figures/feature_map_high_quality_appendix.pdf
-  used on input line 550.
+  used on input line 560.
 (pdftex.def)             Requested size: 247.6778pt x 288.37769pt.
-<../paper_figures/feature_map_low_quality_appendix.pdf, id=331, 550.56686pt x 6
+<../paper_figures/feature_map_low_quality_appendix.pdf, id=275, 550.56686pt x 6
 41.04086pt>
 File: ../paper_figures/feature_map_low_quality_appendix.pdf Graphic file (type 
 pdf)
 <use ../paper_figures/feature_map_low_quality_appendix.pdf>
 Package pdftex.def Info: ../paper_figures/feature_map_low_quality_appendix.pdf 
- used on input line 557.
+ used on input line 567.
 (pdftex.def)             Requested size: 247.6778pt x 288.37769pt.
 
 
@@ -494,46 +509,45 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[13
+[13 <../paper_figures/loss_function_comparison.pdf>] [14 <../paper_figures/feat
+ure_map_high_quality_appendix.pdf>] [15
 
-] [14 <../paper_figures/feature_map_high_quality_appendix.pdf> <../paper_figure
-s/feature_map_low_quality_appendix.pdf>]
-(./IEEE-conference-template-062824.aux) ) 
+ <../paper_figures/feature_map_low_quality_appendix.pdf>] (./IEEE-conference-te
+mplate-062824.aux) ) 
 Here is how much of TeX's memory you used:
- 4420 strings out of 480171
- 71746 string characters out of 5894488
- 387108 words of memory out of 5000000
- 22304 multiletter control sequences out of 15000+600000
+ 4427 strings out of 480171
+ 71940 string characters out of 5894488
+ 391414 words of memory out of 5000000
+ 22307 multiletter control sequences out of 15000+600000
  513788 words of font info for 110 fonts, out of 8000000 for 9000
  59 hyphenation exceptions out of 8191
  55i,11n,62p,1654b,266s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texlive/texmf-dist/fonts/e
-nc/dvips/base/8r.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
-/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
-ex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.p
-fb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share
-/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texliv
-e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf
--dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/f
-onts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/typ
-e1/public/amsfonts/cm/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
-c/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
-ts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
-sy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pf
-b></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr
-/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/
-texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/share/t
-exlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/share/te
-xlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dis
-t/fonts/type1/urw/times/utmbi8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/
-urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri
-8a.pfb>
-Output written on IEEE-conference-template-062824.pdf (14 pages, 6765110 bytes)
+{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/
+share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/
+texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texliv
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/f
+onts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/ty
+pe1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/pub
+lic/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/ams
+fonts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pf
+b></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/
+share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/
+texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texlive
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fo
+nts/type1/public/amsfonts/symbols/msam10.pfb></usr/share/texlive/texmf-dist/fon
+ts/type1/public/amsfonts/symbols/msbm10.pfb></usr/share/texlive/texmf-dist/font
+s/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/tim
+es/utmbi8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
+</usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on IEEE-conference-template-062824.pdf (15 pages, 6766863 bytes)
 .
 PDF statistics:
- 499 PDF objects out of 1000 (max. 8388607)
- 203 compressed objects within 3 object streams
+ 502 PDF objects out of 1000 (max. 8388607)
+ 205 compressed objects within 3 object streams
  0 named destinations out of 1000 (max. 500000)
  51 words of extra memory for PDF output out of 10000 (max. 10000000)
 

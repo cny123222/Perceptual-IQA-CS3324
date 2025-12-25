@@ -39,8 +39,8 @@ srcc_values = [lr_data[lr]['srcc'] for lr in lr_values]
 plcc_values = [lr_data[lr]['plcc'] for lr in lr_values]
 epochs_values = [lr_data[lr]['epochs'] for lr in lr_values]
 
-# 绘制单图，同时显示SRCC和PLCC
-fig, ax1 = plt.subplots(1, 1, figsize=(6, 4))
+# 绘制单图，同时显示SRCC和PLCC，适中尺寸
+fig, ax1 = plt.subplots(1, 1, figsize=(5.5, 3.8))
 
 # SRCC曲线（左Y轴）
 color1 = '#FF6B6B'
@@ -58,7 +58,7 @@ ax1.set_xlabel('Learning Rate', fontsize=11, weight='bold')
 ax1.set_ylabel('SRCC', fontsize=11, weight='bold', color=color1)
 ax1.tick_params(axis='y', labelcolor=color1)
 ax1.set_ylim([0.930, 0.950])  # 统一范围
-ax1.grid(True, alpha=0.3, linestyle='--')
+ax1.grid(True, alpha=0.3, linestyle='--', which='both')  # 添加网格线
 
 # PLCC曲线（右Y轴）
 ax2 = ax1.twinx()

@@ -496,8 +496,8 @@ We conducted extensive learning rate sensitivity analysis and found that Swin Tr
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.48\textwidth]{../paper_figures/lr_sensitivity_final.pdf}
-\caption{Learning rate sensitivity analysis. Left: SRCC vs learning rate showing optimal LR at $5\times10^{-7}$ (marked with gold star). Right: Training efficiency showing faster convergence with larger learning rates but slightly worse performance. The y-axis range is extended to better visualize the stability of the training process.}
+\includegraphics[width=0.75\columnwidth]{../paper_figures/lr_sensitivity_final.pdf}
+\caption{Learning rate sensitivity analysis. SRCC (red, left y-axis) and PLCC (cyan, right y-axis) versus learning rate. The optimal learning rate of $5\times10^{-7}$ (marked with gold star) achieves the best SRCC performance. Both metrics are unified to [0.930, 0.950] range for better comparison.}
 \label{fig:lr_sensitivity}
 \end{figure}
 
@@ -509,7 +509,17 @@ Table \ref{tab:training_log} presents the epoch-wise training log of our best mo
 
 \subsection{Computational Complexity}
 
-Our SMART-IQA models have the following parameter counts: Tiny (28M), Small (50M), and Base (88M). While the Base model has more parameters than the ResNet50-based HyperIQA (25M), it achieves significantly better performance (+3.18\% SRCC). The Tiny variant offers an excellent efficiency-performance trade-off with only 1.29\% SRCC drop compared to the Base model while maintaining comparable parameter count to the baseline.
+We conduct comprehensive complexity analysis to evaluate the computational efficiency of our SMART-IQA models. Table \ref{tab:complexity} compares the parameter count, FLOPs, and inference time across all model variants and the original HyperIQA baseline.
+
+\input{../complexity/TABLE_COMPLEXITY.tex}
+
+\textbf{Parameter Count Analysis:} SMART-Tiny (29.52M) has comparable parameter count to HyperIQA-ResNet50 (27.38M), with only 7.8\% more parameters, while achieving significantly better accuracy. SMART-Base (89.11M) has 3.25$\times$ more parameters than the baseline but delivers +5.4\% SRCC improvement, demonstrating an excellent accuracy-efficiency trade-off.
+
+\textbf{Computational Complexity:} The FLOPs increase from 4.33G (HyperIQA-ResNet50) to 15.28G (SMART-Base), a 3.5$\times$ increase. However, SMART-Tiny (4.47G FLOPs) maintains nearly identical computational cost to the baseline while providing superior performance through better feature representation.
+
+\textbf{Inference Speed:} Despite higher FLOPs, SMART-Base maintains practical inference speed of 10.06ms per image (99.4 FPS) on an RTX 5090 GPU, making it suitable for real-time applications. The baseline achieves faster inference (3.12ms, 320.5 FPS) but at the cost of accuracy. All measurements use 224$\times$224 input resolution and FP32 precision.
+
+\textbf{Efficiency-Performance Trade-off:} The results demonstrate that Swin Transformer's hierarchical attention mechanism provides a favorable accuracy-efficiency trade-off: with moderate computational overhead (3-4$\times$ FLOPs), SMART-Base achieves substantial accuracy gains (+5.4\% SRCC), while maintaining practical inference speed for real-world deployment.
 
 \subsection{Data Augmentation}
 We explored various data augmentation strategies including color jitter, random horizontal flipping, and random cropping. Interestingly, we found that aggressive color jitter can hurt in-domain performance while slightly improving cross-dataset generalization. For the final model, we use only random cropping to balance performance and training efficiency.
