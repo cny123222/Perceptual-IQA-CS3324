@@ -21,6 +21,32 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
+\bibitem{mittal2012brisque}
+A.~Mittal, A.~K. Moorthy, and A.~C. Bovik, ``No-reference image quality
+  assessment in the spatial domain,'' \emph{IEEE Transactions on Image
+  Processing}, vol.~21, no.~12, pp. 4695--4708, 2012.
+
+\bibitem{mittal2013niqe}
+A.~Mittal, R.~Soundararajan, and A.~C. Bovik, ``Making a “completely blind”
+  image quality analyzer,'' \emph{IEEE Signal Processing Letters}, vol.~20,
+  no.~3, pp. 209--212, 2013.
+
+\bibitem{zhang2018dbcnn}
+\BIBentryALTinterwordspacing
+W.~Zhang, K.~Ma, J.~Yan, D.~Deng, and Z.~Wang, ``Blind image quality assessment
+  using a deep bilinear convolutional neural network,'' \emph{IEEE Transactions
+  on Circuits and Systems for Video Technology}, vol.~30, no.~1, p. 36–47,
+  Jan. 2020. [Online]. Available:
+  \url{http://dx.doi.org/10.1109/TCSVT.2018.2886771}
+\BIBentrySTDinterwordspacing
+
+\bibitem{talebi2018nima}
+\BIBentryALTinterwordspacing
+H.~Talebi and P.~Milanfar, ``Nima: Neural image assessment,'' \emph{IEEE
+  Transactions on Image Processing}, vol.~27, no.~8, p. 3998–4011, Aug. 2018.
+  [Online]. Available: \url{http://dx.doi.org/10.1109/TIP.2018.2831899}
+\BIBentrySTDinterwordspacing
+
 \bibitem{su2020hyperiq}
 S.~Su, Q.~Yan, Y.~Zhu, C.~Zhang, X.~Ge, J.~Sun, and Y.~Zhang, ``Blindly assess
   image quality in the wild guided by a self-adaptive hyper network,'' in
@@ -43,30 +69,13 @@ Z.~Liu, Y.~Lin, Y.~Cao, H.~Hu, Y.~Wei, Z.~Zhang, S.~Lin, and B.~Guo, ``Swin
   [Online]. Available: \url{https://arxiv.org/abs/2103.14030}
 \BIBentrySTDinterwordspacing
 
-\bibitem{mittal2012brisque}
-A.~Mittal, A.~K. Moorthy, and A.~C. Bovik, ``No-reference image quality
-  assessment in the spatial domain,'' \emph{IEEE Transactions on Image
-  Processing}, vol.~21, no.~12, pp. 4695--4708, 2012.
-
-\bibitem{mittal2013niqe}
-A.~Mittal, R.~Soundararajan, and A.~C. Bovik, ``Making a “completely blind”
-  image quality analyzer,'' \emph{IEEE Signal Processing Letters}, vol.~20,
-  no.~3, pp. 209--212, 2013.
-
-\bibitem{talebi2018nima}
+\bibitem{bosse2017wadiqam}
 \BIBentryALTinterwordspacing
-H.~Talebi and P.~Milanfar, ``Nima: Neural image assessment,'' \emph{IEEE
-  Transactions on Image Processing}, vol.~27, no.~8, p. 3998–4011, Aug. 2018.
-  [Online]. Available: \url{http://dx.doi.org/10.1109/TIP.2018.2831899}
-\BIBentrySTDinterwordspacing
-
-\bibitem{zhang2018dbcnn}
-\BIBentryALTinterwordspacing
-W.~Zhang, K.~Ma, J.~Yan, D.~Deng, and Z.~Wang, ``Blind image quality assessment
-  using a deep bilinear convolutional neural network,'' \emph{IEEE Transactions
-  on Circuits and Systems for Video Technology}, vol.~30, no.~1, p. 36–47,
-  Jan. 2020. [Online]. Available:
-  \url{http://dx.doi.org/10.1109/TCSVT.2018.2886771}
+S.~Bosse, D.~Maniry, K.-R. Muller, T.~Wiegand, and W.~Samek, ``Deep neural
+  networks for no-reference and full-reference image quality assessment,''
+  \emph{IEEE Transactions on Image Processing}, vol.~27, no.~1, p. 206–219,
+  Jan. 2018. [Online]. Available:
+  \url{http://dx.doi.org/10.1109/TIP.2017.2760518}
 \BIBentrySTDinterwordspacing
 
 \bibitem{ying2020paq2piq}
@@ -76,19 +85,19 @@ Z.~Ying, H.~Niu, P.~Gupta, D.~Mahajan, D.~Ghadiyaram, and A.~Bovik, ``From
   quality,'' 2019. [Online]. Available: \url{https://arxiv.org/abs/1912.10088}
 \BIBentrySTDinterwordspacing
 
+\bibitem{ke2021musiq}
+\BIBentryALTinterwordspacing
+J.~Ke, Q.~Wang, Y.~Wang, P.~Milanfar, and F.~Yang, ``Musiq: Multi-scale image
+  quality transformer,'' 2021. [Online]. Available:
+  \url{https://arxiv.org/abs/2108.05997}
+\BIBentrySTDinterwordspacing
+
 \bibitem{yang2022maniqa}
 \BIBentryALTinterwordspacing
 S.~Yang, T.~Wu, S.~Shi, S.~Lao, Y.~Gong, M.~Cao, J.~Wang, and Y.~Yang,
   ``Maniqa: Multi-dimension attention network for no-reference image quality
   assessment,'' 2022. [Online]. Available:
   \url{https://arxiv.org/abs/2204.08958}
-\BIBentrySTDinterwordspacing
-
-\bibitem{ke2021musiq}
-\BIBentryALTinterwordspacing
-J.~Ke, Q.~Wang, Y.~Wang, P.~Milanfar, and F.~Yang, ``Musiq: Multi-scale image
-  quality transformer,'' 2021. [Online]. Available:
-  \url{https://arxiv.org/abs/2108.05997}
 \BIBentrySTDinterwordspacing
 
 \bibitem{golestaneh2022tres}
@@ -132,15 +141,6 @@ H.~Lin, V.~Hosu, and D.~Saupe, ``Kadid-10k: A large-scale artificially
 C.~Li, Z.~Zhang, H.~Wu, W.~Sun, X.~Min, X.~Liu, G.~Zhai, and W.~Lin,
   ``Agiqa-3k: An open database for ai-generated image quality assessment,''
   2023. [Online]. Available: \url{https://arxiv.org/abs/2306.04717}
-\BIBentrySTDinterwordspacing
-
-\bibitem{bosse2017wadiqam}
-\BIBentryALTinterwordspacing
-S.~Bosse, D.~Maniry, K.-R. Muller, T.~Wiegand, and W.~Samek, ``Deep neural
-  networks for no-reference and full-reference image quality assessment,''
-  \emph{IEEE Transactions on Image Processing}, vol.~27, no.~1, p. 206–219,
-  Jan. 2018. [Online]. Available:
-  \url{http://dx.doi.org/10.1109/TIP.2017.2760518}
 \BIBentrySTDinterwordspacing
 
 \bibitem{li2022sfa}
