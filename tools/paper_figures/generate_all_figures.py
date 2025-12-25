@@ -1,3 +1,4 @@
+import sys
 #!/usr/bin/env python3
 """
 生成SMART-IQA论文图表 - 使用已知实验数据

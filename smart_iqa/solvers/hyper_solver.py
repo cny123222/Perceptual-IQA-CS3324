@@ -1,8 +1,8 @@
 import torch
 from scipy import stats
 import numpy as np
-import models
-import data_loader
+from ..models import hyperiqa as models
+from ..data import loader as data_loader
 from tqdm import tqdm
 import os
 from datetime import datetime

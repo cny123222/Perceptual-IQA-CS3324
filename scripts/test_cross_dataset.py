@@ -15,7 +15,6 @@ import sys
 import argparse
 import torch
 import torchvision
-import models_swin as models
 from scipy import stats
 import numpy as np
 import json
@@ -23,6 +22,9 @@ from PIL import Image
 from datetime import datetime
 from tqdm import tqdm
 import glob
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from smart_iqa.models import smart_iqa as models
 
 
 def get_device():

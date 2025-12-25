@@ -6,7 +6,11 @@ import csv
 import json
 import sys
 from datetime import datetime
-from HyerIQASolver import HyperIQASolver
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from smart_iqa.solvers.hyper_solver import HyperIQASolver
 
 # 设置 CUDA 设备（如果使用 CUDA，取消注释下面一行并指定 GPU ID）
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'  # 使用第一个 GPU，可以改为 '0,1' 使用多个 GPU

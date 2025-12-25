@@ -1,8 +1,8 @@
 import torch
 from scipy import stats
 import numpy as np
-import models_swin as models
-import data_loader
+from ..models import smart_iqa as models
+from ..data import loader as data_loader
 from tqdm import tqdm
 import os
 import torch.nn.functional as F
@@ -17,8 +17,8 @@ def get_device():
     else:
         return torch.device("cpu")
 
-class HyperIQASolver(object):
-    """Solver for training and testing hyperIQA with Swin Transformer backbone"""
+class SmartIQASolver(object):
+    """Solver for training and testing SMART-IQA (Swin Transformer backbone)"""
     def __init__(self, config, path, train_idx, test_idx):
 
         self.device = get_device()

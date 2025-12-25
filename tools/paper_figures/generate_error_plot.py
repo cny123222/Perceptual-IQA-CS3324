@@ -15,7 +15,8 @@ import json
 from tqdm import tqdm
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import models_swin as models
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from smart_iqa.models import smart_iqa as models
 from torchvision import transforms
 
 

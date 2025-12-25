@@ -23,7 +23,11 @@ import numpy as np
 import csv
 import json
 from datetime import datetime
-from HyperIQASolver_swin import HyperIQASolver
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from smart_iqa.solvers.smart_solver import SmartIQASolver
 
 # Set CUDA device (uncomment and specify GPU ID if using CUDA)
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'  # Use first GPU, can be '0,1' for multiple GPUs
@@ -213,7 +217,7 @@ def main(config):
             
             print(f'  Train: {len(train_index)} images, Test: {len(test_index)} images')
             
-            solver = HyperIQASolver(config, folder_path[config.dataset], train_index, test_index)
+            solver = SmartIQASolver(config, folder_path[config.dataset], train_index, test_index)
             srcc_all[i], plcc_all[i] = solver.train()
     else:
         # Original logic for other datasets
@@ -226,7 +230,7 @@ def main(config):
             train_index = sel_num[0:int(round(0.8 * len(sel_num)))]
             test_index = sel_num[int(round(0.8 * len(sel_num))):len(sel_num)]
 
-            solver = HyperIQASolver(config, folder_path[config.dataset], train_index, test_index)
+            solver = SmartIQASolver(config, folder_path[config.dataset], train_index, test_index)
             srcc_all[i], plcc_all[i] = solver.train()
 
     # print(srcc_all)

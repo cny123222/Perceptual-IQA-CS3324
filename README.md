@@ -110,7 +110,7 @@ For cross-dataset generalization experiments:
 ### Basic Training (Swin-Base)
 
 ```bash
-python train_swin.py \
+python scripts/train_smart_iqa.py \
     --model_size base \
     --use_attention \
     --koniq_path ./koniq-10k \
@@ -122,7 +122,7 @@ python train_swin.py \
 ### Training with Image Preloading (Faster)
 
 ```bash
-python train_swin.py \
+python scripts/train_smart_iqa.py \
     --model_size base \
     --use_attention \
     --preload \
@@ -136,13 +136,13 @@ python train_swin.py \
 
 ```bash
 # Swin-Tiny (28M parameters)
-python train_swin.py --model_size tiny --use_attention
+python scripts/train_smart_iqa.py --model_size tiny --use_attention
 
 # Swin-Small (50M parameters) - Recommended for deployment
-python train_swin.py --model_size small --use_attention
+python scripts/train_smart_iqa.py --model_size small --use_attention
 
 # Swin-Base (88M parameters) - Best performance
-python train_swin.py --model_size base --use_attention
+python scripts/train_smart_iqa.py --model_size base --use_attention
 ```
 
 ### Key Arguments
@@ -165,7 +165,7 @@ python train_swin.py --model_size base --use_attention
 ### Test on KonIQ-10k
 
 ```bash
-python train_test_IQA.py \
+python scripts/train_hyperiqa.py \
     --dataset koniq-10k \
     --koniq_path ./koniq-10k \
     --test_only \
@@ -175,7 +175,7 @@ python train_test_IQA.py \
 ### Cross-Dataset Evaluation
 
 ```bash
-python cross_dataset_test.py \
+python scripts/test_cross_dataset.py \
     --checkpoint checkpoints/best_model.pth \
     --model_size base \
     --use_attention
@@ -197,11 +197,11 @@ We provide pretrained models for all three variants:
 
 **Usage**:
 ```python
-from models_swin import HyperIQA_Swin
+from smart_iqa import SmartIQA
 import torch
 
 # Load model
-model = HyperIQA_Swin(model_size='base', use_attention=True)
+model = SmartIQA(model_size='base', use_attention=True)
 checkpoint = torch.load('checkpoints/best_model.pth')
 model.load_state_dict(checkpoint['model_state_dict'])
 model.eval()
@@ -219,7 +219,7 @@ with torch.no_grad():
 
 ```bash
 # Train SMART-Base on KonIQ-10k
-python train_swin.py --model_size base --use_attention --epochs 50 --lr 5e-7
+python scripts/train_smart_iqa.py --model_size base --use_attention --epochs 50 --lr 5e-7
 ```
 
 **Expected Results**: SRCC ≈ 0.9378, PLCC ≈ 0.9485
@@ -228,22 +228,22 @@ python train_swin.py --model_size base --use_attention --epochs 50 --lr 5e-7
 
 ```bash
 # 1. Baseline: HyperIQA with ResNet-50
-python train_test_IQA.py --dataset koniq-10k
+python scripts/train_hyperiqa.py --dataset koniq-10k
 
 # 2. Swin-Base backbone only (no AFA, no attention)
-python train_swin.py --model_size base
+python scripts/train_smart_iqa.py --model_size base
 
 # 3. Swin-Base + AFA (no attention)
-python train_swin.py --model_size base
+python scripts/train_smart_iqa.py --model_size base
 
 # 4. Full model (Swin-Base + AFA + Attention)
-python train_swin.py --model_size base --use_attention
+python scripts/train_smart_iqa.py --model_size base --use_attention
 ```
 
 ### Cross-Dataset Generalization (Table III)
 
 ```bash
-python cross_dataset_test.py \
+python scripts/test_cross_dataset.py \
     --checkpoint checkpoints/best_model.pth \
     --model_size base \
     --use_attention
@@ -254,18 +254,18 @@ python cross_dataset_test.py \
 ```bash
 # Train all three sizes
 for size in tiny small base; do
-    python train_swin.py --model_size $size --use_attention
+    python scripts/train_smart_iqa.py --model_size $size --use_attention
 done
 ```
 
 ### Attention Visualization (Figure 6)
 
 ```bash
-python visualize_attention.py \
+python tools/visualization/visualize_attention.py \
     --checkpoint checkpoints/best_model.pth \
     --model_size base
 
-python create_attention_comparison.py
+python tools/visualization/create_attention_comparison.py
 ```
 
 ### Computational Complexity Analysis (Appendix C.3)
@@ -280,18 +280,18 @@ python generate_complexity_table.py
 
 ```bash
 # Ablation study bar chart (Figure 3)
-python generate_ablation_dual_bars_times.py
+python tools/paper_figures/generate_ablation.py
 
 # Model size trade-off (Figure 4)
 # Learning rate sensitivity (Figure 7)
 # Loss function comparison (Figure 8)
-python generate_paper_figures_v2.py
+python tools/paper_figures/generate_all_figures.py
 
 # Error analysis scatter plot (Figure 6)
-python generate_error_analysis.py
+python tools/paper_figures/generate_error_plot.py
 
 # Feature map heatmaps (Appendix D)
-python generate_feature_maps_for_appendix.py
+python tools/paper_figures/generate_feature_heatmaps.py
 ```
 
 ---
@@ -321,23 +321,36 @@ python generate_feature_maps_for_appendix.py
 
 ```
 Perceptual-IQA-CS3324/
-├── models_swin.py              # SMART-IQA model architecture
-├── models.py                   # HyperIQA baseline (ResNet-50)
-├── train_swin.py               # Training script for SMART-IQA
-├── train_test_IQA.py           # Training script for baseline
-├── HyperIQASolver_swin.py      # Solver for SMART-IQA
-├── HyperIQASolver.py           # Solver for baseline
-├── data_loader.py              # Data loading utilities
-├── folders.py                  # Dataset folder classes
-├── cross_dataset_test.py       # Cross-dataset evaluation
+├── smart_iqa/                  # Core SMART-IQA package
+│   ├── __init__.py
+│   ├── models/                 # Model architectures
+│   │   ├── __init__.py
+│   │   ├── smart_iqa.py        # SMART-IQA (Swin Transformer)
+│   │   └── hyperiqa.py         # HyperIQA baseline (ResNet-50)
+│   ├── solvers/                # Training solvers
+│   │   ├── __init__.py
+│   │   ├── smart_solver.py     # SMART-IQA solver
+│   │   └── hyper_solver.py     # HyperIQA solver
+│   └── data/                   # Data loading
+│       ├── __init__.py
+│       ├── loader.py           # Data loader
+│       └── datasets.py         # Dataset classes
 │
-├── visualize_attention.py      # Attention mechanism visualization
-├── visualize_feature_maps.py   # Feature map visualization
-├── create_attention_comparison.py  # Generate attention comparison figure
-├── generate_error_analysis.py  # Generate error analysis scatter plot
-├── generate_feature_maps_for_appendix.py  # Feature heatmaps for appendix
-├── generate_ablation_dual_bars_times.py   # Ablation study figure
-├── generate_paper_figures_v2.py           # Other paper figures
+├── scripts/                    # Training and testing scripts
+│   ├── train_smart_iqa.py      # Train SMART-IQA
+│   ├── train_hyperiqa.py       # Train HyperIQA baseline
+│   └── test_cross_dataset.py   # Cross-dataset evaluation
+│
+├── tools/                      # Visualization and analysis tools
+│   ├── visualization/          # Attention and feature visualization
+│   │   ├── visualize_attention.py
+│   │   ├── visualize_features.py
+│   │   └── create_attention_comparison.py
+│   └── paper_figures/          # Paper figure generation
+│       ├── generate_all_figures.py
+│       ├── generate_ablation.py
+│       ├── generate_error_plot.py
+│       └── generate_feature_heatmaps.py
 │
 ├── complexity/                 # Computational complexity analysis
 │   ├── compute_complexity.py
@@ -345,10 +358,11 @@ Perceptual-IQA-CS3324/
 │   ├── run_all_complexity.py
 │   └── generate_complexity_table.py
 │
-├── IEEE-conference-template-062824/  # Paper LaTeX source
+├── paper/                      # Paper LaTeX source
 │   ├── IEEE-conference-template-062824.tex
+│   ├── IEEE-conference-template-062824.pdf
 │   ├── references.bib
-│   └── *.tex (tables)
+│   └── TABLE_*.tex
 │
 ├── paper_figures/              # Generated figures for paper
 ├── checkpoints/                # Trained model checkpoints
@@ -356,6 +370,7 @@ Perceptual-IQA-CS3324/
 ├── pretrained/                 # Pretrained models
 │
 ├── requirements.txt            # Python dependencies
+├── LICENSE                     # MIT License
 └── README.md                   # This file
 ```
 
@@ -435,25 +450,29 @@ If you find this work useful for your research, please cite:
 ### Custom Dataset
 
 ```python
-from folders import IQADataset
-from torch.utils.data import DataLoader
+from smart_iqa.data import DataLoader
+from torch.utils.data import DataLoader as TorchDataLoader
 
 # Define your custom dataset
-dataset = IQADataset(
-    root='path/to/images',
-    index=list(range(num_images)),
-    transform=your_transform
+dataset = DataLoader(
+    dataset='koniq-10k',
+    path='path/to/dataset',
+    img_indx=list(range(num_images)),
+    patch_size=224,
+    patch_num=1,
+    batch_size=8,
+    istrain=True
 )
 
-dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
+dataloader = dataset.get_data()
 ```
 
 ### Attention Weight Extraction
 
 ```python
-from models_swin import HyperIQA_Swin
+from smart_iqa import SmartIQA
 
-model = HyperIQA_Swin(model_size='base', use_attention=True)
+model = SmartIQA(model_size='base', use_attention=True)
 model.eval()
 
 with torch.no_grad():

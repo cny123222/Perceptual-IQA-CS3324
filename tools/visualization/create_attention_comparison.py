@@ -1,3 +1,4 @@
+import sys
 #!/usr/bin/env python3
 """
 创建注意力可视化对比图用于论文

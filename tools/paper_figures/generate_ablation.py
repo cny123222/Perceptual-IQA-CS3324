@@ -1,3 +1,5 @@
+import os
+import sys
 """
 Generate dual bar charts for ablation study
 Left: SRCC comparison, Right: PLCC comparison
