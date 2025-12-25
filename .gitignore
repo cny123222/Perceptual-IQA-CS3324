@@ -61,27 +61,31 @@ benchmarks/StairIQA/pretrained/
 benchmarks/DBCNN/dbcnn/models/
 
 # Datasets (large files, should not be tracked)
-# Dataset symlinks and directories
-koniq-10k
 koniq-10k/
-koniq-test
 koniq-test/
-spaq-test
 spaq-test/
-kadid-test
 kadid-test/
-agiqa-test
 agiqa-test/
 *.zip
-csiq_label.txt
 
-# Dataset label files
-csiq_label.txt
-
-# datasets
-
-# Logs directory (symbolic link to data disk)
+# Logs and checkpoints (large files)
 logs/
-
-# Checkpoints directory (symbolic link to data disk)
 checkpoints/
+
+# Generated paper figures
+paper_figures/*.png
+paper_figures/*.pdf
+paper_figures/*.jpg
+
+# LaTeX auxiliary files
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/*.toc
+paper/*.synctex.gz
+
+# Complexity analysis results
+complexity/*.log
+complexity/*.md

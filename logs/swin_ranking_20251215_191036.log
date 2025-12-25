@@ -1,38 +1,0 @@
-Training and testing on koniq-10k dataset for 1 rounds...
-Using Swin Transformer backbone
-KonIQ-10k: 7046 train images, 2010 test images
-Round 1
-  Train: 7046 images, Test: 2010 images
-Using device: cuda
-Backbone: Swin Transformer Tiny
-Model checkpoints will be saved to: /root/Perceptual-IQA-CS3324/checkpoints/koniq-10k-swin-ranking-alpha0.3_20251215_191039
-Loading Koniq-10k dataset from /root/Perceptual-IQA-CS3324/koniq-10k/...
-Building sample list from 7046 images...
-  Preparing samples:   0%|          | 0/7046 [00:00<?, ?img/s]  Preparing samples: 100%|██████████| 7046/7046 [00:00<00:00, 140360.61img/s]
-  Total samples created: 140920
-Pre-loading 7046 unique images into cache...
-  Loading images:   0%|          | 0/7046 [00:00<?, ?img/s]  Loading images:   0%|          | 8/7046 [00:00<01:30, 77.66img/s]  Loading images:   0%|          | 18/7046 [00:00<01:19, 88.09img/s]  Loading images:   0%|          | 27/7046 [00:00<01:19, 88.43img/s]  Loading images:   1%|          | 36/7046 [00:00<01:19, 88.06img/s]  Loading images:   1%|          | 45/7046 [00:00<01:19, 88.18img/s]  Loading images:   1%|          | 54/7046 [00:00<01:20, 87.22img/s]  Loading images:   1%|          | 63/7046 [00:00<01:20, 86.97img/s]  Loading images:   1%|          | 72/7046 [00:00<01:19, 87.35img/s]  Loading images:   1%|          | 81/7046 [00:00<01:19, 87.27img/s]  Loading images:   1%|▏         | 91/7046 [00:01<01:19, 87.56img/s]  Loading images:   1%|▏         | 100/7046 [00:01<01:20, 86.37img/s]  Loading images:   2%|▏         | 109/7046 [00:01<01:20, 85.72img/s]  Loading images:   2%|▏         | 118/7046 [00:01<01:21, 84.99img/s]  Loading images:   2%|▏         | 127/7046 [00:01<01:20, 86.05img/s]  Loading images:   2%|▏         | 136/7046 [00:01<01:20, 86.14img/s]  Loading images:   2%|▏         | 145/7046 [00:01<01:19, 86.44img/s]  Loading images:   2%|▏         | 155/7046 [00:01<01:18, 88.04img/s]  Loading images:   2%|▏         | 160/7046 [00:01<01:19, 86.98img/s]
-Traceback (most recent call last):
-  File "/root/Perceptual-IQA-CS3324/train_swin.py", line 140, in <module>
-    main(config)
-  File "/root/Perceptual-IQA-CS3324/train_swin.py", line 98, in main
-    solver = HyperIQASolver(config, folder_path[config.dataset], train_index, test_index)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/Perceptual-IQA-CS3324/HyperIQASolver_swin.py", line 61, in __init__
-    train_loader = data_loader.DataLoader(config.dataset, path, train_idx, config.patch_size, config.train_patch_num, batch_size=config.batch_size, istrain=True)
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/Perceptual-IQA-CS3324/data_loader.py", line 75, in __init__
-    self.data = folders.Koniq_10kFolder(
-                ^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/Perceptual-IQA-CS3324/folders.py", line 276, in __init__
-    img = pil_loader(path)
-          ^^^^^^^^^^^^^^^^
-  File "/root/Perceptual-IQA-CS3324/folders.py", line 456, in pil_loader
-    return img.convert('RGB')
-           ^^^^^^^^^^^^^^^^^^
-  File "/root/miniconda3/lib/python3.12/site-packages/PIL/Image.py", line 986, in convert
-    self.load()
-  File "/root/miniconda3/lib/python3.12/site-packages/PIL/ImageFile.py", line 390, in load
-    n, err_code = decoder.decode(b)
-                  ^^^^^^^^^^^^^^^^^
-KeyboardInterrupt
