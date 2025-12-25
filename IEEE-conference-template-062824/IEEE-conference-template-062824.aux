@@ -98,36 +98,35 @@
 \bibcite{zeng2021pqr}{20}
 \bibcite{zhang2021unique}{21}
 \bibcite{sun2024stairiqa}{22}
-\citation{su2020hyperiq}
 \@writefile{toc}{\contentsline {section}{Appendix}{11}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {A}HyperNetwork Architecture}{11}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {B}TargetNetwork Details}{11}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {C}Model Architecture Specifications}{11}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {D}Design Rationale}{12}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Learning rate sensitivity analysis. SRCC (red, left y-axis) and PLCC (cyan, right y-axis) versus learning rate. The optimal learning rate of $5\times 10^{-7}$ (marked with gold star) achieves the best SRCC performance. Both metrics are unified to [0.930, 0.950] range for better comparison.}}{12}{}\protected@file@percent }
+\newlabel{fig:lr_sensitivity}{{7}{12}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {E}Complete Hyperparameter Configuration}{12}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {F}Learning Rate Sensitivity Analysis}{12}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {G}Training Dynamics and Convergence Analysis}{12}{}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Detailed Experimental Hyperparameters and Training Configuration}}{13}{}\protected@file@percent }
 \newlabel{tab:hyperparameters}{{V}{13}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {H}Computational Complexity and Efficiency Analysis}{13}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Epoch-wise Training Log of Best Model (Swin-Base, LR=$5\times 10^{-7}$)}}{14}{}\protected@file@percent }
-\newlabel{tab:training_log}{{VI}{14}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Learning rate sensitivity analysis. SRCC (red, left y-axis) and PLCC (cyan, right y-axis) versus learning rate. The optimal learning rate of $5\times 10^{-7}$ (marked with gold star) achieves the best SRCC performance. Both metrics are unified to [0.930, 0.950] range for better comparison.}}{14}{}\protected@file@percent }
-\newlabel{fig:lr_sensitivity}{{7}{14}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {G}Training Dynamics and Convergence Analysis}{13}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {H}Computational Complexity and Efficiency Analysis}{14}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {I}Data Augmentation Strategy Analysis}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {J}Loss Function Comparison and Analysis}{14}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Epoch-wise Training Log of Best Model (Swin-Base, LR=$5\times 10^{-7}$)}}{15}{}\protected@file@percent }
+\newlabel{tab:training_log}{{VI}{15}}
 \@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Computational Complexity Comparison across Model Variants}}{15}{}\protected@file@percent }
 \newlabel{tab:complexity}{{VII}{15}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {J}Loss Function Comparison and Analysis}{15}{}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces Loss function comparison on KonIQ-10k}}{15}{}\protected@file@percent }
 \newlabel{tab:loss_comparison}{{VIII}{15}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {K}Visualization Methodology}{15}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Loss function performance comparison. Left: SRCC comparison showing L1 (MAE) achieves the best performance. Right: SRCC vs PLCC scatter plot demonstrating the consistency of L1 loss across both metrics.}}{16}{}\protected@file@percent }
-\newlabel{fig:loss_comparison}{{8}{16}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Loss function performance comparison. Left: SRCC comparison showing L1 (MAE) achieves the best performance. Right: SRCC vs PLCC scatter plot demonstrating the consistency of L1 loss across both metrics.}}{15}{}\protected@file@percent }
+\newlabel{fig:loss_comparison}{{8}{15}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {K}Visualization Methodology}{16}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {L}High-Quality Image Analysis (Figure\nobreakspace  {}9\hbox {})}{16}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {M}Low-Quality Image Analysis (Figure\nobreakspace  {}10\hbox {})}{16}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Feature map visualization for a high-quality image (MOS 81.4/100). The hierarchical feature extraction shows increasing activation strength from low to high stages, with Stage 3-4 dominating. This pattern indicates the model relies on semantic understanding for high-quality assessment.}}{16}{}\protected@file@percent }
+\newlabel{fig:feature_high}{{9}{16}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {N}Connection to Channel Attention}{16}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Feature map visualization for a high-quality image (MOS 81.4/100). The hierarchical feature extraction shows increasing activation strength from low to high stages, with Stage 3-4 dominating. This pattern indicates the model relies on semantic understanding for high-quality assessment.}}{17}{}\protected@file@percent }
-\newlabel{fig:feature_high}{{9}{17}}
 \@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Feature map visualization for a low-quality image (MOS 20.1/100). Strong activations in lower stages (Stage 1-2) indicate the model focuses on local distortions (compression artifacts, noise, texture degradation), while higher stages show weaker activations due to semantic content being obscured by distortions.}}{17}{}\protected@file@percent }
 \newlabel{fig:feature_low}{{10}{17}}
 \gdef \@abspage@last{17}

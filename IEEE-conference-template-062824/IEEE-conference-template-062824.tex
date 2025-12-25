@@ -398,8 +398,6 @@ The author would like to thank Shanghai Jiao Tong University for providing compu
 
 \section{HyperNetwork and TargetNetwork Implementation Details}
 
-Following the HyperIQA paradigm \cite{su2020hyperiq}, we employ a content-adaptive prediction mechanism where a HyperNetwork dynamically generates parameters for a compact TargetNetwork based on image content. This architecture enables our model to adjust its prediction strategy according to specific distortion types and content characteristics.
-
 \subsection{HyperNetwork Architecture}
 
 The HyperNetwork takes the deepest semantic feature $F^K \in \mathbb{R}^{H_K \times W_K \times C_K}$ (Stage 4 output from Swin Transformer) as input and generates parameters $\theta_x = \{W_1, b_1, W_2, b_2\}$ for the TargetNetwork. For SMART-Base, $F^K \in \mathbb{R}^{7 \times 7 \times 1024}$.
