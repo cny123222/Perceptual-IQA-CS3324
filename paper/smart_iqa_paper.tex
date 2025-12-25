@@ -515,11 +515,11 @@ Pairwise Ranking & 0.9292 & 0.9249 & -0.0083 \\
 \label{fig:loss_comparison}
 \end{figure}
 
-\section{Feature Map Visualization and Interpretation}
+\subsection{Feature Map Visualization and Interpretation}
 
 To provide deeper insights into the hierarchical feature learning mechanism of our Swin Transformer backbone, we visualize the internal feature activations across all four stages for images of different quality levels. These visualizations reveal how the model adaptively focuses on different semantic levels depending on image quality characteristics.
 
-\subsection{Visualization Methodology}
+\subsubsection{Visualization Methodology}
 
 To visualize the hierarchical feature extraction process, we extract feature maps from all four Swin Transformer stages and compute spatial activation heatmaps. For each stage $k$ (where $k = 1, 2, 3, 4$ corresponds to the four hierarchical levels), we extract the feature map $F^k \in \mathbb{R}^{H_k \times W_k \times C_k}$, where $H_k$ and $W_k$ denote spatial dimensions and $C_k$ denotes the number of channels. We compute the channel-wise average magnitude to obtain a spatial activation map $A^k \in \mathbb{R}^{H_k \times W_k}$:
 \begin{equation}
@@ -527,26 +527,26 @@ A^k(i,j) = \frac{1}{C_k} \sum_{c=1}^{C_k} |F^k(i,j,c)|
 \end{equation}
 where $i$ and $j$ index the spatial locations, and $c$ indexes the channel dimension. We then normalize each $A^k$ to the range of 0 to 1 and apply a perceptually-uniform colormap (viridis) for visualization. Warmer colors (yellow/green) indicate stronger activations, while cooler colors (blue/purple) indicate weaker activations.
 
-\subsection{High-Quality Image Analysis (Figure~\ref{fig:feature_high})}
+\subsubsection{High-Quality Image Analysis}
 
 Figure~\ref{fig:feature_high} shows feature maps for a high-quality image (MOS 81.4/100). Stage 1 (low-level features) exhibits relatively uniform, moderate activations across the image, with slightly higher responses at edges and texture boundaries—the absence of strong localized spikes suggests minimal low-level distortions such as compression artifacts, noise, or blur. Stage 2 (mid-level features) shows structured activations aligned with object boundaries and regions of interest (e.g., human subjects, salient objects), reflecting the model's extraction of mid-level geometric structures. Stage 3 (high-level features) displays the strongest overall activations, particularly in semantically important regions, indicating that for high-quality images, the model relies heavily on high-level semantic understanding to confirm good quality. Stage 4 (semantic features) maintains strong activations in content-rich areas, providing global context that helps the model verify the image is of high perceptual quality with meaningful content. A key observation emerges from this analysis: for high-quality images, the activation strength increases hierarchically from low to high levels, with Stage 3-4 dominating. This pattern aligns precisely with our channel attention analysis (Figure~\ref{fig:attention_analysis}), where high-quality images receive higher attention weights on deeper stages, validating the interpretability of our learned attention mechanism.
 
-\subsection{Low-Quality Image Analysis (Figure~\ref{fig:feature_low})}
+\subsubsection{Low-Quality Image Analysis}
 
 Figure~\ref{fig:feature_low} shows feature maps for a low-quality image (MOS 20.1/100), with an activation pattern markedly different from the high-quality case. Stage 1 (low-level features) exhibits \textit{strong, localized activations} in regions with visible compression artifacts, noise, and texture degradation, demonstrating that the model's low-level features are highly responsive to these quality-impairing distortions. Stage 2 (mid-level features) shows increased activations at distortion boundaries and in regions with geometric distortions (blur, blockiness), with a more irregular activation map compared to the high-quality image. In contrast, Stage 3 (high-level features) displays \textit{weaker overall activations} compared to the high-quality case, suggesting that semantic features are less reliable or less salient in severely degraded images. Stage 4 (semantic features) maintains some activation in content-rich areas, but the overall magnitude is reduced, indicating that global semantic understanding is hindered by low-level distortions. This analysis reveals that for low-quality images, lower stages (1-2) exhibit disproportionately strong activations, while higher stages (3-4) are suppressed—a "bottom-heavy" activation pattern that reflects the model's adaptive strategy: when distortions are prominent, prioritize low-level features for distortion detection; when quality is high, prioritize semantic features for content verification.
 
-\subsection{Connection to Channel Attention}
+\subsubsection{Connection to Channel Attention}
 
 These feature map visualizations directly support our channel attention mechanism (Section~3.4). The channel attention module learns to assign higher weights to stages that are most informative for a given image: high-quality images receive higher attention on Stages 3-4 for semantic understanding, while low-quality images receive higher attention on Stages 1-2 for distortion detection. This adaptive weighting strategy, combined with the hierarchical feature extraction of Swin Transformer, enables SMART-IQA to achieve robust performance across diverse quality levels and distortion types by dynamically allocating computational resources to the most relevant feature hierarchies based on image characteristics.
 
-\begin{figure}[t]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=0.48\textwidth]{../paper_figures/feature_map_high_quality_appendix.pdf}
 \caption{Feature map visualization for a high-quality image (MOS 81.4/100). The hierarchical feature extraction shows increasing activation strength from low to high stages, with Stage 3-4 dominating. This pattern indicates the model relies on semantic understanding for high-quality assessment.}
 \label{fig:feature_high}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=0.48\textwidth]{../paper_figures/feature_map_low_quality_appendix.pdf}
 \caption{Feature map visualization for a low-quality image (MOS 20.1/100). Strong activations in lower stages (Stage 1-2) indicate the model focuses on local distortions (compression artifacts, noise, texture degradation), while higher stages show weaker activations due to semantic content being obscured by distortions.}
