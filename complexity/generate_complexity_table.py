@@ -25,14 +25,14 @@ models = {
     'SMART-Tiny\n(Swin-T)': {
         'params': 29.52,
         'flops': 4.47,
-        'time': None,  # 估算
-        'throughput': None
+        'time': 6.00,     # ms
+        'throughput': 167.24  # images/sec
     },
     'SMART-Small\n(Swin-S)': {
         'params': 50.84,
         'flops': 8.65,
-        'time': None,  # 估算
-        'throughput': None
+        'time': 10.62,    # ms
+        'throughput': 92.73  # images/sec
     },
     'SMART-Base\n(Swin-B)': {
         'params': 89.11,
@@ -53,8 +53,8 @@ def generate_latex_table():
 \textbf{Model} & \textbf{Params (M)} & \textbf{FLOPs (G)} & \textbf{Time (ms)} & \textbf{FPS} \\
 \midrule
 HyperIQA (ResNet50) & 27.38 & 4.33 & 3.12 & 320.5 \\
-SMART-Tiny (Swin-T) & 29.52 & 4.47 & - & - \\
-SMART-Small (Swin-S) & 50.84 & 8.65 & - & - \\
+SMART-Tiny (Swin-T) & 29.52 & 4.47 & 6.00 & 166.7 \\
+SMART-Small (Swin-S) & 50.84 & 8.65 & 10.62 & 94.2 \\
 SMART-Base (Swin-B) & 89.11 & 15.28 & 10.06 & 99.4 \\
 \bottomrule
 \end{tabular}
@@ -128,18 +128,18 @@ def generate_comparison_plot():
 
 def generate_inference_time_plot():
     """生成推理时间对比图"""
-    # 只包含有实际测量数据的模型
-    measured_models = ['HyperIQA\n(ResNet50)', 'SMART-Base\n(Swin-B)']
-    times = [models[m]['time'] for m in measured_models if models[m]['time'] is not None]
-    throughputs = [models[m]['throughput'] for m in measured_models if models[m]['throughput'] is not None]
+    # 所有模型都有实际测量数据
+    measured_models = list(models.keys())
+    times = [models[m]['time'] for m in measured_models]
+    throughputs = [models[m]['throughput'] for m in measured_models]
     
-    short_names = ['HyperIQA', 'SMART-Base']
+    short_names = ['HyperIQA', 'SMART-T', 'SMART-S', 'SMART-B']
     
     fig, axes = plt.subplots(1, 2, figsize=(7, 3.5))
     
     # 子图1: 推理时间
     ax1 = axes[0]
-    bars1 = ax1.bar(short_names, times, color=['#1f77b4', '#d62728'], 
+    bars1 = ax1.bar(short_names, times, color=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'], 
                     alpha=0.8, edgecolor='black', linewidth=0.8)
     ax1.set_ylabel('Inference Time (ms)', fontsize=11)
     ax1.set_ylim([0, max(times) * 1.2])
@@ -154,7 +154,7 @@ def generate_inference_time_plot():
     
     # 子图2: 吞吐量
     ax2 = axes[1]
-    bars2 = ax2.bar(short_names, throughputs, color=['#1f77b4', '#d62728'], 
+    bars2 = ax2.bar(short_names, throughputs, color=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'], 
                     alpha=0.8, edgecolor='black', linewidth=0.8)
     ax2.set_ylabel('Throughput (images/sec)', fontsize=11)
     ax2.set_ylim([0, max(throughputs) * 1.2])
@@ -190,8 +190,8 @@ def generate_markdown_summary():
 | 模型 | 参数量 (M) | FLOPs (G) | 推理时间 (ms) | 吞吐量 (images/sec) |
 |------|-----------|-----------|--------------|---------------------|
 | HyperIQA (ResNet50) | 27.38 | 4.33 | 3.12 | 329.73 |
-| SMART-Tiny (Swin-T) | 29.52 | 4.47 | - | - |
-| SMART-Small (Swin-S) | 50.84 | 8.65 | - | - |
+| SMART-Tiny (Swin-T) | 29.52 | 4.47 | 6.00 | 167.24 |
+| SMART-Small (Swin-S) | 50.84 | 8.65 | 10.62 | 92.73 |
 | SMART-Base (Swin-B) | 89.11 | 15.28 | 10.06 | 97.37 |
 
 ## 🔍 关键观察
