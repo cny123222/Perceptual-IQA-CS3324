@@ -618,14 +618,14 @@ This adaptive weighting, combined with the hierarchical feature extraction, enab
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.48\textwidth]{../paper_figures/feature_map_high_quality_appendix.pdf}
-\caption{Feature map visualization for a high-quality image (MOS 81.4/100). The hierarchical feature extraction shows increasing activation strength from low to high stages, with Stage 3-4 dominating. This pattern indicates the model relies on semantic understanding for high-quality assessment.}
+\caption{Feature map visualization for a high-quality image (MOS 81.4/100). Each stage's activation heatmap reveals where the network focuses its computational resources: Stage 1 (low-level textures) shows uniform moderate activations without distortion spikes; Stage 2-3 (mid-to-high-level structures) exhibit increasingly stronger responses aligned with semantic regions; Stage 4 (deep semantic features) maintains robust activations across content-rich areas. This \textit{``top-heavy''} activation pattern, dominated by high-level semantic stages (3-4), aligns with our channel attention analysis (Section 4.6) and indicates the model relies on semantic understanding to confirm high quality—understanding \textit{what} the image depicts suffices to verify its integrity.}
 \label{fig:feature_high}
 \end{figure}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.48\textwidth]{../paper_figures/feature_map_low_quality_appendix.pdf}
-\caption{Feature map visualization for a low-quality image (MOS 20.1/100). Strong activations in lower stages (Stage 1-2) indicate the model focuses on local distortions (compression artifacts, noise, texture degradation), while higher stages show weaker activations due to semantic content being obscured by distortions.}
+\caption{Feature map visualization for a low-quality image (MOS 20.1/100). The activation pattern contrasts sharply with Figure~\ref{fig:feature_high}: Stage 1 (low-level) exhibits \textit{strong, localized activations} responding to compression artifacts, noise, and texture degradation—the model's early layers detect quality-impairing distortions; Stage 2 (mid-level) shows irregular, heightened responses at distortion boundaries; Stage 3-4 (high-level semantic) display \textit{weaker overall activations} as distortions obscure semantic content. This \textit{``bottom-heavy''} activation pattern, with strong responses in low-level stages (1-2), demonstrates the model's adaptive strategy: prioritizing the detection of local distortion artifacts when semantic content is obscured, mirroring the distributed attention weights observed in our channel attention analysis.}
 \label{fig:feature_low}
 \end{figure}
 
