@@ -24,21 +24,24 @@
 \bibitem{su2020hyperiq}
 S.~Su, Q.~Yan, Y.~Zhu, C.~Zhang, X.~Ge, J.~Sun, and Y.~Zhang, ``Blindly assess
   image quality in the wild guided by a self-adaptive hyper network,'' in
-  \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern
-  Recognition}, 2020, pp. 3667--3676.
+  \emph{2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition
+  (CVPR)}, 2020, pp. 3664--3673.
 
 \bibitem{dosovitskiy2021vit}
+\BIBentryALTinterwordspacing
 A.~Dosovitskiy, L.~Beyer, A.~Kolesnikov, D.~Weissenborn, X.~Zhai,
-  T.~Unterthiner, M.~Dehghani, M.~Minderer, G.~Heigold, S.~Gelly \emph{et~al.},
-  ``An image is worth 16x16 words: Transformers for image recognition at
-  scale,'' in \emph{International Conference on Learning Representations},
-  2021.
+  T.~Unterthiner, M.~Dehghani, M.~Minderer, G.~Heigold, S.~Gelly, J.~Uszkoreit,
+  and N.~Houlsby, ``An image is worth 16x16 words: Transformers for image
+  recognition at scale,'' 2021. [Online]. Available:
+  \url{https://arxiv.org/abs/2010.11929}
+\BIBentrySTDinterwordspacing
 
 \bibitem{liu2021swin}
+\BIBentryALTinterwordspacing
 Z.~Liu, Y.~Lin, Y.~Cao, H.~Hu, Y.~Wei, Z.~Zhang, S.~Lin, and B.~Guo, ``Swin
-  transformer: Hierarchical vision transformer using shifted windows,'' in
-  \emph{Proceedings of the IEEE/CVF International Conference on Computer
-  Vision}, 2021, pp. 10\,012--10\,022.
+  transformer: Hierarchical vision transformer using shifted windows,'' 2021.
+  [Online]. Available: \url{https://arxiv.org/abs/2103.14030}
+\BIBentrySTDinterwordspacing
 
 \bibitem{mittal2012brisque}
 A.~Mittal, A.~K. Moorthy, and A.~C. Bovik, ``No-reference image quality
@@ -46,53 +49,68 @@ A.~Mittal, A.~K. Moorthy, and A.~C. Bovik, ``No-reference image quality
   Processing}, vol.~21, no.~12, pp. 4695--4708, 2012.
 
 \bibitem{mittal2013niqe}
-A.~Mittal, R.~Soundararajan, and A.~C. Bovik, ``Making a "completely blind"
-  image quality analyzer,'' in \emph{IEEE Signal processing letters}, vol.~20,
-  no.~3.\hskip 1em plus 0.5em minus 0.4em\relax IEEE, 2013, pp. 209--212.
+A.~Mittal, R.~Soundararajan, and A.~C. Bovik, ``Making a “completely blind”
+  image quality analyzer,'' \emph{IEEE Signal Processing Letters}, vol.~20,
+  no.~3, pp. 209--212, 2013.
 
 \bibitem{talebi2018nima}
+\BIBentryALTinterwordspacing
 H.~Talebi and P.~Milanfar, ``Nima: Neural image assessment,'' \emph{IEEE
-  Transactions on Image Processing}, vol.~27, no.~8, pp. 3998--4011, 2018.
+  Transactions on Image Processing}, vol.~27, no.~8, p. 3998–4011, Aug. 2018.
+  [Online]. Available: \url{http://dx.doi.org/10.1109/TIP.2018.2831899}
+\BIBentrySTDinterwordspacing
 
 \bibitem{zhang2018dbcnn}
+\BIBentryALTinterwordspacing
 W.~Zhang, K.~Ma, J.~Yan, D.~Deng, and Z.~Wang, ``Blind image quality assessment
   using a deep bilinear convolutional neural network,'' \emph{IEEE Transactions
-  on Circuits and Systems for Video Technology}, vol.~30, no.~1, pp. 36--47,
-  2018.
+  on Circuits and Systems for Video Technology}, vol.~30, no.~1, p. 36–47,
+  Jan. 2020. [Online]. Available:
+  \url{http://dx.doi.org/10.1109/TCSVT.2018.2886771}
+\BIBentrySTDinterwordspacing
 
 \bibitem{ying2020paq2piq}
+\BIBentryALTinterwordspacing
 Z.~Ying, H.~Niu, P.~Gupta, D.~Mahajan, D.~Ghadiyaram, and A.~Bovik, ``From
   patches to pictures (paq-2-piq): Mapping the perceptual space of picture
-  quality,'' in \emph{Proceedings of the IEEE/CVF Conference on Computer Vision
-  and Pattern Recognition}, 2020, pp. 3575--3585.
+  quality,'' 2019. [Online]. Available: \url{https://arxiv.org/abs/1912.10088}
+\BIBentrySTDinterwordspacing
 
 \bibitem{yang2022maniqa}
+\BIBentryALTinterwordspacing
 S.~Yang, T.~Wu, S.~Shi, S.~Lao, Y.~Gong, M.~Cao, J.~Wang, and Y.~Yang,
   ``Maniqa: Multi-dimension attention network for no-reference image quality
-  assessment,'' in \emph{Proceedings of the IEEE/CVF Conference on Computer
-  Vision and Pattern Recognition Workshops}, 2022, pp. 1191--1200.
+  assessment,'' 2022. [Online]. Available:
+  \url{https://arxiv.org/abs/2204.08958}
+\BIBentrySTDinterwordspacing
 
 \bibitem{ke2021musiq}
+\BIBentryALTinterwordspacing
 J.~Ke, Q.~Wang, Y.~Wang, P.~Milanfar, and F.~Yang, ``Musiq: Multi-scale image
-  quality transformer,'' in \emph{Proceedings of the IEEE/CVF International
-  Conference on Computer Vision}, 2021, pp. 5148--5157.
+  quality transformer,'' 2021. [Online]. Available:
+  \url{https://arxiv.org/abs/2108.05997}
+\BIBentrySTDinterwordspacing
 
 \bibitem{golestaneh2022tres}
+\BIBentryALTinterwordspacing
 S.~A. Golestaneh, S.~Dadsetan, and K.~M. Kitani, ``No-reference image quality
-  assessment via transformers, relative ranking, and self-consistency,'' in
-  \emph{Proceedings of the IEEE/CVF Winter Conference on Applications of
-  Computer Vision}, 2022, pp. 1220--1230.
+  assessment via transformers, relative ranking, and self-consistency,'' 2022.
+  [Online]. Available: \url{https://arxiv.org/abs/2108.06858}
+\BIBentrySTDinterwordspacing
 
 \bibitem{zhang2023liqe}
+\BIBentryALTinterwordspacing
 W.~Zhang, G.~Zhai, Y.~Wei, X.~Yang, and K.~Ma, ``Blind image quality assessment
-  via vision-language correspondence: A multitask learning perspective,'' in
-  \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern
-  Recognition}, 2023, pp. 14\,071--14\,081.
+  via vision-language correspondence: A multitask learning perspective,'' 2023.
+  [Online]. Available: \url{https://arxiv.org/abs/2303.14968}
+\BIBentrySTDinterwordspacing
 
 \bibitem{wang2023clipiqa}
-J.~Wang, K.~C. Chan, and C.~C. Loy, ``Exploring clip for assessing the look and
-  feel of images,'' in \emph{Proceedings of the AAAI Conference on Artificial
-  Intelligence}, vol.~37, 2023, pp. 2555--2563.
+\BIBentryALTinterwordspacing
+J.~Wang, K.~C.~K. Chan, and C.~C. Loy, ``Exploring clip for assessing the look
+  and feel of images,'' 2022. [Online]. Available:
+  \url{https://arxiv.org/abs/2207.12396}
+\BIBentrySTDinterwordspacing
 
 \bibitem{hosu2020koniq}
 V.~Hosu, H.~Lin, T.~Sziranyi, and D.~Saupe, ``Koniq-10k: An ecologically valid
@@ -101,46 +119,50 @@ V.~Hosu, H.~Lin, T.~Sziranyi, and D.~Saupe, ``Koniq-10k: An ecologically valid
 
 \bibitem{fang2020perceptual}
 Y.~Fang, H.~Zhu, Y.~Zeng, K.~Ma, and Z.~Wang, ``Perceptual quality assessment
-  of smartphone photography,'' in \emph{Proceedings of the IEEE/CVF Conference
-  on Computer Vision and Pattern Recognition}, 2020, pp. 3677--3686.
+  of smartphone photography,'' in \emph{2020 IEEE/CVF Conference on Computer
+  Vision and Pattern Recognition (CVPR)}, 2020, pp. 3674--3683.
 
 \bibitem{lin2019kadid}
 H.~Lin, V.~Hosu, and D.~Saupe, ``Kadid-10k: A large-scale artificially
   distorted iqa database,'' in \emph{2019 Eleventh International Conference on
-  Quality of Multimedia Experience (QoMEX)}.\hskip 1em plus 0.5em minus
-  0.4em\relax IEEE, 2019, pp. 1--3.
+  Quality of Multimedia Experience (QoMEX)}, 2019, pp. 1--3.
 
 \bibitem{li2023agiqa}
+\BIBentryALTinterwordspacing
 C.~Li, Z.~Zhang, H.~Wu, W.~Sun, X.~Min, X.~Liu, G.~Zhai, and W.~Lin,
   ``Agiqa-3k: An open database for ai-generated image quality assessment,''
-  \emph{IEEE Transactions on Circuits and Systems for Video Technology}, 2023.
+  2023. [Online]. Available: \url{https://arxiv.org/abs/2306.04717}
+\BIBentrySTDinterwordspacing
 
 \bibitem{bosse2017wadiqam}
+\BIBentryALTinterwordspacing
 S.~Bosse, D.~Maniry, K.-R. Muller, T.~Wiegand, and W.~Samek, ``Deep neural
-  networks for no-reference and full-reference image quality assessment,'' in
-  \emph{IEEE Transactions on Image Processing}, vol.~27, no.~1.\hskip 1em plus
-  0.5em minus 0.4em\relax IEEE, 2017, pp. 206--219.
+  networks for no-reference and full-reference image quality assessment,''
+  \emph{IEEE Transactions on Image Processing}, vol.~27, no.~1, p. 206–219,
+  Jan. 2018. [Online]. Available:
+  \url{http://dx.doi.org/10.1109/TIP.2017.2760518}
+\BIBentrySTDinterwordspacing
 
 \bibitem{li2022sfa}
-D.~Li, T.~Jiang, W.~Lin, and M.~Jiang, ``Blindly assess image quality in the
-  wild guided by a self-adaptive hyper network,'' \emph{IEEE Transactions on
-  Circuits and Systems for Video Technology}, vol.~32, no.~3, pp. 1287--1299,
-  2022.
+S.~Su, Q.~Yan, Y.~Zhu, C.~Zhang, X.~Ge, J.~Sun, and Y.~Zhang, ``Blindly assess
+  image quality in the wild guided by a self-adaptive hyper network,'' in
+  \emph{2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition
+  (CVPR)}, 2020, pp. 3664--3673.
 
 \bibitem{zeng2021pqr}
-H.~Zeng, L.~Zhang, and A.~C. Bovik, ``Perceptual quality assessment of
-  omnidirectional images as moving camera videos,'' in \emph{Proceedings of the
-  IEEE/CVF Conference on Computer Vision and Pattern Recognition}, 2021, pp.
-  3423--3432.
+X.~Sui, K.~Ma, Y.~Yao, and Y.~Fang, ``Perceptual quality assessment of
+  omnidirectional images as moving camera videos,'' \emph{IEEE Transactions on
+  Visualization and Computer Graphics}, vol.~28, no.~8, pp. 3022--3034, 2022.
 
 \bibitem{zhang2021unique}
 W.~Zhang, K.~Ma, G.~Zhai, and X.~Yang, ``Uncertainty-aware blind image quality
-  assessment in the laboratory and wild,'' in \emph{Proceedings of the IEEE/CVF
-  International Conference on Computer Vision}, 2021, pp. 3142--3151.
+  assessment in the laboratory and wild,'' \emph{IEEE Transactions on Image
+  Processing}, vol.~30, pp. 3474--3486, 2021.
 
 \bibitem{sun2024stairiqa}
-W.~Sun, H.~Zhang, L.~Liao, Y.~Wei, G.~Zhai, and X.~Min, ``Stairiqa: Towards
-  staircase-shaped quality scales for blind image quality assessment,''
-  \emph{IEEE Transactions on Multimedia}, 2024.
+W.~Sun, X.~Min, D.~Tu, S.~Ma, and G.~Zhai, ``Blind quality assessment for
+  in-the-wild images via hierarchical feature fusion and iterative mixed
+  database training,'' \emph{IEEE Journal of Selected Topics in Signal
+  Processing}, 2023.
 
 \end{thebibliography}
