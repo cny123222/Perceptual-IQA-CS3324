@@ -87,11 +87,11 @@ A fundamental challenge in multi-scale BIQA is how to effectively aggregate feat
 \begin{equation}
 \tilde{F}^i = \text{AdaptiveAvgPool}(F^i, H_{\text{target}} \times W_{\text{target}})
 \end{equation}
-where $\tilde{F}^i \in \mathbb{R}^{H_{\text{target}} \times W_{\text{target}} \times C_i}$. The adaptive pooling operation partitions each spatial location $(h, w)$ of the input feature map into a receptive field and computes the average:
+where $\tilde{F}^i \in \mathbb{R}^{H_{\text{target}} \times W_{\text{target}} \times C_i}$ denotes the pooled feature map. The adaptive pooling operation partitions the input feature map into receptive fields. For each output spatial location $(h, w)$, we compute the average over its corresponding receptive field $R_{h,w}$ across all channels:
 \begin{equation}
-\tilde{F}^i[h, w, :] = \frac{1}{|R_{h,w}|} \sum_{(p,q) \in R_{h,w}} F^i[p, q, :]
+\tilde{F}^i_{h,w} = \frac{1}{|R_{h,w}|} \sum_{(p,q) \in R_{h,w}} F^i_{p,q}
 \end{equation}
-where $R_{h,w}$ is the receptive field corresponding to output position $(h, w)$, with size determined by:
+where $\tilde{F}^i_{h,w} \in \mathbb{R}^{C_i}$ represents the feature vector at output position $(h, w)$, $F^i_{p,q} \in \mathbb{R}^{C_i}$ represents the feature vector at input position $(p, q)$, and $R_{h,w}$ is the receptive field corresponding to output position $(h, w)$. The receptive field size is determined by:
 \begin{equation}
 |R_{h,w}| = k_h \times k_w, \quad k_h = \left\lceil \frac{H_i}{H_{\text{target}}} \right\rceil, \quad k_w = \left\lceil \frac{W_i}{W_{\text{target}}} \right\rceil
 \end{equation}
@@ -114,11 +114,11 @@ where each $F^i_{\text{pool}} \in \mathbb{R}^{H_{\text{target}} \times W_{\text{
 
 While the AFA module unifies multi-scale features into a common representation space, a critical question remains: \textit{how should features from different scales be weighted for quality prediction?} \textit{Why dynamic weighting is essential:} Different quality levels and distortion types exhibit quality cues at different feature hierarchies. For high-quality images with minimal distortions, quality can be reliably inferred from high-level semantic features alone—understanding what the image depicts (e.g., a clear sky, sharp architecture) suffices to confirm integrity. Conversely, for low-quality images with visible artifacts, low-level texture features become critical for detecting blur, noise, and compression distortions, while high-level features provide contextual understanding. Fixed equal weighting fails to capture this quality-dependent assessment strategy. As our experiments in Section 4.6 demonstrate, the model learns to concentrate 99.67\% of attention on deep semantic stages for pristine images, while distributing attention uniformly across all hierarchies for distorted ones—an adaptive behavior that mimics human visual inspection. To enable this adaptivity, we introduce a lightweight channel attention mechanism that dynamically determines scale importance based on image content.
 
-\textbf{Global Semantic Descriptor Extraction.} We leverage the deepest stage feature $F^K \in \mathbb{R}^{H_K \times W_K \times C_K}$, which encodes the most abstract semantic representation of image content, to guide the attention weight generation. A global descriptor is extracted via global average pooling:
+\textbf{Global Semantic Descriptor Extraction.} We leverage the deepest stage feature $F^K \in \mathbb{R}^{H_K \times W_K \times C_K}$, which encodes the most abstract semantic representation of image content, to guide the attention weight generation. A global descriptor $\mathbf{g} \in \mathbb{R}^{C_K}$ is extracted via global average pooling:
 \begin{equation}
-\mathbf{g} = \text{GAP}(F^K) = \frac{1}{H_K \cdot W_K} \sum_{h=1}^{H_K} \sum_{w=1}^{W_K} F^K[h, w, :] \in \mathbb{R}^{C_K}
+\mathbf{g} = \text{GAP}(F^K) = \frac{1}{H_K \cdot W_K} \sum_{h=1}^{H_K} \sum_{w=1}^{W_K} F^K_{h,w}
 \end{equation}
-This operation compresses the spatial dimensions while preserving the channel-wise statistics, yielding a compact representation of the global semantic content. The choice of $F^K$ for attention generation is motivated by the hypothesis that high-level semantic understanding (e.g., recognizing whether an image depicts a natural scene, portrait, or architectural structure) should inform which feature scales are most relevant for quality assessment.
+where $F^K_{h,w} \in \mathbb{R}^{C_K}$ denotes the feature vector at spatial position $(h, w)$ of the deepest stage. This operation compresses the spatial dimensions while preserving the channel-wise statistics, yielding a compact representation of the global semantic content. The choice of $F^K$ for attention generation is motivated by the hypothesis that high-level semantic understanding (e.g., recognizing whether an image depicts a natural scene, portrait, or architectural structure) should inform which feature scales are most relevant for quality assessment.
 
 \textbf{Scale Importance Prediction via Gating Network.} The global descriptor $\mathbf{g}$ is fed through a lightweight two-layer gating network to predict the importance of each hierarchical stage:
 \begin{equation}
@@ -362,6 +362,7 @@ The author would like to thank Shanghai Jiao Tong University for providing compu
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 
+\newpage
 \appendix
 
 \section{HyperNetwork and TargetNetwork Implementation Details}
