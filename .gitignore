@@ -66,6 +66,7 @@ koniq-test/
 spaq-test/
 kadid-test/
 agiqa-test/
+koniq-test
 *.zip
 
 # Logs and checkpoints (large files)

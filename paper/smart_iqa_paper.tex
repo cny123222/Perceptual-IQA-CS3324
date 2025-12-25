@@ -393,7 +393,7 @@ where $\sigma$ denotes the sigmoid activation function, and $q$ is the predicted
 
 \textbf{Computational Efficiency Analysis:} The number of dynamically generated parameters is:
 \begin{equation}
-|\theta_x| = d \times d_{\text{target}} + d_{\text{target}} + d_{\text{target}} \times 1 + 1 = 100{,}352 \times 128 + 128 + 128 + 1 = 12{,}845{,}313
+|\theta_x| = d \times d_{\text{target}} + d_{\text{target}} + d_{\text{target}} + 1 = 12{,}845{,}313
 \end{equation}
 These 12.8M parameters (approximately 14\% of the total model parameters for SMART-Base) are generated per-image, enabling content-specific quality prediction. Despite this overhead, the HyperNetwork approach provides significant benefits: (1) it allows the model to adapt its prediction function to different content types; (2) it implicitly learns quality-aware feature representations in $F^K$; (3) it provides a regularization effect by forcing the model to generate consistent parameters for similar content.
 
