@@ -1,3 +1,21 @@
+"""
+SMART-IQA: Swin Multi-scale Attention-guided Regression Transformer for BIQA
+
+This module implements the SMART-IQA model architecture, which extends HyperIQA's
+content-adaptive paradigm with Swin Transformer backbone and attention-guided
+multi-scale feature fusion.
+
+Key Components:
+- MultiScaleAttention: Channel attention for dynamic feature weighting
+- AdaptiveFeatureAggregation: Spatial-preserving multi-scale fusion
+- HyperNet: Content-adaptive parameter generation
+- TargetNet: Quality score prediction with dynamic parameters
+- HyperIQA_Swin: Complete SMART-IQA model
+
+Author: Nuoyan Chen
+Institution: Shanghai Jiao Tong University
+"""
+
 import torch as torch
 import torch.nn as nn
 from torch.nn import functional as F

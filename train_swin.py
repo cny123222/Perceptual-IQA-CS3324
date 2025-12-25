@@ -1,3 +1,20 @@
+"""
+SMART-IQA Training Script
+
+This script trains the SMART-IQA model on KonIQ-10k dataset using the official
+train/test split. It supports:
+- Three model sizes: Swin-Tiny, Swin-Small, Swin-Base
+- Optional attention mechanism
+- Image preloading for faster training
+- Cross-dataset evaluation on SPAQ
+
+Usage:
+    python train_swin.py --model_size base --use_attention --preload --test_spaq
+
+Author: Nuoyan Chen
+Institution: Shanghai Jiao Tong University
+"""
+
 import os
 import sys
 import argparse
@@ -8,8 +25,8 @@ import json
 from datetime import datetime
 from HyperIQASolver_swin import HyperIQASolver
 
-# 设置 CUDA 设备（如果使用 CUDA，取消注释下面一行并指定 GPU ID）
-# os.environ['CUDA_VISIBLE_DEVICES'] = '0'  # 使用第一个 GPU，可以改为 '0,1' 使用多个 GPU
+# Set CUDA device (uncomment and specify GPU ID if using CUDA)
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0'  # Use first GPU, can be '0,1' for multiple GPUs
 
 
 class Logger(object):
