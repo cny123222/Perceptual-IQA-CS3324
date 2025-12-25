@@ -94,8 +94,8 @@ def get_koniq_train_test_indices(root_path):
 
 
 def main(config):
-    # 获取当前脚本所在目录的绝对路径
-    base_dir = os.path.dirname(os.path.abspath(__file__))
+    # 获取项目根目录的绝对路径（脚本在scripts/子目录中，需要向上一级）
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     
     # Setup logging
     log_dir = os.path.join(base_dir, 'logs')
