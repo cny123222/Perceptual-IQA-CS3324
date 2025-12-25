@@ -5,6 +5,7 @@
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
 \usepackage{graphicx}
+\usepackage{mathptmx}  % Times font for text and math (better bold support)
 \usepackage{textcomp}
 \usepackage{xcolor}
 \usepackage{multirow}  % For multi-row tables
@@ -319,7 +320,7 @@ AGIQA-3K & 0.6627 & 0.7236 & 0.6484 & 0.6830 \\
 
 To validate that the learned channel attention mechanism exhibits interpretable, content-dependent behavior, we analyze the attention weight distributions across images of different quality levels. We select three representative test images from KonIQ-10k spanning the quality spectrum and visualize their learned attention patterns. Figure \ref{fig:attention_analysis} presents the comprehensive analysis with both quantitative attention weights and qualitative visual examples.
 
-\textbf{Key Insight: The model learns an adaptive "triage" strategy.} Our analysis reveals a striking and theoretically grounded pattern: \textit{attention distribution correlates strongly with image quality level}. For low-quality images (MOS=1.23/5.0), the model allocates attention relatively uniformly across all four stages: Stage 1 (27.5\%), Stage 2 (17.4\%), Stage 3 (28.7\%), Stage 4 (26.5\%). This balanced distribution indicates that the model engages multiple hierarchical levels to comprehensively assess quality when distortions are present—analogous to a medical triage system deploying all diagnostic resources for complex cases. Conversely, for high-quality images (MOS=4.11/5.0), attention becomes extremely concentrated on Stage 3 (99.67\%), with minimal weight on other stages. This dramatic shift demonstrates content-adaptive behavior: when distortions are absent or minimal, high-level semantic features alone suffice for quality judgment—like a quick visual inspection confirming normalcy.
+\textbf{Emergent Adaptive Triage Strategy.} Our analysis reveals a striking and theoretically grounded pattern: \textit{attention distribution correlates strongly with image quality level}. For low-quality images (MOS=1.23/5.0), the model allocates attention relatively uniformly across all four stages: Stage 1 (27.5\%), Stage 2 (17.4\%), Stage 3 (28.7\%), Stage 4 (26.5\%). This balanced distribution indicates that the model engages multiple hierarchical levels to comprehensively assess quality when distortions are present—analogous to a medical triage system deploying all diagnostic resources for complex cases. Conversely, for high-quality images (MOS=4.11/5.0), attention becomes extremely concentrated on Stage 3 (99.67\%), with minimal weight on other stages. This dramatic shift demonstrates content-adaptive behavior: when distortions are absent or minimal, high-level semantic features alone suffice for quality judgment—like a quick visual inspection confirming normalcy.
 
 \textbf{Interpretation Through Feature Hierarchy.} This behavior aligns with our understanding of hierarchical feature representations: early stages (Stage 1-2) encode low-level texture patterns, gradients, and local structures that are highly sensitive to distortion artifacts such as blur, noise, block effects, and compression artifacts. Later stages (Stage 3-4) capture high-level semantic content including object categories, scene compositions, and global structures. For distorted images, the model must examine low-level features to detect artifacts (hence balanced attention), while for pristine images, content recognition through high-level features suffices (hence concentrated attention on deep stages).
 
@@ -412,42 +413,19 @@ This section provides comprehensive specifications for all SMART-IQA model varia
 
 \subsection{Model Architecture Specifications}
 
-\textbf{SMART-Base (Swin-Base Backbone):}
-\begin{itemize}
-    \item \textit{Multi-scale Features:}
-        \begin{itemize}
-            \item Stage 1: $F^1 \in \mathbb{R}^{28 \times 28 \times 128}$ (low-level features)
-            \item Stage 2: $F^2 \in \mathbb{R}^{14 \times 14 \times 256}$ (mid-level features)
-            \item Stage 3: $F^3 \in \mathbb{R}^{7 \times 7 \times 512}$ (high-level features)
-            \item Stage 4: $F^4 \in \mathbb{R}^{7 \times 7 \times 1024}$ (semantic features)
-        \end{itemize}
-    \item \textit{Swin Transformer Configuration:}
-        \begin{itemize}
-            \item Patch embedding dimension: 128
-            \item Transformer block depths: [2, 2, 18, 2] across 4 stages
-            \item Number of attention heads: [4, 8, 16, 32] across 4 stages
-            \item Window size: $7 \times 7$ for local attention
-            \item Drop path rate: 0.2 (Tiny), 0.25 (Small), 0.3 (Base) for stochastic depth regularization
-        \end{itemize}
-    \item \textit{Adaptive Feature Aggregation:} $H_{\text{target}} = W_{\text{target}} = 7$, $C_{\text{unified}} = 512$
-    \item \textit{Channel Attention:} Hidden dimension $d_{\text{hidden}} = 128$, 4 attention weights for 4 stages
-    \item \textit{HyperNetwork \& TargetNetwork:} Hidden dimension $d_{\text{target}} = 128$, generates 12.8M parameters
-\end{itemize}
+\textbf{SMART-Base (Swin-Base Backbone):} The Base variant uses Swin-Base as the backbone, producing multi-scale features across four hierarchical stages: Stage 1 outputs $F^1 \in \mathbb{R}^{28 \times 28 \times 128}$ (low-level features), Stage 2 outputs $F^2 \in \mathbb{R}^{14 \times 14 \times 256}$ (mid-level features), Stage 3 outputs $F^3 \in \mathbb{R}^{7 \times 7 \times 512}$ (high-level features), and Stage 4 outputs $F^4 \in \mathbb{R}^{7 \times 7 \times 1024}$ (semantic features). The Swin Transformer configuration employs patch embedding dimension 128, with Transformer block depths of 2, 2, 18, and 2 across the four stages respectively, and attention head numbers of 4, 8, 16, and 32, with window size $7 \times 7$ for local attention. For regularization, we apply model-specific drop path rates: 0.2 for Tiny, 0.25 for Small, and 0.3 for Base to prevent overfitting. The Adaptive Feature Aggregation module unifies all features to $H_{\text{target}} = W_{\text{target}} = 7$ with $C_{\text{unified}} = 512$ channels. The channel attention mechanism uses hidden dimension $d_{\text{hidden}} = 128$ to generate 4 attention weights for the 4 stages. Finally, the HyperNetwork-TargetNetwork architecture uses hidden dimension $d_{\text{target}} = 128$, with the HyperNetwork generating 12.8M parameters that define the TargetNetwork's weights for content-adaptive quality prediction.
 
-\textbf{SMART-Small (Swin-Small Backbone):} Uses channel dimensions $[96, 192, 384, 768]$ across four stages, with Transformer block depths [2, 2, 18, 2] and attention heads [3, 6, 12, 24]. Total parameters: 50.84M. Other architectural components (AFA, channel attention, HyperNetwork) remain identical to Base configuration. The reduced channel dimensions provide a favorable accuracy-efficiency trade-off, achieving 0.9338 SRCC with only 8.65G FLOPs.
+\textbf{SMART-Small (Swin-Small Backbone):} Uses channel dimensions of 96, 192, 384, and 768 across four stages, with Transformer block depths of 2, 2, 18, and 2, and attention heads of 3, 6, 12, and 24 respectively. Total parameters: 50.84M. Other architectural components (AFA, channel attention, HyperNetwork) remain identical to Base configuration. The reduced channel dimensions provide a favorable accuracy-efficiency trade-off, achieving 0.9338 SRCC with only 8.65G FLOPs.
 
-\textbf{SMART-Tiny (Swin-Tiny Backbone):} Uses the same channel dimensions as Small $[96, 192, 384, 768]$ but with fewer Transformer blocks: depths [2, 2, 6, 2] and attention heads [3, 6, 12, 24]. Total parameters: 29.52M. This lightweight variant achieves 0.9249 SRCC with only 4.47G FLOPs, making it an excellent choice for resource-constrained scenarios while still significantly outperforming the ResNet-50 baseline (+3.5\% SRCC).
+\textbf{SMART-Tiny (Swin-Tiny Backbone):} Uses the same channel dimensions as Small (96, 192, 384, and 768) but with fewer Transformer blocks: depths of 2, 2, 6, and 2, and attention heads of 3, 6, 12, and 24 respectively. Total parameters: 29.52M. This lightweight variant achieves 0.9249 SRCC with only 4.47G FLOPs, making it an excellent choice for resource-constrained scenarios while still significantly outperforming the ResNet-50 baseline (+3.5\% SRCC).
 
 \subsection{Design Rationale}
 
-\subsubsection{Why a 4-Stage Hierarchy?} 
-The 4-stage hierarchical design is crucial for capturing features at different semantic levels: Stage 1 focuses on low-level textures and local patterns critical for detecting compression artifacts and noise; Stages 2-3 extract mid-level structures important for understanding blur and distortion geometry; Stage 4 captures high-level semantic content that provides context for quality assessment. Ablation studies (Section~\ref{sec:ablation}) confirm that all four stages contribute complementarily to final performance, with each stage addressing distinct aspects of image quality perception.
+Our design rationale for SMART-IQA's fusion architecture is guided by three core principles that emerged from systematic experimentation and theoretical analysis. First, the 4-stage hierarchical design is essential for capturing features at progressively abstract semantic levels: Stage 1 focuses on low-level textures and local patterns critical for detecting compression artifacts and noise; Stages 2-3 extract mid-level structures important for understanding blur and distortion geometry; Stage 4 captures high-level semantic content that provides context for quality assessment. Ablation studies (Section~\ref{sec:ablation}) empirically confirm that all four stages contribute complementarily to final performance, with each stage addressing distinct aspects of image quality perception that cannot be adequately captured by fewer hierarchies.
 
-\subsubsection{Why a Unified $7 \times 7$ Resolution?}
-The AFA module unifies all features to a $7 \times 7$ spatial resolution, which is the native resolution of Stage 4 features from Swin Transformer. This choice is motivated by three factors: (1) it avoids lossy downsampling of the most critical semantic features from Stage 4; (2) it provides sufficient spatial detail (49 locations) for localizing distortions; and (3) it strikes an optimal balance between computational cost and representational capacity. Using larger resolutions (e.g., $14 \times 14$) would quadruple the feature dimensionality without significant accuracy gains based on our preliminary experiments.
+Second, we unify all features to a $7 \times 7$ spatial resolution through the AFA module, which corresponds to the native resolution of Stage 4 features from Swin Transformer. This specific choice avoids lossy downsampling of the most critical semantic features while retaining sufficient spatial detail (49 locations) for localizing non-uniform distortions. Furthermore, it strikes an optimal balance between computational cost and representational capacity—larger resolutions such as $14 \times 14$ would quadruple the feature dimensionality without yielding significant accuracy gains based on our preliminary experiments, whereas smaller resolutions sacrifice the spatial localization capability essential for authentic BIQA.
 
-\subsubsection{Why a 512-Channel Fusion Dimension?}
-After experimenting with $\{256, 512, 1024\}$, we identified 512 as the optimal channel dimension for feature fusion. This provides the best balance: 256 channels under-represent the multi-scale information, while 1024 channels lead to overfitting on KonIQ-10k without improving cross-dataset generalization. The unified 512-dimensional features from 4 stages result in a 2048-dimensional concatenated feature vector ($512 \times 4$), which is then processed by channel attention to dynamically emphasize the most relevant scales for each image.
+Finally, we determined through extensive experimentation with $\{256, 512, 1024\}$ channel dimensions that 512 provides the optimal balance for feature fusion. Analysis reveals that 256 channels under-represent the multi-scale information, failing to fully capture the rich semantic content across hierarchies, while 1024 channels lead to overfitting on KonIQ-10k without improving cross-dataset generalization. The unified 512-dimensional features from all four stages result in a 2048-dimensional concatenated feature vector ($512 \times 4$), which is then processed by channel attention to dynamically emphasize the most relevant scales for each image based on its content characteristics.
 
 \subsection{Complete Hyperparameter Configuration}
 
@@ -461,17 +439,7 @@ This section provides in-depth analysis of critical experimental design choices,
 
 \subsection{Learning Rate Sensitivity Analysis}
 
-A critical finding in our experiments is that Swin Transformers require significantly smaller learning rates compared to CNNs when fine-tuned for IQA tasks. We conducted comprehensive learning rate sensitivity analysis across the range $[1\times10^{-7}, 1\times10^{-5}]$ using SMART-Base on KonIQ-10k.
-
-\textbf{Key Observations:}
-\begin{itemize}
-    \item \textit{Optimal Rate:} The optimal learning rate is $5\times10^{-7}$, which is 200$\times$ lower than the typical learning rate used for ResNet-50 ($1\times10^{-4}$) in HyperIQA.
-    \item \textit{High LR Instability:} Learning rates $\geq 5\times10^{-6}$ cause training instability, with SRCC oscillating and converging to suboptimal solutions (SRCC $< 0.92$). This is likely due to the pre-trained Swin Transformer weights being disrupted by large gradient updates.
-    \item \textit{Low LR Underfitting:} Learning rates $\leq 1\times10^{-7}$ result in slow convergence, failing to reach peak performance within 10 epochs (SRCC $\approx 0.93$).
-    \item \textit{Robust Range:} The performance is relatively stable in the range $[3\times10^{-7}, 1\times10^{-6}]$, with SRCC varying within $\pm 0.002$, indicating that our method is not overly sensitive to exact learning rate tuning within this sweet spot.
-\end{itemize}
-
-Figure~\ref{fig:lr_sensitivity} shows the complete learning rate sensitivity analysis. The consistent trends across both SRCC and PLCC metrics (visualized on dual y-axes with unified [0.930, 0.950] range) confirm the reliability of our learning rate selection.
+A critical finding in our experiments is that Swin Transformers require significantly smaller learning rates compared to CNNs when fine-tuned for IQA tasks. We conducted comprehensive learning rate sensitivity analysis across the range $[1\times10^{-7}, 1\times10^{-5}]$ using SMART-Base on KonIQ-10k. Our analysis reveals that the optimal learning rate is $5\times10^{-7}$, which is 200$\times$ lower than the typical learning rate used for ResNet-50 ($1\times10^{-4}$) in HyperIQA. This substantial reduction is necessary because learning rates exceeding $5\times10^{-6}$ cause training instability, with SRCC oscillating and converging to suboptimal solutions (SRCC $< 0.92$)—a phenomenon we attribute to the pre-trained Swin Transformer weights being disrupted by large gradient updates. Conversely, learning rates below $1\times10^{-7}$ result in slow convergence, failing to reach peak performance within 10 epochs (SRCC $\approx 0.93$). Importantly, we observe that performance remains relatively stable in the range $[3\times10^{-7}, 1\times10^{-6}]$, with SRCC varying within $\pm 0.002$, indicating that our method is not overly sensitive to exact learning rate tuning within this window. Figure~\ref{fig:lr_sensitivity} presents the complete sensitivity analysis, with consistent trends across both SRCC and PLCC metrics (visualized on dual y-axes with unified [0.930, 0.950] range) confirming the reliability of our learning rate selection.
 
 \begin{figure}[t]
 \centering
@@ -504,15 +472,7 @@ We conduct comprehensive complexity analysis to evaluate the computational effic
 
 \textbf{Computational Cost (FLOPs):} The FLOPs increase from 4.33G (HyperIQA) to 15.28G (SMART-Base), a 3.5$\times$ increase. Notably, SMART-Tiny (4.47G FLOPs) maintains nearly identical computational cost to the baseline (+3.2\%) while providing the aforementioned +3.5\% SRCC improvement. This near-perfect iso-FLOPs comparison validates the superiority of hierarchical vision transformers over ResNet for IQA. SMART-Small (8.65G) offers a middle ground, doubling FLOPs for +4.4\% SRCC.
 
-\textbf{Inference Speed and Throughput:} Despite higher FLOPs, all SMART-IQA variants maintain practical inference speeds on modern GPUs (NVIDIA RTX 5090):
-\begin{itemize}
-    \item HyperIQA: 3.12ms (320.5 FPS) - fastest but least accurate
-    \item SMART-Tiny: 6.00ms (166.7 FPS) - 2$\times$ slower, excellent accuracy-speed balance
-    \item SMART-Small: 10.62ms (94.2 FPS) - still real-time, high accuracy
-    \item SMART-Base: 10.06ms (99.4 FPS) - surprisingly faster than Small despite more parameters
-\end{itemize}
-
-The counterintuitive observation that SMART-Base is slightly faster than SMART-Small (despite 75\% more parameters and 77\% more FLOPs) can be explained by better GPU utilization: Base's larger channel dimensions (e.g., 1024 in Stage 4) align better with GPU tensor cores, whereas Small's intermediate dimensions (768) may incur padding overhead. This highlights that theoretical FLOPs do not always translate directly to wall-clock time.
+\textbf{Inference Speed and Throughput:} Despite higher FLOPs, all SMART-IQA variants maintain practical inference speeds on modern GPUs (NVIDIA RTX 5090). HyperIQA achieves 3.12ms per image (320.5 FPS), representing the fastest but least accurate baseline. SMART-Tiny requires 6.00ms (166.7 FPS), approximately 2$\times$ slower but offering an excellent accuracy-speed balance. SMART-Small takes 10.62ms (94.2 FPS), remaining well within real-time requirements while delivering high accuracy. Counterintuitively, SMART-Base achieves 10.06ms (99.4 FPS), slightly faster than Small despite having 75\% more parameters and 77\% more FLOPs. We attribute this observation to better GPU utilization: Base's larger channel dimensions (e.g., 1024 in Stage 4) align better with GPU tensor cores, whereas Small's intermediate dimensions (768) may incur padding overhead. This highlights that theoretical FLOPs do not always translate directly to wall-clock time, and hardware-aware architecture design can yield unexpected efficiency gains.
 
 \textbf{Accuracy-Efficiency Pareto Frontier:} Plotting accuracy vs FLOPs reveals that all three SMART variants dominate HyperIQA: for any given accuracy level, SMART achieves it with comparable or lower computational cost. More importantly, SMART-Base's absolute accuracy (0.9378 SRCC) is unmatched, and its 10ms inference time is still well within real-time requirements ($< 33$ms for 30 FPS), making it the preferred choice for applications prioritizing quality over extreme throughput.
 
@@ -520,31 +480,15 @@ The counterintuitive observation that SMART-Base is slightly faster than SMART-S
 
 \subsection{Data Augmentation Strategy Analysis}
 
-We systematically explored various data augmentation strategies to understand their impact on both in-domain performance (KonIQ-10k) and cross-dataset generalization (LIVEC, KADID-10K, AGIQA-3K).
+We systematically explored various data augmentation strategies to understand their impact on both in-domain performance (KonIQ-10k) and cross-dataset generalization (LIVEC, KADID-10K, AGIQA-3K). Among geometric augmentations, random horizontal flip applied with 0.5 probability consistently improves performance on all datasets (+0.002 SRCC average) by increasing effective training set size without introducing unrealistic distortions. Random cropping, which extracts 25 random $224\times224$ patches per image during training from $512\times384$ resized images, proves critical for patch-based IQA by ensuring the model encounters diverse local regions—ablation studies show that removing random crop causes SRCC to drop by -0.015 as the model overfits to specific image regions. Our resize strategy preserves aspect ratio information at $(512, 384)$ dimensions, as smaller resize dimensions ($384\times288$) reduce performance (-0.006 SRCC), likely due to loss of fine-grained texture information important for assessing compression artifacts.
 
-\textbf{Evaluated Augmentation Techniques:}
-\begin{itemize}
-    \item \textit{Random Horizontal Flip:} Applied with 0.5 probability. Improves performance on all datasets (+0.002 SRCC average) by increasing effective training set size without introducing unrealistic distortions.
-    \item \textit{Random Crop:} Extracts 25 random $224\times224$ patches per image during training from $512\times384$ resized images. Critical for patch-based IQA, ensuring the model sees diverse local regions. Without random crop, SRCC drops by -0.015 as the model overfits to specific image regions.
-    \item \textit{Color Jitter:} Randomly adjusts brightness, contrast, saturation, and hue. Counterintuitively, aggressive color jitter (brightness=$\pm$0.2, contrast=$\pm$0.2) \textit{hurts} in-domain KonIQ-10k performance (-0.008 SRCC) while providing marginal cross-dataset gains (+0.004 SRCC on LIVEC). We hypothesize this occurs because KonIQ-10k's authentic distortions already cover diverse color variations, and additional jittering disrupts the model's ability to learn genuine color-related quality cues.
-    \item \textit{Resize Strategy:} We resize images to $(512, 384)$ before cropping, preserving aspect ratio information. Using smaller resize dimensions ($384\times288$) reduces performance (-0.006 SRCC), likely due to loss of fine-grained texture information important for assessing compression artifacts.
-\end{itemize}
-
-\textbf{Final Configuration:} Based on these findings, our final model uses random horizontal flip and random crop, without color jitter. This configuration optimizes in-domain performance while maintaining strong cross-dataset generalization (Section~4.4). During testing, we also extract 25 patches and average their predictions, providing robust quality estimation.
+Counterintuitively, we find that color-based augmentations are detrimental to our method. Aggressive color jitter (brightness=$\pm$0.2, contrast=$\pm$0.2) that randomly adjusts brightness, contrast, saturation, and hue actually \textit{hurts} in-domain KonIQ-10k performance (-0.008 SRCC) while providing only marginal cross-dataset gains (+0.004 SRCC on LIVEC). We attribute this to KonIQ-10k's authentic distortions already covering diverse color variations—additional jittering disrupts the model's ability to learn genuine color-related quality cues. Based on these findings, our final configuration employs random horizontal flip and random crop without color jitter, optimizing in-domain performance while maintaining strong cross-dataset generalization (Section~4.4). During testing, we extract 25 patches per image and average their predictions to provide robust quality estimation.
 
 \subsection{Loss Function Comparison and Analysis}
 
-We conducted comprehensive experiments comparing five loss functions for training SMART-Base: L1 (MAE), L2 (MSE), SRCC loss, Pairwise Ranking loss, and Pairwise Fidelity loss. Table~\ref{tab:loss_comparison} and Figure~\ref{fig:loss_comparison} present the results.
+We conducted comprehensive experiments comparing five loss functions for training SMART-Base: L1 (MAE), L2 (MSE), SRCC loss, Pairwise Ranking loss, and Pairwise Fidelity loss. Table~\ref{tab:loss_comparison} and Figure~\ref{fig:loss_comparison} present the results. Our analysis reveals that simple L1 (MAE) loss achieves the best performance (SRCC 0.9375, PLCC 0.9488), outperforming all alternatives. Its effectiveness stems from providing stable gradients and directly optimizing for small prediction errors across the quality range. L2 (MSE) loss performs nearly identically (SRCC 0.9373) with slightly worse PLCC (0.9469)—we attribute L1's marginal advantage to its robustness to outliers, as L2's quadratic penalty can cause training instability when encountering mispredicted images with large errors.
 
-\textbf{Key Findings:}
-\begin{itemize}
-    \item \textit{L1 Loss Wins:} Simple L1 (MAE) loss achieves the best performance (SRCC 0.9375, PLCC 0.9488), outperforming all alternatives. Its effectiveness stems from providing stable gradients and directly optimizing for small prediction errors across the quality range.
-    \item \textit{L2 vs L1:} L2 (MSE) performs nearly identically to L1 (SRCC 0.9373), with slightly worse PLCC (0.9469). The marginal L1 advantage likely comes from its robustness to outliers—L2's quadratic penalty can cause training instability when encountering mispredicted images with large errors.
-    \item \textit{Ranking Losses Fail:} Pairwise Ranking loss (SRCC 0.9292) and Pairwise Fidelity loss (SRCC 0.9315) significantly underperform. These losses optimize for relative order rather than absolute scores, which appears suboptimal for IQA where the prediction target (MOS) is a continuous regression value. The large performance gap (-0.0083 SRCC for Ranking) indicates that treating IQA as regression rather than ranking is fundamentally more suitable.
-    \item \textit{SRCC Loss:} Directly optimizing SRCC correlation as a differentiable loss (SRCC 0.9313) also underperforms L1. While theoretically appealing to optimize the evaluation metric directly, SRCC loss suffers from non-smooth gradients and can get stuck in local minima during optimization.
-\end{itemize}
-
-\textbf{Implications:} Our results suggest that for BIQA with continuous MOS targets, simple regression losses (L1/L2) are more effective than ranking-based or correlation-based losses. This contrasts with some prior work that advocates for ranking losses; we hypothesize this difference arises from: (1) KonIQ-10k's high-quality MOS annotations enable effective regression; (2) our strong Swin Transformer features reduce the need for complex loss functions; (3) ranking losses may be more beneficial for datasets with noisy or unreliable MOS labels, which is not the case for KonIQ-10k.
+In contrast, ranking-based losses significantly underperform regression losses. Pairwise Ranking loss (SRCC 0.9292) and Pairwise Fidelity loss (SRCC 0.9315) both show substantial performance degradation compared to L1, with gaps of -0.0083 and -0.0060 SRCC respectively. These losses optimize for relative order rather than absolute scores, which appears suboptimal for IQA where the prediction target (MOS) is a continuous regression value. Similarly, directly optimizing SRCC correlation as a differentiable loss (SRCC 0.9313) also underperforms L1 despite the theoretical appeal of optimizing the evaluation metric directly—we attribute this to SRCC loss suffering from non-smooth gradients and getting stuck in local minima during optimization. These findings suggest that for BIQA with continuous MOS targets, simple regression losses (L1/L2) are fundamentally more effective than ranking-based or correlation-based losses. We hypothesize this difference from prior work advocating ranking losses arises from: (1) KonIQ-10k's high-quality MOS annotations enabling effective regression; (2) our strong Swin Transformer features reducing the need for complex loss functions; and (3) ranking losses potentially being more beneficial for datasets with noisy or unreliable MOS labels, which is not the case for KonIQ-10k.
 
 \begin{table}[t]
 \centering
@@ -576,56 +520,35 @@ To provide deeper insights into the hierarchical feature learning mechanism of o
 
 \subsection{Visualization Methodology}
 
-For each stage $k \in \{1,2,3,4\}$, we extract the feature map $F^k \in \mathbb{R}^{H_k \times W_k \times C_k}$ and compute its channel-wise average magnitude to obtain a spatial activation map $A^k \in \mathbb{R}^{H_k \times W_k}$:
+To visualize the hierarchical feature extraction process, we extract feature maps from all four Swin Transformer stages and compute spatial activation heatmaps. For each stage $k$ (where $k = 1, 2, 3, 4$ corresponds to the four hierarchical levels), we extract the feature map $F^k \in \mathbb{R}^{H_k \times W_k \times C_k}$, where $H_k$ and $W_k$ denote spatial dimensions and $C_k$ denotes the number of channels. We compute the channel-wise average magnitude to obtain a spatial activation map $A^k \in \mathbb{R}^{H_k \times W_k}$:
 \begin{equation}
 A^k(i,j) = \frac{1}{C_k} \sum_{c=1}^{C_k} |F^k(i,j,c)|
 \end{equation}
-We then normalize each $A^k$ to [0,1] range and apply a perceptually-uniform colormap (viridis) for visualization. Warmer colors (yellow/green) indicate stronger activations, while cooler colors (blue/purple) indicate weaker activations.
+where $i$ and $j$ index the spatial locations, and $c$ indexes the channel dimension. We then normalize each $A^k$ to the range of 0 to 1 and apply a perceptually-uniform colormap (viridis) for visualization. Warmer colors (yellow/green) indicate stronger activations, while cooler colors (blue/purple) indicate weaker activations.
 
 \subsection{High-Quality Image Analysis (Figure~\ref{fig:feature_high})}
 
-Figure~\ref{fig:feature_high} shows feature maps for a high-quality image (MOS 81.4/100). We observe:
-\begin{itemize}
-    \item \textit{Stage 1 (Low-level):} Exhibits relatively uniform, moderate activations across the image, with slightly higher responses at edges and texture boundaries. The absence of strong localized spikes suggests minimal low-level distortions (no compression artifacts, noise, or blur).
-    \item \textit{Stage 2 (Mid-level):} Shows structured activations aligned with object boundaries and regions of interest (e.g., human subjects, salient objects). The activation pattern reflects the model extracting mid-level geometric structures.
-    \item \textit{Stage 3 (High-level):} Displays the strongest overall activations, particularly in semantically important regions. This indicates that for high-quality images, the model relies heavily on high-level semantic understanding to confirm good quality.
-    \item \textit{Stage 4 (Semantic):} Maintains strong activations in content-rich areas, providing global context that helps the model verify the image is of high perceptual quality with meaningful content.
-\end{itemize}
-
-\textbf{Key Insight:} For high-quality images, the activation strength increases hierarchically from low to high levels, with Stage 3-4 dominating. This pattern aligns with our channel attention analysis (Figure~\ref{fig:attention_analysis}), where high-quality images receive higher attention weights on deeper stages.
+Figure~\ref{fig:feature_high} shows feature maps for a high-quality image (MOS 81.4/100). Stage 1 (low-level features) exhibits relatively uniform, moderate activations across the image, with slightly higher responses at edges and texture boundaries—the absence of strong localized spikes suggests minimal low-level distortions such as compression artifacts, noise, or blur. Stage 2 (mid-level features) shows structured activations aligned with object boundaries and regions of interest (e.g., human subjects, salient objects), reflecting the model's extraction of mid-level geometric structures. Stage 3 (high-level features) displays the strongest overall activations, particularly in semantically important regions, indicating that for high-quality images, the model relies heavily on high-level semantic understanding to confirm good quality. Stage 4 (semantic features) maintains strong activations in content-rich areas, providing global context that helps the model verify the image is of high perceptual quality with meaningful content. A key observation emerges from this analysis: for high-quality images, the activation strength increases hierarchically from low to high levels, with Stage 3-4 dominating. This pattern aligns precisely with our channel attention analysis (Figure~\ref{fig:attention_analysis}), where high-quality images receive higher attention weights on deeper stages, validating the interpretability of our learned attention mechanism.
 
 \subsection{Low-Quality Image Analysis (Figure~\ref{fig:feature_low})}
 
-Figure~\ref{fig:feature_low} shows feature maps for a low-quality image (MOS 20.1/100). The activation pattern is markedly different:
-\begin{itemize}
-    \item \textit{Stage 1 (Low-level):} Exhibits \textit{strong, localized activations} in regions with visible compression artifacts, noise, and texture degradation. The model's low-level features are highly responsive to these quality-impairing distortions.
-    \item \textit{Stage 2 (Mid-level):} Shows increased activations at distortion boundaries and in regions with geometric distortions (blur, blockiness). The activation map is more irregular compared to the high-quality image.
-    \item \textit{Stage 3 (High-level):} Displays \textit{weaker overall activations} compared to the high-quality case, suggesting that semantic features are less reliable or less salient in severely degraded images.
-    \item \textit{Stage 4 (Semantic):} Maintains some activation in content-rich areas, but the overall magnitude is reduced, indicating that global semantic understanding is hindered by low-level distortions.
-\end{itemize}
-
-\textbf{Key Insight:} For low-quality images, lower stages (1-2) exhibit disproportionately strong activations, while higher stages (3-4) are suppressed. This "bottom-heavy" activation pattern reflects the model's adaptive strategy: when distortions are prominent, prioritize low-level features; when quality is high, prioritize semantic features.
+Figure~\ref{fig:feature_low} shows feature maps for a low-quality image (MOS 20.1/100), with an activation pattern markedly different from the high-quality case. Stage 1 (low-level features) exhibits \textit{strong, localized activations} in regions with visible compression artifacts, noise, and texture degradation, demonstrating that the model's low-level features are highly responsive to these quality-impairing distortions. Stage 2 (mid-level features) shows increased activations at distortion boundaries and in regions with geometric distortions (blur, blockiness), with a more irregular activation map compared to the high-quality image. In contrast, Stage 3 (high-level features) displays \textit{weaker overall activations} compared to the high-quality case, suggesting that semantic features are less reliable or less salient in severely degraded images. Stage 4 (semantic features) maintains some activation in content-rich areas, but the overall magnitude is reduced, indicating that global semantic understanding is hindered by low-level distortions. This analysis reveals that for low-quality images, lower stages (1-2) exhibit disproportionately strong activations, while higher stages (3-4) are suppressed—a "bottom-heavy" activation pattern that reflects the model's adaptive strategy: when distortions are prominent, prioritize low-level features for distortion detection; when quality is high, prioritize semantic features for content verification.
 
 \subsection{Connection to Channel Attention}
 
-These feature map visualizations directly support our channel attention mechanism (Section~3.4). The channel attention module learns to assign higher weights to stages that are most informative for a given image:
-\begin{itemize}
-    \item High-quality images $\rightarrow$ higher attention on Stages 3-4 (semantic understanding)
-    \item Low-quality images $\rightarrow$ higher attention on Stages 1-2 (distortion detection)
-\end{itemize}
-This adaptive weighting, combined with the hierarchical feature extraction, enables SMART-IQA to achieve robust performance across diverse quality levels and distortion types.
+These feature map visualizations directly support our channel attention mechanism (Section~3.4). The channel attention module learns to assign higher weights to stages that are most informative for a given image: high-quality images receive higher attention on Stages 3-4 for semantic understanding, while low-quality images receive higher attention on Stages 1-2 for distortion detection. This adaptive weighting strategy, combined with the hierarchical feature extraction of Swin Transformer, enables SMART-IQA to achieve robust performance across diverse quality levels and distortion types by dynamically allocating computational resources to the most relevant feature hierarchies based on image characteristics.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.48\textwidth]{../paper_figures/feature_map_high_quality_appendix.pdf}
-\caption{Feature map visualization for a high-quality image (MOS 81.4/100). Each stage's activation heatmap reveals where the network focuses its computational resources: Stage 1 (low-level textures) shows uniform moderate activations without distortion spikes; Stage 2-3 (mid-to-high-level structures) exhibit increasingly stronger responses aligned with semantic regions; Stage 4 (deep semantic features) maintains robust activations across content-rich areas. This \textit{``top-heavy''} activation pattern, dominated by high-level semantic stages (3-4), aligns with our channel attention analysis (Section 4.6) and indicates the model relies on semantic understanding to confirm high quality—understanding \textit{what} the image depicts suffices to verify its integrity.}
+\caption{Feature map visualization for a high-quality image (MOS 81.4/100). The hierarchical feature extraction shows increasing activation strength from low to high stages, with Stage 3-4 dominating. This pattern indicates the model relies on semantic understanding for high-quality assessment.}
 \label{fig:feature_high}
 \end{figure}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.48\textwidth]{../paper_figures/feature_map_low_quality_appendix.pdf}
-\caption{Feature map visualization for a low-quality image (MOS 20.1/100). The activation pattern contrasts sharply with Figure~\ref{fig:feature_high}: Stage 1 (low-level) exhibits \textit{strong, localized activations} responding to compression artifacts, noise, and texture degradation—the model's early layers detect quality-impairing distortions; Stage 2 (mid-level) shows irregular, heightened responses at distortion boundaries; Stage 3-4 (high-level semantic) display \textit{weaker overall activations} as distortions obscure semantic content. This \textit{``bottom-heavy''} activation pattern, with strong responses in low-level stages (1-2), demonstrates the model's adaptive strategy: prioritizing the detection of local distortion artifacts when semantic content is obscured, mirroring the distributed attention weights observed in our channel attention analysis.}
+\caption{Feature map visualization for a low-quality image (MOS 20.1/100). Strong activations in lower stages (Stage 1-2) indicate the model focuses on local distortions (compression artifacts, noise, texture degradation), while higher stages show weaker activations due to semantic content being obscured by distortions.}
 \label{fig:feature_low}
 \end{figure}
 
