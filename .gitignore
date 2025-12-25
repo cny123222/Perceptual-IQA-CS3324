@@ -62,11 +62,21 @@ benchmarks/DBCNN/dbcnn/models/
 
 # Datasets (large files, should not be tracked)
 koniq-10k/
+koniq-10k
 koniq-test/
-spaq-test/
-kadid-test/
-agiqa-test/
 koniq-test
+spaq-test/
+spaq-test
+kadid-test/
+kadid-test
+agiqa-test/
+agiqa-test
+
+# Dataset-related files
+csiq_label.txt
+
+# Reproduction scripts (project-specific)
+REPRODUCE_BEST_MODEL.sh
 *.zip
 
 # Logs and checkpoints (large files)
