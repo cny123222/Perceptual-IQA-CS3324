@@ -203,7 +203,14 @@ We compare SMART-IQA with state-of-the-art BIQA methods on KonIQ-10k, including 
 
 \textbf{Comparison with Transformer-based Methods.} Among transformer-based approaches, MUSIQ (0.929 SRCC) and LIQE (0.930 SRCC) represent strong baselines, yet SMART-IQA outperforms them by +0.8\% and +0.78\% SRCC respectively. This gap is particularly noteworthy because: (1) MUSIQ employs multi-scale transformers with multiple resolution inputs, introducing higher computational cost, while our single-resolution approach with hierarchical feature extraction achieves better efficiency-performance trade-offs; (2) LIQE leverages vision-language pre-training from CLIP, requiring large-scale multimodal data, whereas our method relies solely on ImageNet-pretrained Swin Transformer, demonstrating that carefully designed architectural components can match or exceed the benefits of expensive multimodal pre-training for IQA tasks.
 
-\textbf{Model Variants.} We evaluate three model sizes (Tiny: 28M, Small: 50M, Base: 88M parameters). Even our smallest Swin-Tiny outperforms HyperIQA by +1.79\% SRCC, demonstrating that architectural design matters more than parameter count. The Swin-Small variant offers an optimal performance-efficiency trade-off for deployment (detailed analysis in Appendix C.3).
+\textbf{Model Variants.} We evaluate three model sizes (Tiny: 28M, Small: 50M, Base: 88M parameters). Even our smallest Swin-Tiny outperforms HyperIQA by +1.79\% SRCC, demonstrating that architectural design matters more than parameter count. The Swin-Small variant offers an optimal performance-efficiency trade-off for deployment (detailed analysis in Appendix C.3). Figure \ref{fig:model_size} illustrates the performance-efficiency trade-off across different model sizes, showing that all SMART-IQA variants achieve superior SRCC compared to HyperIQA while maintaining competitive parameter efficiency.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{../paper_figures/model_size_final.pdf}
+\caption{Model size vs. performance trade-off analysis. SMART-IQA variants (Swin-Tiny, Swin-Small, Swin-Base) consistently outperform HyperIQA (ResNet50) across all model sizes, demonstrating that architectural design matters more than parameter count. The plot shows SRCC performance against model parameters, with all three SMART-IQA variants achieving higher accuracy while maintaining competitive efficiency.}
+\label{fig:model_size}
+\end{figure}
 
 \begin{table*}[t]
 \centering
