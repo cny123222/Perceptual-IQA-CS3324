@@ -22,7 +22,10 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['ps.fonttype'] = 42
 
 # 读取结果
-with open('attention_visualization_results.json') as f:
+import os
+script_dir = os.path.dirname(os.path.abspath(__file__))
+json_path = os.path.join(script_dir, 'attention_visualization_results.json')
+with open(json_path) as f:
     results = json.load(f)
 
 # 读取MOS_zscore (0-100范围)
