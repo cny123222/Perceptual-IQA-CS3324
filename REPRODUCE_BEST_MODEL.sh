@@ -26,27 +26,39 @@ cd /root/Perceptual-IQA-CS3324
 # Test Random Crop:           True
 # SPAQ Cross-Dataset Test:    False
 
-python scripts/train_smart_iqa.py \
-    --dataset koniq-10k \
-    --model_size base \
-    --attention_fusion \
-    --epochs 10 \
-    --lr 5e-7 \
-    --batch_size 32 \
-    --weight_decay 0.0002 \
-    --drop_path_rate 0.3 \
-    --test_patch_num 20 \
-    --train_patch_num 20 \
-    --patch_size 224 \
-    --loss_type l1 \
-    --ranking_loss_alpha 0.0 \
-    --lr_scheduler cosine \
-    --test_random_crop \
-    --no_color_jitter \
-    --no_spaq
+# All parameters now use default values from train_smart_iqa.py
+# Simply run the script without any arguments to reproduce the best model
+python scripts/train_smart_iqa.py
+
+# Or equivalently with all parameters explicitly specified:
+# python scripts/train_smart_iqa.py \
+#     --dataset koniq-10k \
+#     --model_size base \
+#     --attention_fusion \
+#     --epochs 10 \
+#     --lr 5e-7 \
+#     --batch_size 32 \
+#     --weight_decay 0.0002 \
+#     --drop_path_rate 0.3 \
+#     --dropout_rate 0.4 \
+#     --test_patch_num 20 \
+#     --train_patch_num 20 \
+#     --patch_size 224 \
+#     --loss_type l1 \
+#     --ranking_loss_alpha 0.0 \
+#     --lr_scheduler cosine \
+#     --test_random_crop \
+#     --no_color_jitter \
+#     --no_spaq
 
 # 说明:
-# 1. 数据集路径自动计算: scripts/../koniq-10k/ → /root/Perceptual-IQA-CS3324/koniq-10k/
-# 2. dropout_rate 会在solver中自动设置，无需命令行参数
-# 3. lr_ratio 会在solver中自动设置为10，无需命令行参数
-# 4. 预期结果: Epoch 8达到 SRCC 0.9378, PLCC 0.9485
+# 1. 所有参数已设置为默认值，直接运行即可复现 best 模型
+# 2. 数据集路径自动计算: scripts/../koniq-10k/ → /root/Perceptual-IQA-CS3324/koniq-10k/
+# 3. lr_ratio 默认为 10，无需指定
+# 4. 预期结果: Epoch 8 达到 SRCC 0.9378, PLCC 0.9485
+
+# 简化运行方式（推荐）:
+# bash REPRODUCE_BEST_MODEL.sh
+# 
+# 或者直接运行:
+# cd /root/Perceptual-IQA-CS3324 && python scripts/train_smart_iqa.py
