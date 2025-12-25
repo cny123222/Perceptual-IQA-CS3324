@@ -82,6 +82,7 @@ REPRODUCE_BEST_MODEL.sh
 # Logs and checkpoints (large files)
 logs/
 checkpoints/
+checkpoints
 
 # Generated paper figures
 paper_figures/*.png
