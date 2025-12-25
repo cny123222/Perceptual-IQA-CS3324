@@ -5,13 +5,16 @@
 
 python scripts/train_smart_iqa.py \
     --dataset koniq-10k \
+    --koniq_path /root/Perceptual-IQA-CS3324/koniq-10k \
     --model_size base \
     --attention_fusion \
     --epochs 10 \
     --lr 5e-7 \
+    --lr_ratio 10 \
     --batch_size 32 \
     --weight_decay 0.0002 \
-    --drop_path_rate 0.2 \
+    --drop_path_rate 0.3 \
+    --dropout_rate 0.3 \
     --test_patch_num 20 \
     --train_patch_num 20 \
     --patch_size 224 \
