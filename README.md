@@ -107,56 +107,73 @@ For cross-dataset generalization experiments:
 
 ## 🚀 Training
 
-### Basic Training (Swin-Base)
+### Quick Start: Reproduce Best Model (SRCC 0.9378)
+
+All default parameters are pre-configured for the best model. Simply run:
 
 ```bash
-python scripts/train_smart_iqa.py \
-    --model_size base \
-    --use_attention \
-    --koniq_path ./koniq-10k \
-    --epochs 50 \
-    --lr 5e-7 \
-    --batch_size 8
+# Method 1: Direct script execution (recommended)
+cd /root/Perceptual-IQA-CS3324
+python scripts/train_smart_iqa.py
+
+# Method 2: Using the reproduction script
+bash REPRODUCE_BEST_MODEL.sh
 ```
 
-### Training with Image Preloading (Faster)
+**Expected Results**: SRCC ≈ 0.9378, PLCC ≈ 0.9485 at Epoch 8
 
-```bash
-python scripts/train_smart_iqa.py \
-    --model_size base \
-    --use_attention \
-    --preload \
-    --koniq_path ./koniq-10k \
-    --epochs 50 \
-    --lr 5e-7 \
-    --batch_size 8
-```
+### Default Configuration
+
+All parameters are now set to the best model configuration:
+
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| `--dataset` | `koniq-10k` | Primary training dataset |
+| `--model_size` | `base` | Swin-Base (88M parameters) |
+| `--attention_fusion` | `True` | Channel attention enabled |
+| `--lr` | `5e-7` | Learning rate for backbone |
+| `--batch_size` | `32` | Batch size |
+| `--epochs` | `10` | Training epochs |
+| `--weight_decay` | `0.0002` | Weight decay |
+| `--drop_path_rate` | `0.3` | Stochastic depth rate (Base) |
+| `--dropout_rate` | `0.4` | Dropout rate (Base) |
+| `--train_patch_num` | `20` | Training patches per image |
+| `--test_patch_num` | `20` | Test patches per image |
+| `--ranking_loss_alpha` | `0.0` | Ranking loss weight (disabled) |
+| `--test_random_crop` | `True` | RandomCrop for testing |
+| `--use_color_jitter` | `False` | ColorJitter disabled |
+| `--test_spaq` | `False` | SPAQ testing disabled |
 
 ### Model Size Variants
 
 ```bash
-# Swin-Tiny (28M parameters)
-python scripts/train_smart_iqa.py --model_size tiny --use_attention
+# Swin-Tiny (29M parameters) - Fastest
+python scripts/train_smart_iqa.py --model_size tiny --drop_path_rate 0.2 --dropout_rate 0.3
 
-# Swin-Small (50M parameters) - Recommended for deployment
-python scripts/train_smart_iqa.py --model_size small --use_attention
+# Swin-Small (51M parameters) - Balanced
+python scripts/train_smart_iqa.py --model_size small --drop_path_rate 0.25 --dropout_rate 0.35
 
-# Swin-Base (88M parameters) - Best performance
-python scripts/train_smart_iqa.py --model_size base --use_attention
+# Swin-Base (89M parameters) - Best Performance (default)
+python scripts/train_smart_iqa.py  # All defaults
 ```
 
-### Key Arguments
+### Custom Training
 
-| Argument | Description | Default |
-|----------|-------------|---------|
-| `--model_size` | Model variant: `tiny`, `small`, or `base` | `base` |
-| `--use_attention` | Enable channel attention mechanism | `False` |
-| `--preload` | Preload images to memory for faster training | `False` |
-| `--koniq_path` | Path to KonIQ-10k dataset | `./koniq-10k` |
-| `--epochs` | Number of training epochs | `50` |
-| `--lr` | Learning rate (5e-7 recommended for Swin) | `5e-7` |
-| `--batch_size` | Batch size | `8` |
-| `--test_spaq` | Enable SPAQ cross-dataset testing | `False` |
+Override default parameters as needed:
+
+```bash
+# Train on different dataset
+python scripts/train_smart_iqa.py --dataset live
+
+# Adjust learning rate
+python scripts/train_smart_iqa.py --lr 1e-6
+
+# Enable ranking loss
+python scripts/train_smart_iqa.py --ranking_loss_alpha 0.3
+
+# Longer training
+python scripts/train_smart_iqa.py --epochs 20
+```
 
 ---
 
