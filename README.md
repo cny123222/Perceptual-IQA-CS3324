@@ -30,7 +30,7 @@ Official PyTorch implementation of **SMART-IQA**, a state-of-the-art blind image
 - [Testing](#testing)
 - [Pretrained Models](#pretrained-models)
 - [Reproducing Paper Results](#reproducing-paper-results)
-- [Citation](#citation)
+- [Repository Structure](#-repository-structure)
 
 ---
 
@@ -356,31 +356,27 @@ Perceptual-IQA-CS3324/
 │
 ├── tools/                      # Visualization and analysis tools
 │   ├── visualization/          # Attention and feature visualization
-│   │   ├── visualize_attention.py
-│   │   ├── visualize_features.py
-│   │   └── create_attention_comparison.py
-│   └── paper_figures/          # Paper figure generation
-│       ├── generate_all_figures.py
-│       ├── generate_ablation.py
-│       ├── generate_error_plot.py
-│       └── generate_feature_heatmaps.py
+│   └── paper_figures/          # Paper figure generation scripts
 │
 ├── complexity/                 # Computational complexity analysis
 │   ├── compute_complexity.py
 │   ├── compute_complexity_resnet.py
-│   ├── run_all_complexity.py
-│   └── generate_complexity_table.py
+│   └── run_all_complexity.py
 │
-├── paper/                      # Paper LaTeX source
-│   ├── IEEE-conference-template-062824.tex
-│   ├── IEEE-conference-template-062824.pdf
-│   ├── references.bib
-│   └── TABLE_*.tex
+├── paper/                      # Paper LaTeX source and tables
+│   ├── smart_iqa_paper.tex     # Main paper source
+│   ├── smart_iqa_paper.pdf     # Compiled paper
+│   ├── references.bib          # Bibliography
+│   ├── IEEEtran.cls            # IEEE template class
+│   └── table_*.tex             # LaTeX tables
 │
 ├── paper_figures/              # Generated figures for paper
-├── checkpoints/                # Trained model checkpoints
-├── logs/                       # Training logs
-├── pretrained/                 # Pretrained models
+│   ├── attention/              # Attention visualizations
+│   └── *.pdf/*.png             # All paper figures
+│
+├── checkpoints/                # Trained model checkpoints (not tracked)
+├── logs/                       # Training logs (not tracked)
+├── pretrained/                 # Pretrained Swin models (not tracked)
 │
 ├── requirements.txt            # Python dependencies
 ├── LICENSE                     # MIT License
@@ -423,38 +419,6 @@ SMART-IQA is guided by three core design principles:
 1. **Global Context First**: Transformer self-attention addresses CNNs' local receptive field limitation for holistic quality perception
 2. **Preserving Spatial Structure**: Maintaining 7×7 spatial grids enables localization of non-uniform authentic distortions
 3. **Dynamic Weighting**: Content-aware feature fusion mimics human visual inspection strategies
-
----
-
-## 📖 Citation
-
-If you find this work useful for your research, please cite:
-
-```bibtex
-@article{chen2024smartiqa,
-  title={SMART-IQA: Swin Multi-scale Attention-guided Regression Transformer for Blind Image Quality Assessment},
-  author={Chen, Nuoyan},
-  journal={arXiv preprint},
-  year={2024}
-}
-```
-
-**Related Work**:
-```bibtex
-@inproceedings{su2020hyperiq,
-  title={Blindly Assess Image Quality in the Wild Guided by a Self-Adaptive Hyper Network},
-  author={Su, Shaolin and Yan, Qingsen and Zhu, Yu and Zhang, Cheng and Ge, Xin and Sun, Jinqiu and Zhang, Yanning},
-  booktitle={CVPR},
-  year={2020}
-}
-
-@inproceedings{liu2021swin,
-  title={Swin Transformer: Hierarchical Vision Transformer using Shifted Windows},
-  author={Liu, Ze and Lin, Yutong and Cao, Yue and Hu, Han and Wei, Yixuan and Zhang, Zheng and Lin, Stephen and Guo, Baining},
-  booktitle={ICCV},
-  year={2021}
-}
-```
 
 ---
 
