@@ -1,7 +1,7 @@
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts
 
-\usepackage[nospace,sort&compress]{cite}
+\usepackage[nospace,compress]{cite}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
 \usepackage{graphicx}
@@ -440,11 +440,14 @@ This section provides comprehensive specifications for all SMART-IQA model varia
 
 \subsection{Design Rationale}
 
-\textbf{Why 4 Stages?} The 4-stage hierarchical design captures features at different semantic levels: Stage 1 focuses on low-level textures and local patterns critical for detecting compression artifacts and noise; Stages 2-3 extract mid-level structures important for understanding blur and distortion geometry; Stage 4 captures high-level semantic content that provides context for quality assessment. Ablation studies (Section~\ref{sec:ablation}) confirm that all four stages contribute complementarily to final performance.
+\subsubsection{Why a 4-Stage Hierarchy?} 
+The 4-stage hierarchical design is crucial for capturing features at different semantic levels: Stage 1 focuses on low-level textures and local patterns critical for detecting compression artifacts and noise; Stages 2-3 extract mid-level structures important for understanding blur and distortion geometry; Stage 4 captures high-level semantic content that provides context for quality assessment. Ablation studies (Section~\ref{sec:ablation}) confirm that all four stages contribute complementarily to final performance, with each stage addressing distinct aspects of image quality perception.
 
-\textbf{Why Unified Resolution $7 \times 7$?} The AFA module unifies all features to $7 \times 7$ spatial resolution, which is the native resolution of Stage 4 features from Swin Transformer. This choice: (1) avoids lossy downsampling of the most semantic features; (2) provides sufficient spatial detail (49 locations) for location-aware quality prediction; (3) balances computational cost with representational capacity. Using larger resolutions (e.g., $14 \times 14$) would quadruple the feature dimensionality without significant accuracy gains based on our preliminary experiments.
+\subsubsection{Why a Unified $7 \times 7$ Resolution?}
+The AFA module unifies all features to a $7 \times 7$ spatial resolution, which is the native resolution of Stage 4 features from Swin Transformer. This choice is motivated by three factors: (1) it avoids lossy downsampling of the most critical semantic features from Stage 4; (2) it provides sufficient spatial detail (49 locations) for localizing distortions; and (3) it strikes an optimal balance between computational cost and representational capacity. Using larger resolutions (e.g., $14 \times 14$) would quadruple the feature dimensionality without significant accuracy gains based on our preliminary experiments.
 
-\textbf{Why Channel Dimension 512?} After experimentation with $\{256, 512, 1024\}$, we found 512 provides the best balance: 256 channels under-represent the multi-scale information, while 1024 channels lead to overfitting on KonIQ-10k without improving cross-dataset generalization. The unified 512-dimensional features from 4 stages result in a 2048-dimensional concatenated feature vector ($512 \times 4$), which is then processed by channel attention.
+\subsubsection{Why a 512-Channel Fusion Dimension?}
+After experimenting with $\{256, 512, 1024\}$, we identified 512 as the optimal channel dimension for feature fusion. This provides the best balance: 256 channels under-represent the multi-scale information, while 1024 channels lead to overfitting on KonIQ-10k without improving cross-dataset generalization. The unified 512-dimensional features from 4 stages result in a 2048-dimensional concatenated feature vector ($512 \times 4$), which is then processed by channel attention to dynamically emphasize the most relevant scales for each image.
 
 \subsection{Complete Hyperparameter Configuration}
 
