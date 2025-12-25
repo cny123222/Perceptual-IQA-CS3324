@@ -99,4 +99,4 @@ paper/*.synctex.gz
 
 # Complexity analysis results
 complexity/*.log
-complexity/*.md
+complexity/*.mdcheckpoints
