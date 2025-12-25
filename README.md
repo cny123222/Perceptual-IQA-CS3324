@@ -112,12 +112,8 @@ For cross-dataset generalization experiments:
 All default parameters are pre-configured for the best model. Simply run:
 
 ```bash
-# Method 1: Direct script execution (recommended)
 cd /root/Perceptual-IQA-CS3324
 python scripts/train_smart_iqa.py
-
-# Method 2: Using the reproduction script
-bash REPRODUCE_BEST_MODEL.sh
 ```
 
 **Expected Results**: SRCC ≈ 0.9378, PLCC ≈ 0.9485 at Epoch 8
