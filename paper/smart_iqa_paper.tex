@@ -182,7 +182,7 @@ We report Spearman's Rank Correlation Coefficient (SRCC) and Pearson Linear Corr
 
 \textbf{Network Architecture:} We implement SMART-IQA using PyTorch with Swin Transformer pretrained on ImageNet-21K as initialization. We evaluate three model variants (Swin-Tiny, Swin-Small, Swin-Base) with $K=4$ hierarchical stages. The AFA module unifies features to $7 \times 7$ spatial resolution with 512 channels. The HyperNetwork generates content-adaptive parameters for the TargetNetwork based on the deepest semantic features (see Appendix~A for detailed implementation). Complete architectural specifications and design rationale are provided in Appendix~B.
 
-\textbf{Training Strategy:} We employ AdamW optimizer with a two-tier learning rate strategy: $\eta_{\text{backbone}} = 5 \times 10^{-7}$ for the pretrained Swin Transformer backbone and $\eta_{\text{other}} = 5 \times 10^{-6}$ for newly introduced modules (10$\times$ difference). This learning rate is 200$\times$ smaller than typical CNN learning rates and was determined through extensive sensitivity analysis (Appendix~C.1). We apply stochastic depth (drop path rate 0.2) to Swin Transformer blocks and dropout (rate 0.3) to fully connected layers for regularization. The model is trained for 10 epochs with batch size 96, showing stable convergence without overfitting (detailed training dynamics in Appendix~C.2).
+\textbf{Training Strategy:} We employ AdamW optimizer with a two-tier learning rate strategy: $\eta_{\text{backbone}} = 5 \times 10^{-7}$ for the pretrained Swin Transformer backbone and $\eta_{\text{other}} = 5 \times 10^{-6}$ for newly introduced modules (10$\times$ difference). This learning rate is 200$\times$ smaller than typical CNN learning rates and was determined through extensive sensitivity analysis (Appendix~C.1). We apply model-specific regularization: stochastic depth (drop path rate 0.2--0.3) to Swin Transformer blocks and dropout (rate 0.3--0.4) to fully connected layers, with stronger regularization for larger models. The model is trained for 10 epochs with batch size 32, showing stable convergence without overfitting (detailed training dynamics in Appendix~C.2).
 
 \textbf{Data Augmentation and Inference:} During training, we randomly crop $224 \times 224$ patches from input images. During inference, we extract 20 non-overlapping patches from each test image and average their predicted scores to obtain the final image-level quality assessment. Training takes approximately 1.7 hours for 10 epochs on NVIDIA GPUs. Figure \ref{fig:training_curves} shows the training process of our best model, demonstrating stable convergence at Epoch 8 with SRCC of 0.9378 and PLCC of 0.9485, without overfitting.
 
@@ -420,7 +420,7 @@ This section provides comprehensive specifications for all SMART-IQA model varia
             \item Transformer block depths: [2, 2, 18, 2] across 4 stages
             \item Number of attention heads: [4, 8, 16, 32] across 4 stages
             \item Window size: $7 \times 7$ for local attention
-            \item Drop path rate: 0.2 (stochastic depth regularization)
+            \item Drop path rate: 0.2 (Tiny), 0.25 (Small), 0.3 (Base) for stochastic depth regularization
         \end{itemize}
     \item \textit{Adaptive Feature Aggregation:} $H_{\text{target}} = W_{\text{target}} = 7$, $C_{\text{unified}} = 512$
     \item \textit{Channel Attention:} Hidden dimension $d_{\text{hidden}} = 128$, 4 attention weights for 4 stages
@@ -476,7 +476,7 @@ Table~\ref{tab:training_log} presents the epoch-wise training log of our best mo
 
 \textbf{Rapid Initial Convergence:} The model achieves SRCC $> 0.90$ within the first epoch, demonstrating the effectiveness of ImageNet-21K pre-trained Swin Transformer weights for transfer learning. This rapid convergence validates our hypothesis that hierarchical vision transformers pre-trained on large-scale image classification can effectively initialize IQA models.
 
-\textbf{Consistent Improvement:} From Epoch 1 to Epoch 8, both training and test SRCC increase monotonically (0.9013 $\rightarrow$ 0.9378 on test set), with test performance closely tracking training performance. This indicates healthy learning dynamics without significant overfitting, which we attribute to: (1) appropriate regularization (drop path rate 0.2, dropout 0.3); (2) moderate training epochs (10 epochs); (3) conservative learning rate that avoids disrupting pre-trained features.
+\textbf{Consistent Improvement:} From Epoch 1 to Epoch 8, both training and test SRCC increase monotonically (0.9013 $\rightarrow$ 0.9378 on test set), with test performance closely tracking training performance. This indicates healthy learning dynamics without significant overfitting, which we attribute to: (1) appropriate regularization (drop path rate 0.3, dropout 0.4 for Base model); (2) moderate training epochs (10 epochs); (3) conservative learning rate that avoids disrupting pre-trained features.
 
 \textbf{Peak Performance:} The best test SRCC of 0.9378 (PLCC 0.9485) is achieved at Epoch 8. Performance plateaus in Epochs 9-10, suggesting that the model has converged and additional training would not yield further improvements. The final training SRCC of 0.9389 is only 0.0011 higher than test SRCC, indicating excellent generalization with minimal train-test gap.
 

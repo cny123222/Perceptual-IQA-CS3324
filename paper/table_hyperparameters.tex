@@ -27,17 +27,17 @@
 & Optimizer & AdamW & AdamW & AdamW \\
 & Learning Rate (Backbone) & $5\times10^{-7}$ & $5\times10^{-7}$ & $5\times10^{-7}$ \\
 & Learning Rate (Others) & $5\times10^{-6}$ & $5\times10^{-6}$ & $5\times10^{-6}$ \\
-& Weight Decay & 0.0001 & 0.0001 & 0.0001 \\
+& Weight Decay & 0.0002 & 0.0002 & 0.0002 \\
 & Batch Size & 32 & 32 & 32 \\
 & Epochs & 10 & 10 & 10 \\
 & Loss Function & L1 (MAE) & L1 (MAE) & L1 (MAE) \\
-& Drop Path Rate & 0.2 & 0.2 & 0.2 \\
-& Dropout Rate & 0.3 & 0.3 & 0.3 \\
+& Drop Path Rate & 0.2 & 0.25 & 0.3 \\
+& Dropout Rate & 0.3 & 0.35 & 0.4 \\
 & Gradient Clipping & None & None & None \\
 \hline
 \multicolumn{5}{l}{\textbf{Data Augmentation}} \\
-& Training Patches per Image & 25 & 25 & 25 \\
-& Test Patches per Image & 25 & 25 & 25 \\
+& Training Patches per Image & 20 & 20 & 20 \\
+& Test Patches per Image & 20 & 20 & 20 \\
 & Random Horizontal Flip & \checkmark & \checkmark & \checkmark \\
 & Random Crop & \checkmark & \checkmark & \checkmark \\
 & Resize & $(512, 384)$ & $(512, 384)$ & $(512, 384)$ \\
