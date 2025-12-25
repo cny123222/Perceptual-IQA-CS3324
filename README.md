@@ -42,7 +42,7 @@ SMART-IQA extends HyperIQA's content-adaptive paradigm with three key innovation
 2. **Adaptive Feature Aggregation (AFA)**: Preserves spatial structure (7×7 grid) while unifying multi-scale features, enabling localization of non-uniform distortions
 3. **Channel Attention Mechanism**: Dynamically weights feature hierarchies based on image content—low-level textures for distorted images, high-level semantics for pristine ones
 
-![Architecture](paper_figures/architecture_new.png)
+![Architecture](paper_figures/architecture_new2.png)
 
 ---
 
