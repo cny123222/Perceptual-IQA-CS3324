@@ -65,7 +65,7 @@ Extensive experiments on KonIQ-10k demonstrate that SMART-IQA achieves state-of-
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=0.95\textwidth]{../paper_figures/architecture_new.png}
+\includegraphics[width=0.95\textwidth]{../paper_figures/architecture_new2.png}
 \caption{Architecture of SMART-IQA. The pipeline consists of: (1) Swin Transformer backbone with $K$ hierarchical stages extracting multi-scale features $\{F^1, F^2, \ldots, F^K\}$ with progressively decreasing spatial resolutions and increasing channel dimensions, (2) Adaptive Feature Aggregation (AFA) module that unifies spatial dimensions through adaptive pooling and $1\times1$ convolution, producing aligned features $\{F^1_{\text{pool}}, F^2_{\text{pool}}, \ldots, F^{K-1}_{\text{pool}}\}$ at target resolution $H_{\text{target}} \times W_{\text{target}}$, (3) Channel Attention Fusion module that uses the deepest feature $F^K$ to generate attention weights $\alpha = \{\alpha_1, \alpha_2, \ldots, \alpha_K\}$ via global pooling and FC layers, dynamically weighting multi-scale features based on content, (4) HyperNet that generates dynamic parameters $\theta_x = \{W_1, b_1, W_2, b_2\}$ for the TargetNet based on $F^K$, and (5) TargetNet that predicts the final quality score $q$ using the attention-weighted feature vector $v_x$ and content-adaptive parameters $\theta_x$. The orange-highlighted attention module enables content-aware feature fusion, while the red dashed arrows indicate dynamic weight generation. In our implementation, we use $K=4$ stages (see Section 3.3 for details).}
 \label{fig:architecture}
 \end{figure*}
