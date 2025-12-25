@@ -1,15 +1,16 @@
-\begin{table}[!t]
+\begin{table*}[!t]
 \centering
-\caption{Computational Complexity Comparison}
+\caption{Computational Complexity Comparison across Model Variants}
 \label{tab:complexity}
-\begin{tabular}{lcccc}
+\begin{tabular}{lccccccc}
 \toprule
-\textbf{Model} & \textbf{Params (M)} & \textbf{FLOPs (G)} & \textbf{Time (ms)} & \textbf{FPS} \\
+\textbf{Model} & \textbf{Params (M)} & \textbf{FLOPs (G)} & \textbf{Inference Time (ms)} & \textbf{Throughput (FPS)} & \textbf{SRCC} & \textbf{PLCC} & \textbf{Relative Speedup} \\
 \midrule
-HyperIQA (ResNet50) & 27.38 & 4.33 & 3.12 & 320.5 \\
-SMART-Tiny (Swin-T) & 29.52 & 4.47 & 6.00 & 166.7 \\
-SMART-Small (Swin-S) & 50.84 & 8.65 & 10.62 & 94.2 \\
-SMART-Base (Swin-B) & 89.11 & 15.28 & 10.06 & 99.4 \\
+HyperIQA (ResNet50) & 27.38 & 4.33 & 3.12 & 320.5 & 0.890$^*$ & 0.910$^*$ & 1.00$\times$ \\
+SMART-Tiny (Swin-T) & 29.52 & 4.47 & 6.00 & 166.7 & 0.9249 & 0.9360 & 0.52$\times$ \\
+SMART-Small (Swin-S) & 50.84 & 8.65 & 10.62 & 94.2 & 0.9338 & 0.9455 & 0.29$\times$ \\
+SMART-Base (Swin-B) & 89.11 & 15.28 & 10.06 & 99.4 & 0.9378 & 0.9485 & 0.31$\times$ \\
 \bottomrule
+\multicolumn{8}{l}{\small $^*$Estimated performance from literature. All measurements on NVIDIA RTX 5090, input resolution 224$\times$224, FP32 precision.}
 \end{tabular}
-\end{table}
+\end{table*}
