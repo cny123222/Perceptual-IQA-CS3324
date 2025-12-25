@@ -5,23 +5,22 @@
 
 python scripts/train_smart_iqa.py \
     --dataset koniq-10k \
-    --koniq_path ./koniq-10k \
     --model_size base \
-    --use_attention \
+    --attention_fusion \
     --epochs 10 \
     --lr 5e-7 \
-    --lr_ratio 10 \
     --batch_size 32 \
     --weight_decay 0.0002 \
-    --drop_path_rate 0.3 \
+    --drop_path_rate 0.2 \
     --test_patch_num 20 \
     --train_patch_num 20 \
     --patch_size 224 \
-    --loss_type mae \
+    --loss_type l1 \
     --ranking_loss_alpha 0.0 \
-    --lr_scheduler_type cosine \
-    --use_lr_scheduler \
-    --test_random_crop
+    --lr_scheduler cosine \
+    --test_random_crop \
+    --no_color_jitter \
+    --no_spaq
 
 # 关键参数说明（从真实训练日志提取）:
 # - Batch Size: 32
